@@ -1,11 +1,11 @@
-package my.project.user;
+package my.project.application_user;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class UserApplication {
+public class ApplicationUserApplication {
     public static void main(String[] args) {
-        SpringApplication.run(UserApplication.class, args);
+        SpringApplication.run(ApplicationUserApplication.class, args);
     }
 }

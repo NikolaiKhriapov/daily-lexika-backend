@@ -1,0 +1,18 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: fraud-check
+  datasource:
+    url: jdbc:postgresql://localhost:5432/fraud-check
+    username: 'postgres'
+    password: '1478236950'
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: 'true'
+    hibernate:
+      ddl-auto: update
+    show-sql: 'true'

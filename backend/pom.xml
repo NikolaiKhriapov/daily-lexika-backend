@@ -18,8 +18,9 @@
 	<name>backend</name>
 
 	<modules>
+		<module>application-user</module>
+		<module>fraud-check</module>
 		<module>vocabulary</module>
-		<module>user</module>
 	</modules>
 
 	<properties>
