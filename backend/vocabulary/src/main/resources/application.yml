@@ -4,6 +4,26 @@ server:
 spring:
   application:
     name: vocabulary
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vocabulary
+    username: 'postgres'
+    password: '1478236950'
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: 'true'
+        show_sql: 'false'
+
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: 'true'
+
+cors:
+  allowed-origins: "*"
+  allowed-methods: "*"
+  allowed-headers: "*"
+  exposed-headers: "*"
 
 eureka:
   client:

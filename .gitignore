@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+/frontend/node_modules/
+/backend/vocabulary/src/main/resources/static/data/Data.xlsx
