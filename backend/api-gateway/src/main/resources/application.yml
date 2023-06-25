@@ -10,7 +10,7 @@ spring:
         - id: application-user
           uri: lb://APPLICATION-USER
           predicates:
-            - Path=/api/v1/application-users/**
+            - Path=/api/v1/auth/**
         - id: vocabulary
           uri: lb://VOCABULARY
           predicates:

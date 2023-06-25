@@ -17,12 +17,6 @@ spring:
     hibernate:
       ddl-auto: create-drop
 
-cors:
-  allowed-origins: "*"
-  allowed-methods: "*"
-  allowed-headers: "*"
-  exposed-headers: "*"
-
 eureka:
   client:
     service-url:

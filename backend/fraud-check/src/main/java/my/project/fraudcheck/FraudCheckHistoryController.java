@@ -17,4 +17,3 @@ public class FraudCheckHistoryController {
         return new FraudCheckResponse(isFraudster);
     }
 }
-

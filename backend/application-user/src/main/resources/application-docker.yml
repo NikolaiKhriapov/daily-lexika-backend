@@ -19,6 +19,12 @@ spring:
   rabbitmq:
     addresses: rabbitmq:5672
 
+cors:
+  allowed-origins: "*"
+  allowed-methods: "*"
+  allowed-headers: "*"
+  exposed-headers: "*"
+
 eureka:
   client:
     service-url:
