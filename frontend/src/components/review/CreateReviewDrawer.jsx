@@ -43,7 +43,7 @@ const CreateReviewDrawer = ({fetchAllWordPacks, name, description, listOfWordId}
                 <DrawerFooter>
                     <Button
                         leftIcon={<CloseIcon/>}
-                        colorScheme={"teal"}
+                        colorScheme={"gray"}
                         onClick={onClose}
                     >
                         Close

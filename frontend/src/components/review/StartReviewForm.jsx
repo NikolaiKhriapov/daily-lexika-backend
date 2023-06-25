@@ -61,44 +61,42 @@ const CreateReviewForm = ({ reviewId }) => {
     };
 
     return (
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
-            <div>
-                <ReviewWordCard reviewWord={reviewWord}/>
-                <Stack spacing={2} align={'center'} mb={30}>
-                    <Flex>
-                        <Button
-                            bg={"grey"}
-                            color={"white"}
-                            rounded={"base"}
-                            size={"lg"}
-                            _hover={{
-                                bg: 'red',
-                                transform: 'translateY(-2px)',
-                                boxShadow: 'lg'
-                            }}
-                            onClick={pressForgotButton}
-                        >
-                            Forgot
-                        </Button>
-                        <Button
-                            ml={5}
-                            bg={"grey"}
-                            color={"white"}
-                            rounded={"base"}
-                            size={"lg"}
-                            _hover={{
-                                bg: 'green',
-                                transform: 'translateY(-2px)',
-                                boxShadow: 'lg'
-                            }}
-                            onClick={pressRememberedButton}
-                        >
-                            Remembered
-                        </Button>
-                    </Flex>
-                </Stack>
-            </div>
-        </div>
+        <>
+            <ReviewWordCard reviewWord={reviewWord} />
+            <Stack spacing={2} align={"center"} mb={30}>
+                <Flex>
+                    <Button
+                        bg={"grey"}
+                        color={"white"}
+                        rounded={"base"}
+                        size={"lg"}
+                        _hover={{
+                            bg: "red",
+                            transform: "translateY(-2px)",
+                            boxShadow: "lg"
+                        }}
+                        onClick={pressForgotButton}
+                    >
+                        Forgot
+                    </Button>
+                    <Button
+                        ml={5}
+                        bg={"grey"}
+                        color={"white"}
+                        rounded={"base"}
+                        size={"lg"}
+                        _hover={{
+                            bg: "green",
+                            transform: "translateY(-2px)",
+                            boxShadow: "lg"
+                        }}
+                        onClick={pressRememberedButton}
+                    >
+                        Remembered
+                    </Button>
+                </Flex>
+            </Stack>
+        </>
     );
 };
 

@@ -1,9 +1,7 @@
 import {
-    Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerFooter, DrawerOverlay, useDisclosure
+    Button, Modal, ModalBody, ModalContent, ModalFooter, ModalOverlay, useDisclosure
 } from "@chakra-ui/react";
 import StartReviewForm from "./StartReviewForm.jsx";
-
-const CloseIcon = () => "x";
 
 const StartReviewDrawer = ({reviewId}) => {
 
@@ -22,28 +20,24 @@ const StartReviewDrawer = ({reviewId}) => {
         >
             Start
         </Button>
-        <Drawer isOpen={isOpen} onClose={onClose} size={"full"}>
-            <DrawerOverlay/>
-            <DrawerContent>
-                <DrawerCloseButton/>
-
-                <DrawerBody>
+        <Modal isOpen={isOpen} onClose={onClose} size={"6xl"} isCentered>
+            <ModalOverlay/>
+            <ModalContent maxH="80vh" minH="80vh">
+                <ModalBody display="flex" flexDirection="column" justifyContent="center">
                     <StartReviewForm
                         reviewId={reviewId}
                     />
-                </DrawerBody>
-
-                <DrawerFooter>
+                </ModalBody>
+                <ModalFooter>
                     <Button
-                        leftIcon={<CloseIcon/>}
-                        colorScheme={"teal"}
+                        colorScheme={"gray"}
                         onClick={onClose}
                     >
                         Close
                     </Button>
-                </DrawerFooter>
-            </DrawerContent>
-        </Drawer>
+                </ModalFooter>
+            </ModalContent>
+        </Modal>
     </>
 }
 

@@ -66,7 +66,7 @@ const ReviewWordPackDrawer = ({allWordsForWordPack, name, description, listOfWor
                 <DrawerFooter>
                     <Button
                         leftIcon={<CloseIcon/>}
-                        colorScheme={"teal"}
+                        colorScheme={"gray"}
                         onClick={onClose}
                     >
                         Close
