@@ -39,6 +39,8 @@ public class ApplicationUser implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    private String profilePhoto;
+
     @Enumerated(EnumType.STRING)
     private ApplicationUserRole applicationUserRole;
 

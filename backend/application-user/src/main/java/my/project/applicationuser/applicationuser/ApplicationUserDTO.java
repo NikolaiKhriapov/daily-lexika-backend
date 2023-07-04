@@ -9,6 +9,7 @@ public record ApplicationUserDTO(
         String email,
         String password,
         Gender gender,
+        byte[] profilePhoto,
         List<String> roles
 ) {
 }
