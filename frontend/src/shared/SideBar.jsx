@@ -177,8 +177,8 @@ const MobileNav = ({onOpen, ...rest}) => {
                             _focus={{boxShadow: 'none'}}>
                             <HStack>
                                 <Avatar
-                                    size={'sm'}
-                                    src={account.profilePhoto} //TODO: finish
+                                    size={'md'}
+                                    src={`data:image/png;base64,${account.profilePhoto}`}
                                 />
                                 <VStack
                                     display={{base: 'none', md: 'flex'}}
