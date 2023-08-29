@@ -24,7 +24,6 @@ public class ReviewService {
     private final ReviewMapper reviewMapper;
     private final WordMapper wordMapper;
     private final MessageSource messageSource;
-    private final WordPackService wordPackService;
 
     @Transactional
     public List<ReviewDTO> getAllReviews() {
@@ -60,39 +59,38 @@ public class ReviewService {
 
     //TODO::: test
     @Transactional
-    public void considerAnswer(Long reviewId, String answer) {
-        Review review = getReview(reviewId);
-        List<Word> listOfWords = new ArrayList<>(review.getListOfWords());
+    public void processReviewAction(Long reviewId, String answer) {
+        if (answer != null) {
+            Review review = getReview(reviewId);
+            List<Word> listOfWords = new ArrayList<>(review.getListOfWords());
 
-        Word thisWord = listOfWords.get(0);
-        thisWord.setOccurrence(thisWord.getOccurrence() + 1);
+            Word thisWord = listOfWords.get(0);
+            thisWord.setOccurrence(thisWord.getOccurrence() + 1);
 
-        if (thisWord.getStatus().equals(Status.NEW)) {
-            thisWord.setStatus(Status.IN_REVIEW);
+            if (thisWord.getStatus().equals(Status.NEW)) {
+                thisWord.setStatus(Status.IN_REVIEW);
+            }
+
+            if (answer.equals("yes")) {
+                updateWordForYesAnswer(thisWord, listOfWords);
+            }
+            if (answer.equals("no")) {
+                updateWordForNoAnswer(thisWord, listOfWords);
+            }
+
+            review.setListOfWords(listOfWords);
+            reviewRepository.save(review);
         }
-
-        if (answer.equals("yes")) {
-            updateWordForYesAnswer(thisWord, listOfWords);
-        }
-        if (answer.equals("no")) {
-            updateWordForNoAnswer(thisWord, listOfWords);
-        }
-
-        review.setListOfWords(listOfWords);
-        reviewRepository.save(review);
     }
 
     @Transactional
     public WordDTO showOneReviewWord(Long reviewId) {
         Review review = getReview(reviewId);
-
-        WordDTO wordDTO = null;
         if (!review.getListOfWords().isEmpty()) {
             Word word = review.getListOfWords().get(0);
-            wordDTO = wordMapper.toDTO(word);
+            return wordMapper.toDTO(word);
         }
-
-        return wordDTO;
+        return null;
     }
 
     private static void updateWordForNoAnswer(Word thisWord, List<Word> listOfWords) {
@@ -116,7 +114,7 @@ public class ReviewService {
             } else if (thisWord.getCurrentStreak() < 3) {
                 thisWord.setCurrentStreak(thisWord.getCurrentStreak() + 1);
             }
-            Collections.rotate(listOfWords, -1);
+            Collections.rotate(listOfWords, -1); // Rotate the list
         }
     }
 }

@@ -40,24 +40,17 @@ export const deleteReview = async (reviewId) => {
     }
 }
 
-export const startReview = async (reviewId) => {
+export const processReviewAction = async (reviewId, answer = null) => {
     try {
-        return await axios.get(
-            `${import.meta.env.VITE_API_BASE_URL}/api/v1/vocabulary/reviews/${reviewId}/start`,
-            getAuthConfig()
-        )
+        let url = `${import.meta.env.VITE_API_BASE_URL}/api/v1/vocabulary/reviews/${reviewId}/action`;
+
+        if (answer !== null) {
+            url += `?answer=${answer}`;
+        }
+
+        return await axios.get(url, getAuthConfig());
     } catch (error) {
         throw error;
     }
 }
 
-export const nextReview = async (reviewId, answer) => {
-    try {
-        return await axios.get(
-            `${import.meta.env.VITE_API_BASE_URL}/api/v1/vocabulary/reviews/${reviewId}/next?answer=${answer}`,
-            getAuthConfig()
-        )
-    } catch (error) {
-        throw error;
-    }
-}

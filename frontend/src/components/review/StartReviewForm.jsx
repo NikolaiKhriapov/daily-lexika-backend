@@ -1,21 +1,27 @@
-import { useEffect, useState } from "react";
-import { Button, Flex, Stack } from "@chakra-ui/react";
+import {useEffect, useState} from "react";
+import {Button, Flex, Stack, Text} from "@chakra-ui/react";
 
-import { nextReview, startReview } from "../../services/review.js";
-import { errorNotification } from "../../services/notification.js";
+import {processReviewAction} from "../../services/review.js";
+import {errorNotification, successNotification} from "../../services/notification.js";
 
 import ReviewWordCard from "./ReviewWordCard.jsx";
 
-const CreateReviewForm = ({ reviewId }) => {
+const CreateReviewForm = ({reviewId}) => {
     const [reviewWord, setReviewWord] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [isFormVisible, setIsFormVisible] = useState(true); // New state variable
 
-    const fetchStartReview = () => {
+    const fetchReviewAction = (answer) => {
         setLoading(true);
-        startReview(reviewId)
+        processReviewAction(reviewId, answer)
             .then((response) => {
-                setReviewWord(response.data.data.reviewWord);
+                if (response.data.data != null) {
+                    setReviewWord(response.data.data.reviewWord);
+                } else {
+                    successNotification("Review completed successfully", "Review completed successfully")
+                    setIsFormVisible(false);
+                }
             })
             .catch((error) => {
                 setError(error.response.data.message);
@@ -27,42 +33,22 @@ const CreateReviewForm = ({ reviewId }) => {
     };
 
     useEffect(() => {
-        fetchStartReview();
+        fetchReviewAction(null);
     }, [reviewId]);
 
-    const pressRememberedButton = () => {
-        setLoading(true);
-        nextReview(reviewId, "yes")
-            .then((response) => {
-                setReviewWord(response.data.data.reviewWord);
-            })
-            .catch((error) => {
-                setError(error.message);
-                errorNotification(error.code, error.message);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+    const pressButton = (answer) => {
+        fetchReviewAction(answer);
     };
 
-    const pressForgotButton = () => {
-        setLoading(true);
-        nextReview(reviewId, "no")
-            .then((response) => {
-                setReviewWord(response.data.data.reviewWord);
-            })
-            .catch((error) => {
-                setError(error.message);
-                errorNotification(error.code, error.message);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    };
+    if (!isFormVisible) {
+        return (
+            <Text fontSize="xl" textAlign="center" mt={10}>Review completed successfully.</Text>
+        );
+    }
 
     return (
         <>
-            <ReviewWordCard reviewWord={reviewWord} />
+            <ReviewWordCard reviewWord={reviewWord}/>
             <Stack spacing={2} align={"center"} mb={30}>
                 <Flex>
                     <Button
@@ -75,7 +61,8 @@ const CreateReviewForm = ({ reviewId }) => {
                             transform: "translateY(-2px)",
                             boxShadow: "lg"
                         }}
-                        onClick={pressForgotButton}
+                        onClick={() => pressButton("no")}
+                        disabled={loading}
                     >
                         Forgot
                     </Button>
@@ -90,7 +77,8 @@ const CreateReviewForm = ({ reviewId }) => {
                             transform: "translateY(-2px)",
                             boxShadow: "lg"
                         }}
-                        onClick={pressRememberedButton}
+                        onClick={() => pressButton("yes")}
+                        disabled={loading || !reviewWord}
                     >
                         Remembered
                     </Button>

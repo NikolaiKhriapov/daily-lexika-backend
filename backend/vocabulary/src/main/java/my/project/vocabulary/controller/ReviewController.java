@@ -3,6 +3,7 @@ package my.project.vocabulary.controller;
 import lombok.RequiredArgsConstructor;
 import my.project.vocabulary.model.dto.ResponseWrapper;
 import my.project.vocabulary.model.dto.ReviewDTO;
+import my.project.vocabulary.model.dto.WordDTO;
 import my.project.vocabulary.service.ReviewService;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -57,29 +58,22 @@ public class ReviewController {
                         .build());
     }
 
-    @GetMapping("/{reviewId}/start")
-    public ResponseEntity<ResponseWrapper> startReview(@PathVariable("reviewId") Long reviewId) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(ResponseWrapper.builder()
-                        .timeStamp(LocalDateTime.now())
-                        .statusCode(HttpStatus.OK.value())
-                        .message(messageSource.getMessage("response.review.startReview", null, Locale.getDefault()))
-                        .data(Map.of("reviewWord", reviewService.showOneReviewWord(reviewId)))
-                        .build());
-    }
+    @GetMapping("/{reviewId}/action")
+    public ResponseEntity<ResponseWrapper> processReviewAction(
+            @PathVariable("reviewId") Long reviewId,
+            @RequestParam(value = "answer", required = false) String answer
+    ) {
+        reviewService.processReviewAction(reviewId, answer);
 
-    @GetMapping("/{reviewId}/next")
-    public ResponseEntity<ResponseWrapper> nextReview(@PathVariable("reviewId") Long reviewId,
-                                                      @RequestParam(value = "answer") String answer) {
-        reviewService.considerAnswer(reviewId, answer);
+        WordDTO reviewWord = reviewService.showOneReviewWord(reviewId);
+        Map<String, WordDTO> data = (reviewWord != null) ? Map.of("reviewWord", reviewWord) : null;
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResponseWrapper.builder()
                         .timeStamp(LocalDateTime.now())
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage("response.review.startReview", null, Locale.getDefault()))
-                        .data(Map.of("reviewWord", reviewService.showOneReviewWord(reviewId)))
+                        .data(data)
                         .build());
     }
 }
