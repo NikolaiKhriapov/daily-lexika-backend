@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 public class DefaultExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiError> handleException(ResourceNotFoundException e, HttpServletRequest request) {
-        ApiError apiError = new ApiError(
+    public ResponseEntity<ApiErrorWrapper> handleException(ResourceNotFoundException e, HttpServletRequest request) {
+        ApiErrorWrapper apiErrorWrapper = new ApiErrorWrapper(
                 request.getRequestURI(),
                 e.getMessage(),
                 HttpStatus.NOT_FOUND.value(),
@@ -21,12 +21,12 @@ public class DefaultExceptionHandler {
                 LocalDateTime.now()
         );
 
-        return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(apiErrorWrapper, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleException(Exception e, HttpServletRequest request) {
-        ApiError apiError = new ApiError(
+    public ResponseEntity<ApiErrorWrapper> handleException(Exception e, HttpServletRequest request) {
+        ApiErrorWrapper apiErrorWrapper = new ApiErrorWrapper(
                 request.getRequestURI(),
                 e.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
@@ -34,6 +34,6 @@ public class DefaultExceptionHandler {
                 LocalDateTime.now()
         );
 
-        return new ResponseEntity<>(apiError, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(apiErrorWrapper, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -6,20 +6,20 @@ const AuthContext = createContext({});
 
 const AuthProvider = ({children}) => {
 
-    const [applicationUser, setApplicationUser] = useState(null);
+    const [user, setUser] = useState(null);
 
-    const setApplicationUserFromToken = () => {
+    const setUserFromToken = () => {
         let token = localStorage.getItem("access_token");
         if (token) {
             token = jwtDecode(token);
-            setApplicationUser({
+            setUser({
                 username: token.sub,
             })
         }
     }
 
     useEffect(() => {
-        setApplicationUserFromToken();
+        setUserFromToken();
     }, [])
 
     const login = async (usernameAndPassword) => {
@@ -30,7 +30,7 @@ const AuthProvider = ({children}) => {
 
                 const decodedToken = jwtDecode(jwtToken);
 
-                setApplicationUser({
+                setUser({
                     username: decodedToken.sub,
                 })
                 resolve(response);
@@ -42,10 +42,10 @@ const AuthProvider = ({children}) => {
 
     const logout = () => {
         localStorage.removeItem("access_token");
-        setApplicationUser(null);
+        setUser(null);
     }
 
-    const isApplicationUserAuthenticated = () => {
+    const isUserAuthenticated = () => {
         const token = localStorage.getItem("access_token");
         if (!token) {
             return false;
@@ -60,11 +60,11 @@ const AuthProvider = ({children}) => {
 
     return (
         <AuthContext.Provider value={{
-            applicationUser,
+            user,
             login,
             logout,
-            isApplicationUserAuthenticated,
-            setApplicationUserFromToken
+            isUserAuthenticated,
+            setUserFromToken
         }}>
             {children}
         </AuthContext.Provider>

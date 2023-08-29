@@ -5,14 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>my.project</groupId>
-    <artifactId>chinese-learning-app-backend</artifactId>
+    <artifactId>backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>backend</name>
 
     <modules>
-        <module>application-user</module>
+        <module>user</module>
         <module>fraud-check</module>
         <module>vocabulary</module>
         <module>eureka-server</module>

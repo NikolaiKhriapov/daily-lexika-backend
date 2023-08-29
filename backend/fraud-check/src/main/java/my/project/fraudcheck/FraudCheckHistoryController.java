@@ -11,9 +11,9 @@ public class FraudCheckHistoryController {
 
     private final FraudCheckHistoryService fraudCheckHistoryService;
 
-    @GetMapping("/{applicationUserId}")
-    public FraudCheckResponse isFraudster(@PathVariable("applicationUserId") Long applicationUserId) {
-        boolean isFraudster = fraudCheckHistoryService.isFraudster(applicationUserId);
+    @GetMapping("/{userId}")
+    public FraudCheckResponse isFraudster(@PathVariable("userId") Long userId) {
+        boolean isFraudster = fraudCheckHistoryService.isFraudster(userId);
         return new FraudCheckResponse(isFraudster);
     }
 }

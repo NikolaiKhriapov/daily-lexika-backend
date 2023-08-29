@@ -1,10 +1,10 @@
 import axios from "axios";
 
-export const register = async (applicationUser) => {
+export const register = async (user) => {
     try {
         return await axios.post(
             `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/register`,
-            applicationUser
+            user
         )
     } catch (error) {
         throw error;

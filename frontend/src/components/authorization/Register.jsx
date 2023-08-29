@@ -2,14 +2,14 @@ import {Flex, Heading, Image, Link, Stack} from "@chakra-ui/react";
 import {useAuth} from "../context/AuthContext.jsx";
 import {useNavigate} from "react-router-dom";
 import {useEffect} from "react";
-import CreateApplicationUserForm from "./RegisterForm.jsx";
+import CreateUserForm from "./RegisterForm.jsx";
 
 const Register = () => {
-    const {applicationUser, setApplicationUserFromToken} = useAuth();
+    const {user, setUserFromToken} = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (applicationUser) {
+        if (user) {
             navigate("/reviews");
         }
     })
@@ -19,10 +19,10 @@ const Register = () => {
             <Flex p={8} flex={1} align={'center'} justify={'center'}>
                 <Stack spacing={4} w={'full'} maxW={'md'}>
                     <Heading fontSize={'2xl'}>Register account</Heading>
-                    <CreateApplicationUserForm
+                    <CreateUserForm
                         onSuccess={(token) => {
                             localStorage.setItem("access_token", token);
-                            setApplicationUserFromToken();
+                            setUserFromToken();
                             navigate("/reviews");
                         }}
                     />

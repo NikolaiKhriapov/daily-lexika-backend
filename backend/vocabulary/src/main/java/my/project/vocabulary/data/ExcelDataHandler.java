@@ -1,11 +1,11 @@
 package my.project.vocabulary.data;
 
 import lombok.RequiredArgsConstructor;
-import my.project.vocabulary.word.Word;
-import my.project.vocabulary.word.WordRepository;
-import my.project.vocabulary.wordpack.Category;
-import my.project.vocabulary.wordpack.WordPack;
-import my.project.vocabulary.wordpack.WordPackRepository;
+import my.project.vocabulary.model.entity.Word;
+import my.project.vocabulary.repository.WordRepository;
+import my.project.vocabulary.model.entity.Category;
+import my.project.vocabulary.model.entity.WordPack;
+import my.project.vocabulary.repository.WordPackRepository;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;

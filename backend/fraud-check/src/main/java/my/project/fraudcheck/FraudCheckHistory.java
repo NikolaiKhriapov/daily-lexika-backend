@@ -7,17 +7,17 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity(name = "fraud_check_history")
 public class FraudCheckHistory {
 
     @Id
     @SequenceGenerator(name = "fraud_check_id_sequence", sequenceName = "fraud_check_id_sequence")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "fraud_check_id_sequence")
     private Long id;
-    private Long applicationUserId;
+    private Long userId;
     private Boolean isFraudster;
     private LocalDateTime createdAt;
 }

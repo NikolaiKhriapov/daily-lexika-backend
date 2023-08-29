@@ -8,7 +8,7 @@ import {
 } from 'react-icons/fi';
 import {useAuth} from "../components/context/AuthContext.jsx";
 import {MoonIcon, SunIcon} from "@chakra-ui/icons";
-import {showAccount} from "../services/application-user.js";
+import {showAccount} from "../services/user.js";
 import {errorNotification} from "../services/notification.js";
 
 const LinkItems = [
@@ -106,7 +106,7 @@ const NavItem = ({icon, route, children, ...rest}) => {
 const MobileNav = ({onOpen, ...rest}) => {
 
     const {colorMode, toggleColorMode} = useColorMode();
-    const {logout, applicationUser} = useAuth();
+    const {logout, user} = useAuth();
     const [account, setAccount] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -114,7 +114,7 @@ const MobileNav = ({onOpen, ...rest}) => {
     const fetchAccount = () => {
         setLoading(true);
         showAccount().then(response => {
-            setAccount(response.data.data.applicationUserDTO)
+            setAccount(response.data.data.userDTO)
         }).catch(error => {
             setError((error.response.data.message))
             errorNotification(
@@ -185,7 +185,7 @@ const MobileNav = ({onOpen, ...rest}) => {
                                     alignItems="flex-start"
                                     spacing="1px"
                                     ml="2">
-                                    <Text fontSize="sm">{applicationUser?.username}</Text>
+                                    <Text fontSize="sm">{user?.username}</Text>
                                 </VStack>
                                 <Box display={{base: 'none', md: 'flex'}}>
                                     <FiChevronDown/>

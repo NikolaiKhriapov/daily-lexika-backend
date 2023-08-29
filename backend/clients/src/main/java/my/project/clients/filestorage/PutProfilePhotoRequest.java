@@ -1,7 +1,7 @@
 package my.project.clients.filestorage;
 
 public record PutProfilePhotoRequest(
-        Long applicationUserId,
+        Long userId,
         byte[] fileBytes,
         String originalFileName
 ) {

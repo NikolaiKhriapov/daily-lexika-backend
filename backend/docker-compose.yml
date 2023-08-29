@@ -59,9 +59,9 @@ services:
     depends_on:
       - eureka-server
 
-  application-user:
-    image: kolyakhryapov/chinese-learning-app-backend-application-user:latest
-    container_name: application-user
+  user:
+    image: kolyakhryapov/chinese-learning-app-backend-user:latest
+    container_name: user
     ports:
       - "8081:8081"
     environment:

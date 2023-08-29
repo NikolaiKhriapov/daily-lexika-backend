@@ -11,10 +11,10 @@ public class FraudCheckHistoryService {
 
     private final FraudCheckHistoryRepository fraudCheckHistoryRepository;
 
-    public boolean isFraudster(Long applicationUserId) {
+    public boolean isFraudster(Long userId) {
         FraudCheckHistory fraudCheckHistory = new FraudCheckHistory();
 
-        fraudCheckHistory.setApplicationUserId(applicationUserId);
+        fraudCheckHistory.setUserId(userId);
         fraudCheckHistory.setIsFraudster(false);
         fraudCheckHistory.setCreatedAt(LocalDateTime.now());
 

@@ -30,12 +30,12 @@ public class FileStorageService {
     }
 
     public PutProfilePhotoResponse putProfilePhoto(PutProfilePhotoRequest putProfilePhotoRequest) {
-        Long applicationUserId = putProfilePhotoRequest.applicationUserId();
+        Long userId = putProfilePhotoRequest.userId();
         byte[] fileBytes = putProfilePhotoRequest.fileBytes();
         String originalFileName = putProfilePhotoRequest.originalFileName();
 
-        String profilePhotoDirectory = fileStorageProperties.getProfilePhotoDirectory().formatted(applicationUserId);
-        String profilePhotoName = fileStorageProperties.getProfilePhotoName().formatted(applicationUserId, getFileExtension(originalFileName));
+        String profilePhotoDirectory = fileStorageProperties.getProfilePhotoDirectory().formatted(userId);
+        String profilePhotoName = fileStorageProperties.getProfilePhotoName().formatted(userId, getFileExtension(originalFileName));
 
         putPhoto(profilePhotoDirectory, profilePhotoName, fileBytes);
 

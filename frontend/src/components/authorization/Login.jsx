@@ -84,11 +84,11 @@ const LoginForm = () => {
 }
 
 const Login = () => {
-    const {applicationUser} = useAuth();
+    const {user: user} = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (applicationUser) {
+        if (user) {
             navigate("/reviews");
         }
     })

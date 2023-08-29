@@ -15,8 +15,8 @@ public class NotificationService {
     public void send(NotificationRequest notificationRequest) {
         notificationRepository.save(
                 new Notification(
-                        notificationRequest.toApplicationUserId(),
-                        notificationRequest.toApplicationUserEmail(),
+                        notificationRequest.toUserId(),
+                        notificationRequest.toUserEmail(),
                         "Chinese Learning App",
                         notificationRequest.message(),
                         LocalDateTime.now()

@@ -68,13 +68,13 @@ const RegisterForm = ({onSuccess}) => {
                         )
                         .required('Required'),
                 })}
-                onSubmit={(applicationUser, {setSubmitting}) => {
+                onSubmit={(user, {setSubmitting}) => {
                     setSubmitting(true);
-                    register(applicationUser)
+                    register(user)
                         .then((response) => {
                             successNotification(
-                                "ApplicationUser registered",
-                                `${applicationUser.name} was successfully registered`
+                                "User registered",
+                                `${user.name} was successfully registered`
                             )
                             onSuccess(response.data.data.authenticationResponse.token);
                         }).catch((error) => {
