@@ -8,13 +8,13 @@ import {
 } from 'react-icons/fi';
 import {useAuth} from "../components/context/AuthContext.jsx";
 import {MoonIcon, SunIcon} from "@chakra-ui/icons";
-import {showAccount} from "../services/user.js";
+import {showUserAccount} from "../services/user.js";
 import {errorNotification} from "../services/notification.js";
 
 const LinkItems = [
-    {name: 'Reviews', route: '/reviews', icon: FiMenu},
-    {name: 'WordPacks', route: '/word-packs', icon: FiMenu},
-    {name: 'Account', route: '/account', icon: FiMenu},
+    {name: 'Daily Reviews', route: '/reviews', icon: FiMenu},
+    {name: 'Word Packs', route: '/word-packs', icon: FiMenu},
+    {name: 'Statistics', route: '/statistics', icon: FiMenu},
 ];
 
 export default function SidebarWithHeader({children}) {
@@ -107,14 +107,14 @@ const MobileNav = ({onOpen, ...rest}) => {
 
     const {colorMode, toggleColorMode} = useColorMode();
     const {logout, user} = useAuth();
-    const [account, setAccount] = useState([]);
+    const [userAccount, setUserAccount] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const fetchAccount = () => {
+    const fetchUserAccount = () => {
         setLoading(true);
-        showAccount().then(response => {
-            setAccount(response.data.data.userDTO)
+        showUserAccount().then(response => {
+            setUserAccount(response.data.data.userDTO)
         }).catch(error => {
             setError((error.response.data.message))
             errorNotification(
@@ -127,7 +127,7 @@ const MobileNav = ({onOpen, ...rest}) => {
     }
 
     useEffect(() => {
-        fetchAccount();
+        fetchUserAccount();
     }, [])
 
     return (
@@ -178,7 +178,7 @@ const MobileNav = ({onOpen, ...rest}) => {
                             <HStack>
                                 <Avatar
                                     size={'md'}
-                                    src={`data:image/png;base64,${account.profilePhoto}`}
+                                    src={`data:image/png;base64,${userAccount.profilePhoto}`}
                                 />
                                 <VStack
                                     display={{base: 'none', md: 'flex'}}
@@ -195,9 +195,7 @@ const MobileNav = ({onOpen, ...rest}) => {
                         <MenuList
                             bg={useColorModeValue('white', 'gray.900')}
                             borderColor={useColorModeValue('gray.200', 'gray.700')}>
-                            <MenuItem>Option 1</MenuItem>
-                            <MenuItem>Option 2</MenuItem>
-                            <MenuItem>Option 3</MenuItem>
+                            <MenuItem>Account</MenuItem>
                             <MenuDivider/>
                             <MenuItem onClick={logout}>Log Out</MenuItem>
                         </MenuList>

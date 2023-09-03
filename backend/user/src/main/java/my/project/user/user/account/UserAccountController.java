@@ -20,7 +20,7 @@ public class UserAccountController {
     private final MessageSource messageSource;
 
     @GetMapping
-    public ResponseEntity<ResponseWrapper> showAccount() {
+    public ResponseEntity<ResponseWrapper> showUserAccount() {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResponseWrapper.builder()

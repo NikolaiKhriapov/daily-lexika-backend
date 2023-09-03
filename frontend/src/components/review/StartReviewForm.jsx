@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {Button, Flex, Stack, Text} from "@chakra-ui/react";
 
 import {processReviewAction} from "../../services/review.js";
-import {errorNotification, successNotification} from "../../services/notification.js";
+import {errorNotification} from "../../services/notification.js";
 
 import ReviewWordCard from "./ReviewWordCard.jsx";
 
@@ -19,7 +19,6 @@ const CreateReviewForm = ({reviewId}) => {
                 if (response.data.data != null) {
                     setReviewWord(response.data.data.reviewWord);
                 } else {
-                    successNotification("Review completed successfully", "Review completed successfully")
                     setIsFormVisible(false);
                 }
             })
@@ -42,7 +41,7 @@ const CreateReviewForm = ({reviewId}) => {
 
     if (!isFormVisible) {
         return (
-            <Text fontSize="xl" textAlign="center" mt={10}>Review completed successfully.</Text>
+            <Text fontSize="xl" textAlign="center" mt={10}>Daily Review Complete</Text>
         );
     }
 

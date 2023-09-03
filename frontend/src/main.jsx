@@ -5,7 +5,7 @@ import {createStandaloneToast} from '@chakra-ui/react'
 import {createBrowserRouter, Navigate, RouterProvider} from "react-router-dom";
 import WordPack from "./WordPack.jsx";
 import Review from "./Review.jsx";
-import Account from "./Account.jsx";
+import Statistics from "./Statistics.jsx";
 import Login from "./components/authorization/Login.jsx";
 import AuthProvider from "./components/context/AuthContext.jsx";
 import ProtectedRoute from "./shared/ProtectedRoute.js";
@@ -31,8 +31,8 @@ const router = createBrowserRouter([
         element: <ProtectedRoute><Review/></ProtectedRoute>
     },
     {
-        path: "/account",
-        element: <ProtectedRoute><Account/></ProtectedRoute>
+        path: "/statistics",
+        element: <ProtectedRoute><Statistics/></ProtectedRoute>
     },
     {
         path: "/",

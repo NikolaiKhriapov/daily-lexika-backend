@@ -5,7 +5,6 @@ import my.project.vocabulary.exception.ResourceNotFoundException;
 import my.project.vocabulary.mapper.ReviewMapper;
 import my.project.vocabulary.model.dto.ReviewDTO;
 import my.project.vocabulary.model.entity.Review;
-import my.project.vocabulary.model.entity.Status;
 import my.project.vocabulary.model.entity.Word;
 import my.project.vocabulary.model.dto.WordDTO;
 import my.project.vocabulary.mapper.WordMapper;
@@ -16,6 +15,8 @@ import jakarta.transaction.Transactional;
 
 import java.util.*;
 
+import static my.project.vocabulary.model.entity.Status.*;
+
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
@@ -25,7 +26,6 @@ public class ReviewService {
     private final WordMapper wordMapper;
     private final MessageSource messageSource;
 
-    @Transactional
     public List<ReviewDTO> getAllReviews() {
         List<Review> allReviews = reviewRepository.findAll();
 
@@ -48,7 +48,6 @@ public class ReviewService {
         reviewRepository.delete(getReview(reviewId));
     }
 
-    @Transactional
     public Review getReview(Long reviewId) {
         return reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
@@ -63,10 +62,6 @@ public class ReviewService {
 
             Word thisWord = listOfWords.get(0);
             thisWord.setOccurrence(thisWord.getOccurrence() + 1);
-
-            if (thisWord.getStatus().equals(Status.NEW)) {
-                thisWord.setStatus(Status.IN_REVIEW);
-            }
 
             if (answer.equals("yes")) {
                 updateWordForYesAnswer(thisWord, listOfWords);
@@ -91,26 +86,38 @@ public class ReviewService {
     }
 
     private static void updateWordForNoAnswer(Word thisWord, List<Word> listOfWords) {
+        if (thisWord.getStatus().equals(NEW)) {
+            thisWord.setStatus(IN_REVIEW);
+        }
+
         thisWord.setTotalStreak(0);
         thisWord.setCurrentStreak(0);
-        thisWord.setStatus(Status.IN_REVIEW);
+        thisWord.setStatus(IN_REVIEW);
         listOfWords.remove(0);
         listOfWords.add(3, thisWord);
     }
 
     private static void updateWordForYesAnswer(Word thisWord, List<Word> listOfWords) {
-        if (thisWord.getCurrentStreak() < 3) {
-            thisWord.setCurrentStreak(thisWord.getCurrentStreak() + 1);
-        }
-
-        if (thisWord.getCurrentStreak() == 3) {
-            thisWord.setTotalStreak(thisWord.getTotalStreak() + 1);
-            if (thisWord.getTotalStreak() >= 5) {
-                thisWord.setStatus(Status.KNOWN);
-            }
+        if (thisWord.getStatus().equals(NEW) || thisWord.getStatus().equals(KNOWN)) {
+            thisWord.setStatus(KNOWN);
             thisWord.setCurrentStreak(0);
             thisWord.setOccurrence(0);
             listOfWords.remove(thisWord);
+        }
+
+        if (thisWord.getStatus().equals(IN_REVIEW)) {
+            if (thisWord.getCurrentStreak() < 3) {
+                thisWord.setCurrentStreak(thisWord.getCurrentStreak() + 1);
+            }
+            if (thisWord.getCurrentStreak() == 3) {
+                thisWord.setTotalStreak(thisWord.getTotalStreak() + 1);
+                if (thisWord.getTotalStreak() >= 5) {
+                    thisWord.setStatus(KNOWN);
+                }
+                thisWord.setCurrentStreak(0);
+                thisWord.setOccurrence(0);
+                listOfWords.remove(thisWord);
+            }
         }
 
         Collections.rotate(listOfWords, -1);

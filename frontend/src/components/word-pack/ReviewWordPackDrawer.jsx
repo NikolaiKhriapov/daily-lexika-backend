@@ -31,7 +31,7 @@ const ReviewWordPackDrawer = ({allWordsForWordPack, name, description, listOfWor
             }}
             onClick={onOpen}
         >
-            Review Words
+            Preview
         </Button>
         <Drawer isOpen={isOpen} onClose={onClose} size={"md"}>
             <DrawerOverlay/>

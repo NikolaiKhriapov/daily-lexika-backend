@@ -64,7 +64,7 @@ export default function ReviewCard({
                                     }}
                                     onClick={onOpen}
                                 >
-                                    Delete
+                                    Remove
                                 </Button>
                                 <AlertDialog
                                     isOpen={isOpen}
@@ -74,11 +74,11 @@ export default function ReviewCard({
                                     <AlertDialogOverlay>
                                         <AlertDialogContent>
                                             <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                                                Delete Review
+                                                Remove Review
                                             </AlertDialogHeader>
 
                                             <AlertDialogBody>
-                                                Are you sure you want to delete {wordPackName}? You can't undo this
+                                                Are you sure you want to remove '{wordPackName}'? You can't undo this
                                                 action.
                                             </AlertDialogBody>
 
@@ -104,7 +104,7 @@ export default function ReviewCard({
                                                         onClose()
                                                     })
                                                 }} ml={3}>
-                                                    Delete
+                                                    Remove
                                                 </Button>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>

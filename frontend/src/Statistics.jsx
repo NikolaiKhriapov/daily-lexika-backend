@@ -1,13 +1,13 @@
 import {Text} from '@chakra-ui/react';
 import SidebarWithHeader from "./shared/SideBar.jsx";
 
-const Account = () => {
+const Statistics = () => {
 
     return (
         <SidebarWithHeader>
-            <Text fontSize={'6xl'}>Account</Text>
+            <Text fontSize={'6xl'}>Statistics</Text>
         </SidebarWithHeader>
     )
 }
 
-export default Account;
+export default Statistics;

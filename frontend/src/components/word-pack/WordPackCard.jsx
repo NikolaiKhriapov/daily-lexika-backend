@@ -1,21 +1,12 @@
-import {
-    Heading,
-    Box,
-    Center,
-    Flex,
-    Text,
-    Stack,
-    Tag,
-} from '@chakra-ui/react';
-
+import {Heading, Box, Center, Flex, Text, Stack, Tag} from '@chakra-ui/react';
 import {useEffect, useState} from 'react';
-import { errorNotification } from '../../services/notification.js';
+import {errorNotification} from '../../services/notification.js';
 import CreateReviewDrawer from "../review/CreateReviewDrawer.jsx";
 import {getAllWordPacks, getAllWordsForWordPack} from "../../services/word-pack.js";
 import {CopyIcon} from "@chakra-ui/icons";
 import ReviewWordPackDrawer from "./ReviewWordPackDrawer.jsx";
 
-export default function WordPackCard({ name, description, category, listOfWordId, review }) {
+export default function WordPackCard({name, description, category, listOfWordId, review}) {
 
     const [allWordPacks, setAllWordPacks] = useState([]);
     const [allWordsForWordPack, setAllWordsForWordPack] = useState([]);
