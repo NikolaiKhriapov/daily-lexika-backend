@@ -11,6 +11,7 @@ import my.project.vocabulary.model.dto.WordDTO;
 import my.project.vocabulary.mapper.WordMapper;
 import my.project.vocabulary.repository.ReviewRepository;
 import org.springframework.context.MessageSource;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
@@ -40,7 +41,6 @@ public class ReviewService {
 
     @Transactional
     public void createReview(ReviewDTO newReviewDTO) {
-
         List<Review> existingReviews = reviewRepository.findAll();
         if (existingReviews
                 .stream().map(review -> review.getWordPack().getName()).toList()
@@ -92,6 +92,15 @@ public class ReviewService {
             return wordMapper.toDTO(word);
         }
         return null;
+    }
+
+    @Scheduled(cron = "0 0 0 * * ?")
+    @Transactional
+    public void updateReviews() {
+        List<Review> existingReviews = reviewRepository.findAll();
+        reviewRepository.deleteAll(existingReviews);
+
+        existingReviews.forEach(oneReview -> reviewRepository.save(reviewMapper.toEntity(reviewMapper.toDTO(oneReview))));
     }
 
     private static void updateWordForNoAnswer(Word thisWord, List<Word> listOfWords) {
