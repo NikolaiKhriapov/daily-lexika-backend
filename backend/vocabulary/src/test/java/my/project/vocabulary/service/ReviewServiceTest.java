@@ -1,16 +1,13 @@
 package my.project.vocabulary.service;
 
 import my.project.vocabulary.mapper.ReviewMapper;
-import my.project.vocabulary.mapper.WordMapper;
 import my.project.vocabulary.model.dto.ReviewDTO;
 import my.project.vocabulary.model.entity.*;
-import my.project.vocabulary.repository.ReviewRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.MessageSource;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -21,21 +18,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class ReviewServiceTest {
+class ReviewMapperTest {
 
-    private ReviewService underTest;
+    private ReviewMapper underTest;
     @Mock
-    private ReviewRepository reviewRepository;
-    @Mock
-    private ReviewMapper reviewMapper;
-    @Mock
-    private WordMapper wordMapper;
-    @Mock
-    private MessageSource messageSource;
+    private WordPackService wordPackService;
 
     @BeforeEach
     void setUp() {
-        underTest = new ReviewService(reviewRepository, reviewMapper, wordMapper, messageSource);
+        underTest = new ReviewMapper(wordPackService);
     }
 
     @Test
