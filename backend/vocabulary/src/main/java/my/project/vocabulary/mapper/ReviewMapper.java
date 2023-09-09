@@ -3,9 +3,9 @@ package my.project.vocabulary.mapper;
 import lombok.RequiredArgsConstructor;
 import my.project.vocabulary.model.dto.ReviewDTO;
 import my.project.vocabulary.model.entity.Review;
-import my.project.vocabulary.model.entity.Status;
 import my.project.vocabulary.model.entity.Word;
 import my.project.vocabulary.model.entity.WordPack;
+import my.project.vocabulary.service.ReviewService;
 import my.project.vocabulary.service.WordPackService;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class ReviewMapper implements Mapper<Review, ReviewDTO> {
 
     private final WordPackService wordPackService;
+    private final ReviewService reviewService;
 
     @Override
     public ReviewDTO toDTO(Review entity) {
@@ -32,29 +33,13 @@ public class ReviewMapper implements Mapper<Review, ReviewDTO> {
     }
 
     @Override
-    public Review toEntity(ReviewDTO dto) {
-        WordPack wordPack = wordPackService.getWordPack(dto.wordPackName());
+    public Review toEntity(ReviewDTO reviewDTO) {
+        WordPack wordPack = wordPackService.getWordPack(reviewDTO.wordPackName());
+        List<Word> listOfWords = reviewService.generateListOfWordsForReview(wordPack, reviewDTO);
 
-        Set<Word> newWords = new HashSet<>(wordPack.getListOfWords()).stream()
-                .filter(word -> word.getStatus().equals(Status.NEW))
-                .limit(dto.maxNewWordsPerDay())
-                .collect(Collectors.toSet());
-        Set<Word> reviewWords = new HashSet<>(wordPack.getListOfWords()).stream()
-                .filter(word -> word.getStatus().equals(Status.IN_REVIEW))
-                .limit(dto.maxReviewWordsPerDay())
-                .collect(Collectors.toSet());
-
-        List<Word> listOfWords = new ArrayList<>();
-        listOfWords.addAll(newWords);
-        listOfWords.addAll(reviewWords);
-
-        listOfWords.forEach(word -> {
-            word.setOccurrence(0);
-            word.setCurrentStreak(0);
-        });
         return new Review(
-                dto.maxNewWordsPerDay(),
-                dto.maxReviewWordsPerDay(),
+                reviewDTO.maxNewWordsPerDay(),
+                reviewDTO.maxReviewWordsPerDay(),
                 wordPack,
                 listOfWords
         );

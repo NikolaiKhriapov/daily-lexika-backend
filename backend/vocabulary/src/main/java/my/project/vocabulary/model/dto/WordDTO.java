@@ -3,6 +3,7 @@ package my.project.vocabulary.model.dto;
 import jakarta.annotation.Nullable;
 import my.project.vocabulary.model.entity.Status;
 
+import java.util.Date;
 import java.util.List;
 
 public record WordDTO(
@@ -27,6 +28,8 @@ public record WordDTO(
         Integer totalStreak,
 
         Integer occurrence,
+
+        Date dateOfLastOccurrence,
 
         List<Long> listOfReviewId,
 

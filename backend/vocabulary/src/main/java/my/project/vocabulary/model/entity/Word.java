@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -31,6 +32,8 @@ public class Word {
     private Integer totalStreak;
 
     private Integer occurrence;
+    
+    private Date dateOfLastOccurrence;
 
     @ManyToMany
     @ToString.Exclude
@@ -40,7 +43,7 @@ public class Word {
     @ToString.Exclude
     private List<ChineseCharacter> listOfChineseCharacters;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable
     @ToString.Exclude
     private List<WordPack> listOfWordPacks;

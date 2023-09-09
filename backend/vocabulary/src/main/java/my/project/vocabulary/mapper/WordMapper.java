@@ -25,6 +25,7 @@ public class WordMapper implements Mapper<Word, WordDTO> {
                 entity.getCurrentStreak(),
                 entity.getTotalStreak(),
                 entity.getOccurrence(),
+                entity.getDateOfLastOccurrence(),
                 entity.getListOfReviews().stream()
                         .map(Review::getId)
                         .collect(Collectors.toList()),

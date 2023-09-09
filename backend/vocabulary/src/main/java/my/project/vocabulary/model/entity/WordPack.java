@@ -1,15 +1,16 @@
 package my.project.vocabulary.model.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
-import my.project.vocabulary.model.entity.Category;
-import my.project.vocabulary.model.entity.Review;
-import my.project.vocabulary.model.entity.Word;
 
 import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "word_packs")
 public class WordPack {
 
@@ -21,7 +22,7 @@ public class WordPack {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    @ManyToMany(mappedBy = "listOfWordPacks", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "listOfWordPacks", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @ToString.Exclude
     private List<Word> listOfWords;
 
