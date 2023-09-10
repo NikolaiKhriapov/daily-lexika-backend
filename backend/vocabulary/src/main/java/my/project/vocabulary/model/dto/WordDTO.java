@@ -1,11 +1,15 @@
 package my.project.vocabulary.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.annotation.Nullable;
 import my.project.vocabulary.model.entity.Status;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+
+@JsonInclude(NON_NULL)
 public record WordDTO(
 
         @Nullable
@@ -29,7 +33,7 @@ public record WordDTO(
 
         Integer occurrence,
 
-        Date dateOfLastOccurrence,
+        LocalDate dateOfLastOccurrence,
 
         List<Long> listOfReviewId,
 

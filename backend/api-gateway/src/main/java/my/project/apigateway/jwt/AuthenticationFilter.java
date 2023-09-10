@@ -1,5 +1,6 @@
 package my.project.apigateway.jwt;
 
+import io.jsonwebtoken.Claims;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.context.MessageSource;
@@ -41,6 +42,9 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                     throw new RuntimeException(messageSource.getMessage(
                             "exception.authenticationFilter.invalidToken", null, Locale.getDefault()));
                 }
+
+                Claims claims = jwtService.extractAllClaims(authHeader);
+                exchange.getRequest().mutate().header("userId", String.valueOf(claims.get("userId"))).build();
             }
             return chain.filter(exchange);
         });

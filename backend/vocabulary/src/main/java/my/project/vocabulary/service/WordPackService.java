@@ -3,13 +3,15 @@ package my.project.vocabulary.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import my.project.vocabulary.exception.ResourceNotFoundException;
-import my.project.vocabulary.mapper.WordPackMapper;
-import my.project.vocabulary.model.dto.WordPackDTO;
-import my.project.vocabulary.model.entity.Word;
 import my.project.vocabulary.model.dto.WordDTO;
-import my.project.vocabulary.mapper.WordMapper;
+import my.project.vocabulary.model.mapper.WordPackMapper;
+import my.project.vocabulary.model.dto.WordPackDTO;
+import my.project.vocabulary.model.entity.WordData;
+import my.project.vocabulary.model.mapper.WordMapper;
 import my.project.vocabulary.model.entity.WordPack;
+import my.project.vocabulary.model.entity.Word;
 import my.project.vocabulary.repository.WordPackRepository;
+import my.project.vocabulary.repository.WordRepository;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
@@ -22,39 +24,50 @@ import java.util.Locale;
 public class WordPackService {
 
     private final WordPackRepository wordPackRepository;
+    private final WordRepository wordRepository;
     private final WordPackMapper wordPackMapper;
     private final WordMapper wordMapper;
     private final MessageSource messageSource;
 
-    @Transactional
     public List<WordPackDTO> getAllWordPacks() {
         List<WordPack> allWordPacks = wordPackRepository.findAll();
 
         List<WordPackDTO> allWordPackDTOs = new ArrayList<>();
         for (WordPack oneWordPack : allWordPacks) {
-            allWordPackDTOs.add(wordPackMapper.toDTO(oneWordPack));
+            allWordPackDTOs.add(wordPackMapper.toDTOWithoutReview(oneWordPack));
         }
 
         return allWordPackDTOs;
     }
 
     @Transactional
-    public WordPack getWordPack(String name) {
-        return wordPackRepository.findById(name)
-                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
-                        "exception.wordPack.notFound", null, Locale.getDefault())));
+    public List<WordDTO> getAllWordsForWordPack(String wordPackName, Long userId) {
+        WordPack wordPack = getWordPackByName(wordPackName);
+
+        List<Long> wordDataIds = wordPack.getListOfWordData().stream()
+                .map(WordData::getId)
+                .toList();
+
+        List<Word> existingWords = wordRepository.findByUserIdAndWordIdIn(userId, wordDataIds);
+        List<Word> wordsToBeSaved = wordPack.getListOfWordData().stream()
+                .filter(wordData -> existingWords.stream()
+                        .noneMatch(word -> word.getWordId().equals(wordData.getId()))
+                )
+                .map(wordData -> new Word(userId, wordData.getId())) // TODO::: change to converter
+                .toList();
+
+        List<Word> savedWords = wordRepository.saveAll(wordsToBeSaved);
+
+        List<Word> listOfWords = new ArrayList<>();
+        listOfWords.addAll(existingWords);
+        listOfWords.addAll(savedWords);
+
+        return new ArrayList<>(wordMapper.toDTOShortList(listOfWords));
     }
 
-    @Transactional
-    public List<WordDTO> getAllWordsForWordPack(String wordPackName) {
-        List <WordDTO> allWordsForWordPack = new ArrayList<>();
-
-        WordPack wordPack = getWordPack(wordPackName);
-
-        for (Word oneWord : wordPack.getListOfWords()) {
-            allWordsForWordPack.add(wordMapper.toDTO(oneWord));
-        }
-
-        return allWordsForWordPack;
+    public WordPack getWordPackByName(String wordPackName) {
+        return wordPackRepository.findById(wordPackName)
+                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
+                        "exception.wordPack.notFound", null, Locale.getDefault())));
     }
 }

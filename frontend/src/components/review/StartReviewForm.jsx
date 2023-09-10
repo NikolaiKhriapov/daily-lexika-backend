@@ -3,8 +3,8 @@ import {Button, Flex, Stack, Text} from "@chakra-ui/react";
 
 import {processReviewAction} from "../../services/review.js";
 import {errorNotification} from "../../services/notification.js";
-
 import ReviewWordCard from "./ReviewWordCard.jsx";
+import {updateUserStreak} from "../../services/user.js";
 
 const CreateReviewForm = ({reviewId}) => {
     const [reviewWord, setReviewWord] = useState([]);
@@ -19,6 +19,7 @@ const CreateReviewForm = ({reviewId}) => {
                 if (response.data.data != null) {
                     setReviewWord(response.data.data.reviewWord);
                 } else {
+                    updateUserStreak()
                     setIsFormVisible(false);
                 }
             })

@@ -7,46 +7,50 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 @ControllerAdvice
 public class DefaultExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiErrorWrapper> handleException(ResourceNotFoundException e, HttpServletRequest request) {
-        ApiErrorWrapper apiErrorWrapper = new ApiErrorWrapper(
+    public ResponseEntity<ApiErrorDTO> handleException(ResourceNotFoundException e, HttpServletRequest request) {
+        ApiErrorDTO apiErrorDTO = new ApiErrorDTO(
                 request.getRequestURI(),
-                e.getMessage(),
                 HttpStatus.NOT_FOUND.value(),
                 HttpStatus.NOT_FOUND,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                e.getMessage(),
+                Arrays.toString(e.getStackTrace())
         );
 
-        return new ResponseEntity<>(apiErrorWrapper, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(apiErrorDTO, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ReviewAlreadyExistsException.class)
-    public ResponseEntity<ApiErrorWrapper> handleException(ReviewAlreadyExistsException e, HttpServletRequest request) {
-        ApiErrorWrapper apiErrorWrapper = new ApiErrorWrapper(
+    public ResponseEntity<ApiErrorDTO> handleException(ReviewAlreadyExistsException e, HttpServletRequest request) {
+        ApiErrorDTO apiErrorDTO = new ApiErrorDTO(
                 request.getRequestURI(),
-                e.getMessage(),
                 HttpStatus.CONFLICT.value(),
                 HttpStatus.CONFLICT,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                e.getMessage(),
+                Arrays.toString(e.getStackTrace())
         );
 
-        return new ResponseEntity<>(apiErrorWrapper, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(apiErrorDTO, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorWrapper> handleException(Exception e, HttpServletRequest request) {
-        ApiErrorWrapper apiErrorWrapper = new ApiErrorWrapper(
+    public ResponseEntity<ApiErrorDTO> handleException(Exception e, HttpServletRequest request) {
+        ApiErrorDTO apiErrorDTO = new ApiErrorDTO(
                 request.getRequestURI(),
-                e.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                e.getMessage(),
+                Arrays.toString(e.getStackTrace())
         );
 
-        return new ResponseEntity<>(apiErrorWrapper, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(apiErrorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

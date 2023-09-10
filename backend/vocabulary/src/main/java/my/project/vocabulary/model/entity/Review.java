@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -19,6 +20,8 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence")
     private Long id;
 
+    private Long userId;
+
     private Integer maxNewWordsPerDay;
 
     private Integer maxReviewWordsPerDay;
@@ -26,14 +29,24 @@ public class Review {
     @OneToOne
     private WordPack wordPack;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @ToString.Exclude
     private List<Word> listOfWords;
 
-    public Review(Integer maxNewWordsPerDay, Integer maxReviewWordsPerDay, WordPack wordPack, List<Word> listOfWords) {
+    private LocalDate dateLastCompleted;
+
+    private LocalDate dateGenerated;
+
+    public Review(Long userId,
+                  Integer maxNewWordsPerDay,
+                  Integer maxReviewWordsPerDay,
+                  WordPack wordPack,
+                  List<Word> listOfWords) {
+        this.userId = userId;
         this.maxNewWordsPerDay = maxNewWordsPerDay;
         this.maxReviewWordsPerDay = maxReviewWordsPerDay;
         this.wordPack = wordPack;
         this.listOfWords = listOfWords;
+        this.dateGenerated = LocalDate.now();
     }
 }

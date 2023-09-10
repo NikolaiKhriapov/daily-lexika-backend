@@ -6,7 +6,7 @@ import {CopyIcon} from "@chakra-ui/icons";
 
 const CloseIcon = () => "x";
 
-const CreateReviewDrawer = ({fetchAllWordPacks, name, description, listOfWordId}) => {
+const CreateReviewDrawer = ({fetchAllWordPacks, name, description, totalWords}) => {
 
     const {isOpen, onOpen, onClose} = useDisclosure()
 
@@ -31,7 +31,7 @@ const CreateReviewDrawer = ({fetchAllWordPacks, name, description, listOfWordId}
 
                 <DrawerBody>
                     <div style={{margin: '15px 0', fontSize: '20px', fontWeight: 'bold'}}>{name}</div>
-                    <div style={{margin: '10px 0'}}><CopyIcon/>{listOfWordId.length}</div>
+                    <div style={{margin: '10px 0'}}><CopyIcon/>{totalWords}</div>
                     <div style={{margin: '10px 0'}}>{description}</div>
                     <hr style={{margin: '30px 0', borderTop: '1px solid black'}}/>
                     <CreateReviewForm

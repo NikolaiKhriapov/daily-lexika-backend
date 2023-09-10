@@ -7,7 +7,7 @@ import {CopyIcon} from "@chakra-ui/icons";
 import ReviewWordPackDrawer from "./ReviewWordPackDrawer.jsx";
 import {getAllReviews} from "../../services/review.js";
 
-export default function WordPackCard({name, description, category, listOfWordId, review}) {
+export default function WordPackCard({name, description, category, totalWords, review}) {
 
     const [allWordPacks, setAllWordPacks] = useState([]);
     const [allWordsForWordPack, setAllWordsForWordPack] = useState([]);
@@ -84,14 +84,14 @@ export default function WordPackCard({name, description, category, listOfWordId,
                     boxShadow={'l'}
                     rounded={'md'}
                     overflow={'hidden'}
-                    style={{ pointerEvents: isReviewExists ? 'none' : 'auto' }} // Disable pointer events
+                    style={{ pointerEvents: isReviewExists ? 'none' : 'auto' }}
                 >
                     <Box p={6} align={'center'}>
                         <Stack spacing={2} align={'center'} mb={30}>
                             <Heading fontSize={'2xl'} fontWeight={500} fontFamily={'body'}>
                                 {name}
                             </Heading>
-                            <Tag borderRadius={'full'}><CopyIcon/>{listOfWordId.length}</Tag>
+                            <Tag borderRadius={'full'}><CopyIcon/>{totalWords}</Tag>
                         </Stack>
                         <Stack spacing={2} mb={30}>
                             <Text color={'gray.500'}>{description}</Text>
@@ -99,7 +99,7 @@ export default function WordPackCard({name, description, category, listOfWordId,
                         <ReviewWordPackDrawer
                             name={name}
                             description={description}
-                            listOfWordId={listOfWordId}
+                            totalWords={totalWords}
                             allWordsForWordPack={allWordsForWordPack}
                         />
                         <p style={{margin: '10px'}}/>
@@ -107,7 +107,7 @@ export default function WordPackCard({name, description, category, listOfWordId,
                             fetchAllWordPacks={fetchAllWordPacks}
                             name={name}
                             description={description}
-                            listOfWordId={listOfWordId}
+                            totalWords={totalWords}
                         />
                     </Box>
                 </Flex>

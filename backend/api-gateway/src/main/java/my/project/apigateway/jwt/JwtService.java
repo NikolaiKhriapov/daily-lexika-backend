@@ -1,5 +1,6 @@
 package my.project.apigateway.jwt;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,15 @@ public class JwtService {
 
     public void validateToken(String token) {
         Jwts.parserBuilder().setSigningKey(getSignInKey()).build().parseClaimsJws(token);
+    }
+
+    Claims extractAllClaims(String token) {
+        return Jwts
+                .parserBuilder()
+                .setSigningKey(getSignInKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     private Key getSignInKey() {

@@ -1,7 +1,7 @@
 package my.project.vocabulary.controller;
 
 import lombok.RequiredArgsConstructor;
-import my.project.vocabulary.model.dto.ResponseWrapper;
+import my.project.vocabulary.model.dto.ResponseDTO;
 import my.project.vocabulary.model.dto.ReviewDTO;
 import my.project.vocabulary.model.dto.WordDTO;
 import my.project.vocabulary.service.ReviewService;
@@ -23,23 +23,24 @@ public class ReviewController {
     private final MessageSource messageSource;
 
     @GetMapping
-    public ResponseEntity<ResponseWrapper> getAllReviews() {
+    public ResponseEntity<ResponseDTO> getAllReviews(@RequestHeader("userId") Long userId) {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ResponseWrapper.builder()
+                .body(ResponseDTO.builder()
                         .timeStamp(LocalDateTime.now())
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage("response.review.getAllReviews", null, Locale.getDefault()))
-                        .data(Map.of("allReviews", reviewService.getAllReviews()))
+                        .data(Map.of("allReviews", reviewService.getAllReviews(userId)))
                         .build());
     }
 
     @PostMapping
-    public ResponseEntity<ResponseWrapper> createReview(@RequestBody ReviewDTO newReviewDTO) {
-        reviewService.createReview(newReviewDTO);
+    public ResponseEntity<ResponseDTO> createReview(@RequestBody ReviewDTO newReviewDTO,
+                                                    @RequestHeader("userId") Long userId) {
+        reviewService.createReview(newReviewDTO, userId);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ResponseWrapper.builder()
+                .body(ResponseDTO.builder()
                         .timeStamp(LocalDateTime.now())
                         .statusCode(HttpStatus.CREATED.value())
                         .message(messageSource.getMessage("response.review.createReview", null, Locale.getDefault()))
@@ -47,11 +48,11 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity<ResponseWrapper> deleteReview(@PathVariable("reviewId") Long reviewId) {
+    public ResponseEntity<ResponseDTO> deleteReview(@PathVariable("reviewId") Long reviewId) {
         reviewService.deleteReview(reviewId);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
-                .body(ResponseWrapper.builder()
+                .body(ResponseDTO.builder()
                         .timeStamp(LocalDateTime.now())
                         .statusCode(HttpStatus.NO_CONTENT.value())
                         .message(messageSource.getMessage("response.review.deleteReview", null, Locale.getDefault()))
@@ -59,21 +60,18 @@ public class ReviewController {
     }
 
     @GetMapping("/{reviewId}/action")
-    public ResponseEntity<ResponseWrapper> processReviewAction(
+    public ResponseEntity<ResponseDTO> processReviewAction(
             @PathVariable("reviewId") Long reviewId,
             @RequestParam(value = "answer", required = false) String answer
     ) {
-        reviewService.processReviewAction(reviewId, answer);
-
-        WordDTO reviewWord = reviewService.showOneReviewWord(reviewId);
-        Map<String, WordDTO> data = (reviewWord != null) ? Map.of("reviewWord", reviewWord) : null;
+        WordDTO reviewWord = reviewService.processReviewAction(reviewId, answer);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ResponseWrapper.builder()
+                .body(ResponseDTO.builder()
                         .timeStamp(LocalDateTime.now())
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage("response.review.startReview", null, Locale.getDefault()))
-                        .data(data)
+                        .data((reviewWord != null) ? Map.of("reviewWord", reviewWord) : null)
                         .build());
     }
 }

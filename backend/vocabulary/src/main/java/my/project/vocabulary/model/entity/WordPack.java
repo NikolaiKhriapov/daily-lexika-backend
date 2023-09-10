@@ -24,7 +24,7 @@ public class WordPack {
 
     @ManyToMany(mappedBy = "listOfWordPacks", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @ToString.Exclude
-    private List<Word> listOfWords;
+    private List<WordData> listOfWordData;
 
     @OneToOne
     private Review review;

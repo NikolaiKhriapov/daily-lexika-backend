@@ -1,4 +1,4 @@
-import {Wrap, WrapItem, Spinner, Text} from '@chakra-ui/react'
+import {Wrap, WrapItem, Spinner, chakra} from '@chakra-ui/react'
 import SidebarWithHeader from "./shared/SideBar.jsx";
 import {useEffect, useState} from "react";
 import {errorNotification} from "./services/notification.js";
@@ -47,7 +47,7 @@ const WordPack = () => {
     if (error) {
         return (
             <SidebarWithHeader>
-                <Text mt={5}>Ooops, there was an error</Text>
+                <chakra.h1 textAlign="center" fontSize="4xl" py={10} fontWeight="bold">Ooops, there was an error</chakra.h1>
             </SidebarWithHeader>
         )
     }
@@ -55,7 +55,7 @@ const WordPack = () => {
     if (allWordPacks.length <= 0) {
         return (
             <SidebarWithHeader>
-                <Text mt={5}>No wordPacks available</Text>
+                <chakra.h1 textAlign="center" fontSize="4xl" py={10} fontWeight="bold">No Word Packs available</chakra.h1>
             </SidebarWithHeader>
         )
     }

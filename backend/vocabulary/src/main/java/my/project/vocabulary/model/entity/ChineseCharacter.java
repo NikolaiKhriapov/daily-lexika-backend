@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import my.project.vocabulary.model.entity.Status;
-import my.project.vocabulary.model.entity.Word;
 
 import java.util.List;
 
@@ -34,9 +32,9 @@ public class ChineseCharacter {
 
     private Integer correctStreak;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @ToString.Exclude
-    private List<Word> listOfWords;
+    private List<WordData> listOfWordData;
 
 //    public ChineseCharacter(String nameChineseSimplified,
 //                            String nameChineseTraditional,

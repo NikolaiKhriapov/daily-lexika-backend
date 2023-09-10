@@ -1,4 +1,4 @@
-import {Wrap, WrapItem, Spinner, Text} from '@chakra-ui/react'
+import {Wrap, WrapItem, Spinner, chakra} from '@chakra-ui/react'
 import SidebarWithHeader from "./shared/SideBar.jsx";
 import {useEffect, useState} from "react";
 import {errorNotification} from "./services/notification.js";
@@ -47,7 +47,7 @@ const Review = () => {
     if (error) {
         return (
             <SidebarWithHeader>
-                <Text mt={5}>Ooops, there was an error</Text>
+                <chakra.h1 textAlign="center" fontSize="4xl" py={10} fontWeight="bold">Ooops, there was an error</chakra.h1>
             </SidebarWithHeader>
         )
     }
@@ -55,7 +55,12 @@ const Review = () => {
     if (allReviews.length <= 0) {
         return (
             <SidebarWithHeader>
-                <Text mt={5}>No reviews available</Text>
+                <chakra.h1 textAlign="center" fontSize="3xl" py={10} fontWeight="bold">
+                    You do not have any daily reviews
+                </chakra.h1>
+                <chakra.h1 textAlign="center" fontSize="2xl" py={3} fontWeight="light">
+                    Add a word pack to create a daily review and start growing your vocabulary
+                </chakra.h1>
             </SidebarWithHeader>
         )
     }
