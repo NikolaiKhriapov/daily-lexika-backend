@@ -1,13 +1,24 @@
-import {
-    Badge, Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerFooter, DrawerOverlay, useDisclosure
-} from "@chakra-ui/react";
+import {Badge, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerOverlay} from "@chakra-ui/react";
 import {CopyIcon} from "@chakra-ui/icons";
+import {useEffect, useState, useRef} from "react";
+import {getAllWordsForWordPack} from "../../services/word-pack.js";
+import {errorNotification} from "../../services/notification.js";
 
-const CloseIcon = () => "x";
+const ReviewWordPackDrawer = ({button, isOpen, onClose, wordPackDTO}) => {
 
-const ReviewWordPackDrawer = ({allWordsForWordPack, name, description, totalWords}) => {
+    const [allWordsForWordPackDTO, setAllWordsForWordPackDTO] = useState([]);
+    const [visibleWords, setVisibleWords] = useState(50);
+    const containerRef = useRef(null);
 
-    const {isOpen, onOpen, onClose} = useDisclosure()
+    const fetchAllWordsForWordPackDTO = () => {
+        getAllWordsForWordPack(wordPackDTO.name)
+            .then((response) => setAllWordsForWordPackDTO(response.data.data.allWordsForWordPackDTO))
+            .catch((error) => errorNotification(error.code, error.response.data.message))
+    };
+
+    useEffect(() => {
+        fetchAllWordsForWordPackDTO();
+    }, []);
 
     const getStatusColor = (status) => {
         if (status === "KNOWN") {
@@ -18,62 +29,50 @@ const ReviewWordPackDrawer = ({allWordsForWordPack, name, description, totalWord
         return "gray";
     };
 
-    return <>
-        <Button
-            bg={"grey"}
-            color={"white"}
-            rounded={"full"}
-            size={"sm"}
-            _hover={{
-                transform: 'translateY(-2px)',
-                boxShadow: 'lg'
-            }}
-            onClick={onOpen}
-        >
-            Preview
-        </Button>
-        <Drawer isOpen={isOpen} onClose={onClose} size={"md"}>
-            <DrawerOverlay/>
-            <DrawerContent>
-                <DrawerCloseButton/>
+    const handleScroll = () => {
+        const container = containerRef.current;
+        if (container && container.scrollTop + container.clientHeight >= container.scrollHeight - 10) {
+            setVisibleWords((prevVisibleWords) => prevVisibleWords + 50);
+        }
+    };
 
-                <DrawerBody>
-                    <div style={{margin: '15px 0', fontSize: '20px', fontWeight: 'bold'}}>{name}</div>
-                    <div style={{margin: '10px 0'}}><CopyIcon/>{totalWords}</div>
-                    <div style={{margin: '10px 0'}}>{description}</div>
-                    <hr style={{margin: '30px 0 5px 0', borderTop: '1px solid black'}}/>
-                    <div>
-                        {allWordsForWordPack.map((oneWord, index) => (
-                            <div key={index}>
-                                <div style={{display: "flex"}}>
-                                    <div style={{flex: "1 1 auto", minWidth: 0}}>
-                                        <div>{oneWord.nameChineseSimplified} {oneWord.pinyin}</div>
-                                        <div>{oneWord.nameEnglish}</div>
-                                    </div>
-                                    <div style={{flex: "0 0 auto", minWidth: "fit-content"}}>
-                                        <div>
-                                            <Badge colorScheme={getStatusColor(oneWord.status)}>{oneWord.status}</Badge>
+    return (
+        <>
+            {button}
+            <Drawer isOpen={isOpen} onClose={onClose} size={"md"}>
+                <DrawerOverlay/>
+                <DrawerContent>
+                    <DrawerCloseButton/>
+                    <DrawerBody>
+                        <div style={{margin: "15px 0", fontSize: "20px", fontWeight: "bold"}}>{wordPackDTO.name}</div>
+                        <div style={{margin: "10px 0"}}><CopyIcon/>{wordPackDTO.totalWords}</div>
+                        <div style={{margin: "10px 0 30px 0"}}>{wordPackDTO.description}</div>
+                        <div ref={containerRef} style={{maxHeight: "81vh", overflowY: "auto"}} onScroll={handleScroll}>
+                            {allWordsForWordPackDTO.slice(0, visibleWords).map((wordDTO, index) => (
+                                <div key={index}
+                                     style={{
+                                         border: "1px solid #ccc",
+                                         borderRadius: "5px",
+                                         padding: "10px",
+                                         marginBottom: "10px"
+                                     }}>
+                                    <div style={{display: "flex"}}>
+                                        <div style={{flex: "1 1 auto", minWidth: 0}}>
+                                            <div>{wordDTO.nameChineseSimplified} {wordDTO.pinyin}</div>
+                                            <div>{wordDTO.nameEnglish}</div>
+                                        </div>
+                                        <div style={{flex: "0 0 auto", minWidth: "fit-content"}}>
+                                            <Badge colorScheme={getStatusColor(wordDTO.status)}>{wordDTO.status}</Badge>
                                         </div>
                                     </div>
                                 </div>
-                                <hr style={{margin: '5px 0', borderTop: '1px solid black'}}/>
-                                    </div>
-                        ))}
-                    </div>
-                </DrawerBody>
-
-                <DrawerFooter>
-                    <Button
-                        leftIcon={<CloseIcon/>}
-                        colorScheme={"gray"}
-                        onClick={onClose}
-                    >
-                        Close
-                    </Button>
-                </DrawerFooter>
-            </DrawerContent>
-        </Drawer>
-    </>
-}
+                            ))}
+                        </div>
+                    </DrawerBody>
+                </DrawerContent>
+            </Drawer>
+        </>
+    );
+};
 
 export default ReviewWordPackDrawer;

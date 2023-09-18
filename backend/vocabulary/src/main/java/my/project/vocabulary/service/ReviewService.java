@@ -3,6 +3,7 @@ package my.project.vocabulary.service;
 import lombok.RequiredArgsConstructor;
 import my.project.vocabulary.exception.ResourceNotFoundException;
 import my.project.vocabulary.exception.ReviewAlreadyExistsException;
+import my.project.vocabulary.model.dto.ReviewStatisticsDTO;
 import my.project.vocabulary.model.mapper.ReviewMapper;
 import my.project.vocabulary.model.dto.ReviewDTO;
 import my.project.vocabulary.model.entity.*;
@@ -90,6 +91,30 @@ public class ReviewService {
             review = reviewRepository.save(review);
         }
         return showOneReviewWord(review);
+    }
+
+    public ReviewStatisticsDTO getReviewStatistics(Long userId, Long reviewId) {
+        List<WordData> listOfWordData = getReview(reviewId).getWordPack().getListOfWordData();
+
+        List<Long> wordDataIds = listOfWordData.stream()
+                .map(WordData::getId)
+                .toList();
+        long newWords = wordRepository.findByUserIdAndWordIdIn(userId, wordDataIds).stream()
+                .filter(word -> word.getStatus().equals(NEW))
+                .count();
+        long reviewWords = wordRepository.findByUserIdAndWordIdIn(userId, wordDataIds).stream()
+                .filter(word -> word.getStatus().equals(IN_REVIEW))
+                .count();
+        long knownWords = wordRepository.findByUserIdAndWordIdIn(userId, wordDataIds).stream()
+                .filter(word -> word.getStatus().equals(KNOWN))
+                .count();
+
+        return new ReviewStatisticsDTO(
+                (int) newWords,
+                (int) reviewWords,
+                (int) knownWords,
+                listOfWordData.size()
+        );
     }
 
     private WordDTO showOneReviewWord(Review review) {

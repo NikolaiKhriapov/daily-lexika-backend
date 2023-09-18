@@ -40,6 +40,11 @@ public class WordPackService {
         return allWordPackDTOs;
     }
 
+    public WordPackDTO getWordPackDTOByName(String wordPackName) {
+        WordPack wordPack = getWordPackByName(wordPackName);
+        return wordPackMapper.toDTOWithoutReview(wordPack);
+    }
+
     @Transactional
     public List<WordDTO> getAllWordsForWordPack(String wordPackName, Long userId) {
         WordPack wordPack = getWordPackByName(wordPackName);

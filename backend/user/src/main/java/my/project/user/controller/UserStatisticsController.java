@@ -29,7 +29,7 @@ public class UserStatisticsController {
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage(
                                 "response.userStatistics.getUserStatistics", null, Locale.getDefault()))
-                        .data(Map.of("userStatistics", userStatisticsService.getUserStatistics()))
+                        .data(Map.of("userStatisticsDTO", userStatisticsService.getUserStatistics()))
                         .build());
     }
 

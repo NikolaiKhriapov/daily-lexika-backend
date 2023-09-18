@@ -29,7 +29,7 @@ public class WordController {
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage(
                                 "response.word.getWordStatistics", null, Locale.getDefault()))
-                        .data(Map.of("wordStatistics", wordService.getWordStatistics(userId)))
+                        .data(Map.of("wordStatisticsDTO", wordService.getWordStatistics(userId)))
                         .build());
     }
 }

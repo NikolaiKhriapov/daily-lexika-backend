@@ -29,11 +29,24 @@ public class WordPackController {
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage(
                                 "response.wordPack.getAllWordPacks", null, Locale.getDefault()))
-                        .data(Map.of("allWordPacks", wordPackService.getAllWordPacks()))
+                        .data(Map.of("allWordPacksDTO", wordPackService.getAllWordPacks()))
                         .build());
     }
 
     @GetMapping("/{wordPackName}")
+    public ResponseEntity<ResponseDTO> getWordPack(@PathVariable("wordPackName") String wordPackName) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResponseDTO.builder()
+                        .timeStamp(LocalDateTime.now())
+                        .statusCode(HttpStatus.OK.value())
+                        .message(messageSource.getMessage(
+                                "response.wordPack.getAllWordPacks", null, Locale.getDefault()))
+                        .data(Map.of("wordPackDTO", wordPackService.getWordPackDTOByName(wordPackName)))
+                        .build());
+    }
+
+    @GetMapping("/{wordPackName}/words")
     public ResponseEntity<ResponseDTO> getAllWordsForWordPack(@PathVariable("wordPackName") String wordPackName,
                                                               @RequestHeader("userId") Long userId) {
         return ResponseEntity
@@ -43,7 +56,7 @@ public class WordPackController {
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage(
                                 "response.wordPack.getAllWordsForWordPacks", null, Locale.getDefault()))
-                        .data(Map.of("allWordsForWordPack", wordPackService.getAllWordsForWordPack(wordPackName, userId)))
+                        .data(Map.of("allWordsForWordPackDTO", wordPackService.getAllWordsForWordPack(wordPackName, userId)))
                         .build());
     }
 

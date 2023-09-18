@@ -7,39 +7,29 @@ import {getAllWordPacks} from "./services/word-pack.js";
 
 const WordPack = () => {
 
-    const [allWordPacks, setAllWordPacks] = useState([]);
+    const [allWordPacksDTO, setAllWordPacksDTO] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const fetchAllWordPacks = () => {
+    const fetchAllWordPacksDTO = () => {
         setLoading(true);
-        getAllWordPacks().then(response => {
-            setAllWordPacks(response.data.data.allWordPacks);
-        }).catch(error => {
-            setError((error.response.data.message))
-            errorNotification(
-                error.code,
-                error.response.data.message
-            )
-        }).finally(() => {
-            setLoading(false);
-        })
+        getAllWordPacks()
+            .then(response => setAllWordPacksDTO(response.data.data.allWordPacksDTO))
+            .catch(error => {
+                setError((error.response.data.message))
+                errorNotification(error.code, error.response.data.message)
+            })
+            .finally(() => setLoading(false))
     }
 
     useEffect(() => {
-        fetchAllWordPacks();
+        fetchAllWordPacksDTO();
     }, [])
 
     if (loading) {
         return (
             <SidebarWithHeader>
-                <Spinner
-                    thickness='4px'
-                    speed='0.65s'
-                    emptyColor='gray.200'
-                    color='blue.500'
-                    size='xl'
-                />
+                <Spinner thickness='4px' speed='0.65s' emptyColor='gray.200' color='blue.500' size='xl'/>
             </SidebarWithHeader>
         )
     }
@@ -47,15 +37,19 @@ const WordPack = () => {
     if (error) {
         return (
             <SidebarWithHeader>
-                <chakra.h1 textAlign="center" fontSize="4xl" py={10} fontWeight="bold">Ooops, there was an error</chakra.h1>
+                <chakra.h1 textAlign="center" fontSize="4xl" py={10} fontWeight="bold">
+                    Ooops, there was an error
+                </chakra.h1>
             </SidebarWithHeader>
         )
     }
 
-    if (allWordPacks.length <= 0) {
+    if (allWordPacksDTO.length <= 0) {
         return (
             <SidebarWithHeader>
-                <chakra.h1 textAlign="center" fontSize="4xl" py={10} fontWeight="bold">No Word Packs available</chakra.h1>
+                <chakra.h1 textAlign="center" fontSize="4xl" py={10} fontWeight="bold">
+                    No Word Packs available
+                </chakra.h1>
             </SidebarWithHeader>
         )
     }
@@ -63,12 +57,9 @@ const WordPack = () => {
     return (
         <SidebarWithHeader>
             <Wrap justify={"center"} spacing={"30px"}>
-                {allWordPacks.map((wordPack, index) => (
+                {allWordPacksDTO.map((wordPackDTO, index) => (
                     <WrapItem key={index}>
-                        <WordPackCard
-                            {...wordPack}
-                            fetchAllWordPacks={fetchAllWordPacks}
-                        />
+                        <WordPackCard wordPackDTO={wordPackDTO} fetchAllWordPacksDTO={fetchAllWordPacksDTO}/>
                     </WrapItem>
                 ))}
             </Wrap>

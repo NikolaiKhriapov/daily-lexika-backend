@@ -7,39 +7,29 @@ import {getAllReviews} from "./services/review.js";
 
 const Review = () => {
 
-    const [allReviews, setAllReviews] = useState([]);
+    const [allReviewsDTO, setAllReviewsDTO] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const fetchAllReviews = () => {
+    const fetchAllReviewsDTO = () => {
         setLoading(true);
-        getAllReviews().then(response => {
-            setAllReviews(response.data.data.allReviews)
-        }).catch(error => {
-            setError((error.response.data.message))
-            errorNotification(
-                error.code,
-                error.response.data.message
-            )
-        }).finally(() => {
-            setLoading(false);
-        })
+        getAllReviews()
+            .then(response => setAllReviewsDTO(response.data.data.allReviewsDTO))
+            .catch(error => {
+                setError((error.response.data.message))
+                errorNotification(error.code, error.response.data.message)
+            })
+            .finally(() => setLoading(false))
     }
 
     useEffect(() => {
-        fetchAllReviews();
+        fetchAllReviewsDTO();
     }, [])
 
     if (loading) {
         return (
             <SidebarWithHeader>
-                <Spinner
-                    thickness='4px'
-                    speed='0.65s'
-                    emptyColor='gray.200'
-                    color='blue.500'
-                    size='xl'
-                />
+                <Spinner thickness='4px' speed='0.65s' emptyColor='gray.200' color='blue.500' size='xl'/>
             </SidebarWithHeader>
         )
     }
@@ -47,12 +37,14 @@ const Review = () => {
     if (error) {
         return (
             <SidebarWithHeader>
-                <chakra.h1 textAlign="center" fontSize="4xl" py={10} fontWeight="bold">Ooops, there was an error</chakra.h1>
+                <chakra.h1 textAlign="center" fontSize="4xl" py={10} fontWeight="bold">
+                    Ooops, there was an error
+                </chakra.h1>
             </SidebarWithHeader>
         )
     }
 
-    if (allReviews.length <= 0) {
+    if (allReviewsDTO.length <= 0) {
         return (
             <SidebarWithHeader>
                 <chakra.h1 textAlign="center" fontSize="3xl" py={10} fontWeight="bold">
@@ -68,12 +60,9 @@ const Review = () => {
     return (
         <SidebarWithHeader>
             <Wrap justify={"center"} spacing={"30px"}>
-                {allReviews.map((review, index) => (
+                {allReviewsDTO.map((reviewDTO, index) => (
                     <WrapItem key={index}>
-                        <ReviewCard
-                            {...review}
-                            fetchAllReviews={fetchAllReviews}
-                        />
+                        <ReviewCard reviewDTO={reviewDTO} fetchAllReviewsDTO={fetchAllReviewsDTO}/>
                     </WrapItem>
                 ))}
             </Wrap>

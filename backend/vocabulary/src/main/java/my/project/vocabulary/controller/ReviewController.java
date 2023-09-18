@@ -30,13 +30,13 @@ public class ReviewController {
                         .timeStamp(LocalDateTime.now())
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage("response.review.getAllReviews", null, Locale.getDefault()))
-                        .data(Map.of("allReviews", reviewService.getAllReviews(userId)))
+                        .data(Map.of("allReviewsDTO", reviewService.getAllReviews(userId)))
                         .build());
     }
 
     @PostMapping
-    public ResponseEntity<ResponseDTO> createReview(@RequestBody ReviewDTO newReviewDTO,
-                                                    @RequestHeader("userId") Long userId) {
+    public ResponseEntity<ResponseDTO> createReview(@RequestHeader("userId") Long userId,
+                                                    @RequestBody ReviewDTO newReviewDTO) {
         reviewService.createReview(newReviewDTO, userId);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -71,7 +71,20 @@ public class ReviewController {
                         .timeStamp(LocalDateTime.now())
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage("response.review.startReview", null, Locale.getDefault()))
-                        .data((reviewWord != null) ? Map.of("reviewWord", reviewWord) : null)
+                        .data((reviewWord != null) ? Map.of("reviewWordDTO", reviewWord) : null)
+                        .build());
+    }
+
+    @GetMapping("/statistics/{reviewId}")
+    public ResponseEntity<ResponseDTO> getReviewStatistics(@RequestHeader("userId") Long userId,
+                                                           @PathVariable("reviewId") Long reviewId) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResponseDTO.builder()
+                        .timeStamp(LocalDateTime.now())
+                        .statusCode(HttpStatus.OK.value())
+                        .message(messageSource.getMessage("response.review.getAllReviews", null, Locale.getDefault()))
+                        .data(Map.of("reviewStatisticsDTO", reviewService.getReviewStatistics(userId, reviewId)))
                         .build());
     }
 }
