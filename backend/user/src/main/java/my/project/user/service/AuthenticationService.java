@@ -3,6 +3,7 @@ package my.project.user.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import my.project.amqp.RabbitMQMessageProducer;
+import my.project.user.exception.UserAlreadyExistsException;
 import my.project.user.model.dto.AuthenticationRequest;
 import my.project.user.model.dto.AuthenticationResponse;
 import my.project.user.model.dto.RegistrationRequest;
@@ -20,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,12 +37,12 @@ public class AuthenticationService {
     @Transactional
     public AuthenticationResponse register(RegistrationRequest registrationRequest) {
 
-        // TODO: check if email not taken
+        checkIfEmailTaken(registrationRequest.email());
 
         User user = User.builder()
                 .name(registrationRequest.name())
                 .surname(registrationRequest.surname())
-                .email(registrationRequest.email())
+                .email(registrationRequest.email().toLowerCase())
                 .password(passwordEncoder.encode(registrationRequest.password()))
                 .gender(registrationRequest.gender())
                 .userRole(UserRole.USER)
@@ -71,6 +73,13 @@ public class AuthenticationService {
         String token = jwtService.generateToken(user);
 
         return new AuthenticationResponse(token);
+    }
+
+    private void checkIfEmailTaken(String email) {
+        Optional<User> userOptional = userRepository.findUserByEmail(email.toLowerCase());
+        if (userOptional.isPresent()) {
+            throw new UserAlreadyExistsException("User '" + userOptional.get().getEmail() + "' already exists");
+        }
     }
 
     private void checkWhetherIsFraudster(User user) {
