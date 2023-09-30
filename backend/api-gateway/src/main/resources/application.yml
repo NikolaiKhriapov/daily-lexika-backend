@@ -29,10 +29,10 @@ spring:
               allowedOrigins: '*'
               allowedMethods: '*'
               allowedHeaders: '*'
-        - id: vocabulary
-          uri: lb://VOCABULARY
+        - id: chinese-flashcards
+          uri: lb://CHINESE-FLASHCARDS
           predicates:
-            - Path=/api/v1/vocabulary/**
+            - Path=/api/v1/chinese-flashcards/**
           filters:
             - AuthenticationFilter
           metadata:

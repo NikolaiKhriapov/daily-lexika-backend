@@ -142,12 +142,12 @@ services:
       - notification
       - file-storage
 
-  vocabulary:
+  chinese-flashcards:
     build:
-      context: ./vocabulary/
+      context: ./chinese-flashcards/
       dockerfile: ./Dockerfile
-    image: vocabulary
-    container_name: vocabulary
+    image: chinese-flashcards
+    container_name: chinese-flashcards
     ports:
       - "8085:8085"
     environment:

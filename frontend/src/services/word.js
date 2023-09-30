@@ -9,7 +9,7 @@ const getAuthConfig = () => ({
 export const getWordStatistics = async () => {
     try {
         return await axios.get(
-            `${import.meta.env.VITE_API_BASE_URL}/api/v1/vocabulary/words/statistics`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/chinese-flashcards/words/statistics`,
             getAuthConfig()
         )
     } catch (error) {

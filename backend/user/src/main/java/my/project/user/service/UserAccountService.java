@@ -59,8 +59,8 @@ public class UserAccountService {
         );
         rabbitMQMessageProducer.publish(
                 deleteChineseFlashcardsRequest,
-                "vocabulary.exchange",
-                "vocabulary.delete-chinese-flashcards.routing-key"
+                "chinese-flashcards.exchange",
+                "chinese-flashcards.delete-chinese-flashcards.routing-key"
         );
     }
 }

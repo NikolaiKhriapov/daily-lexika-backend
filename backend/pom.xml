@@ -14,7 +14,7 @@
     <modules>
         <module>user</module>
         <module>fraud-check</module>
-        <module>vocabulary</module>
+        <module>chinese-flashcards</module>
         <module>eureka-server</module>
         <module>clients</module>
         <module>notification</module>

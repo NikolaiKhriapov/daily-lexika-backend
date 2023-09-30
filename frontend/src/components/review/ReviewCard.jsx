@@ -86,11 +86,11 @@ export default function ReviewCard({reviewDTO, fetchAllReviewsDTO}) {
                                                                 "Review deleted successfully",
                                                                 `${reviewDTO.wordPackName} deleted successfully`
                                                             )
-                                                            fetchAllReviewsDTO();
+                                                            fetchAllReviewsDTO()
                                                         })
                                                         .catch(error =>
                                                             errorNotification(error.code, error.response.data.message))
-                                                        .finally(() => onClose())
+                                                        .finally(() => onCloseRemoveButton())
                                                 }} ml={3}>
                                                     Remove
                                                 </Button>

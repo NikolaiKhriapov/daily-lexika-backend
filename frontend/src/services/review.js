@@ -9,7 +9,7 @@ const getAuthConfig = () => ({
 export const getAllReviews = async () => {
     try {
         return await axios.get(
-            `${import.meta.env.VITE_API_BASE_URL}/api/v1/vocabulary/reviews`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/chinese-flashcards/reviews`,
             getAuthConfig()
         )
     } catch (error) {
@@ -20,7 +20,7 @@ export const getAllReviews = async () => {
 export const createReview = async (review) => {
     try {
         return await axios.post(
-            `${import.meta.env.VITE_API_BASE_URL}/api/v1/vocabulary/reviews`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/chinese-flashcards/reviews`,
             review,
             getAuthConfig()
         )
@@ -32,7 +32,7 @@ export const createReview = async (review) => {
 export const deleteReview = async (reviewId) => {
     try {
         return await axios.delete(
-            `${import.meta.env.VITE_API_BASE_URL}/api/v1/vocabulary/reviews/${reviewId}`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/chinese-flashcards/reviews/${reviewId}`,
             getAuthConfig()
         )
     } catch (error) {
@@ -42,7 +42,7 @@ export const deleteReview = async (reviewId) => {
 
 export const processReviewAction = async (reviewId, answer = null) => {
     try {
-        let url = `${import.meta.env.VITE_API_BASE_URL}/api/v1/vocabulary/reviews/${reviewId}/action`;
+        let url = `${import.meta.env.VITE_API_BASE_URL}/api/v1/chinese-flashcards/reviews/${reviewId}/action`;
 
         if (answer !== null) {
             url += `?answer=${answer}`;
@@ -57,7 +57,7 @@ export const processReviewAction = async (reviewId, answer = null) => {
 export const getReviewStatistics = async (reviewId) => {
     try {
         return await axios.get(
-            `${import.meta.env.VITE_API_BASE_URL}/api/v1/vocabulary/reviews/statistics/${reviewId}`,
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/chinese-flashcards/reviews/statistics/${reviewId}`,
             getAuthConfig()
         )
     } catch (error) {
