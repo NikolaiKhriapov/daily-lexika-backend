@@ -1,5 +1,5 @@
 import {
-    Button, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay, Stack, Text
+    Button, Flex, Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay, Progress, Stack, Text
 } from "@chakra-ui/react";
 import React, {useEffect, useState} from "react";
 import {processReviewAction} from "../../services/review.js";
@@ -7,9 +7,10 @@ import {updateUserStreak} from "../../services/user.js";
 import {errorNotification, successNotification} from "../../services/notification.js";
 import ReviewWordCard from "./ReviewWordCard.jsx";
 
-const StartReviewWindow = ({reviewId, isOpen, onClose, button}) => {
+const StartReviewWindow = ({reviewId, isOpen, onClose, button, totalReviewWords}) => {
 
     const [reviewWordDTO, setReviewWordDTO] = useState([])
+    const [reviewUpdatedSize, setReviewUpdatedSize] = useState([])
     const [isFormVisible, setIsFormVisible] = useState(true)
     const [isReviewComplete, setIsReviewComplete] = useState(false)
 
@@ -25,6 +26,7 @@ const StartReviewWindow = ({reviewId, isOpen, onClose, button}) => {
             .then((response) => {
                 if (response.data.data != null) {
                     setReviewWordDTO(response.data.data.reviewWordDTO)
+                    setReviewUpdatedSize(response.data.data.reviewUpdatedSize)
                 } else {
                     updateUserStreak()
                     setIsFormVisible(false)
@@ -61,6 +63,8 @@ const StartReviewWindow = ({reviewId, isOpen, onClose, button}) => {
         </Button>
     )
 
+    const reviewProgress = (totalReviewWords - reviewUpdatedSize) / totalReviewWords * 100
+
     return (
         <>
             {button}
@@ -73,8 +77,11 @@ const StartReviewWindow = ({reviewId, isOpen, onClose, button}) => {
                             <Text fontSize="xl" textAlign="center" mt={10}>Daily Review Complete</Text>
                         ) : (
                             <>
+                                <Stack spacing={2} mb={90} ml={10} mr={10}>
+                                    <Progress colorScheme='gray' size='sm' rounded={'md'} value={reviewProgress}/>
+                                </Stack>
                                 <ReviewWordCard reviewWordDTO={reviewWordDTO}/>
-                                <Stack spacing={2} align={"center"} mb={30}>
+                                <Stack spacing={2} align={"center"} mb={90}>
                                     <Flex>
                                         {forgotButton}
                                         {rememberedButton}

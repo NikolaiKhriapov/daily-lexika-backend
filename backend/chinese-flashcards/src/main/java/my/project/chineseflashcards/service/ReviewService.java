@@ -43,7 +43,7 @@ public class ReviewService {
                 reviewRepository.delete(oneReview);
                 reviewRepository.save(generateReview(reviewMapper.toDTO(oneReview), userId));
             }
-            allReviewDTOs.add(reviewMapper.toDTOShort(oneReview));
+            allReviewDTOs.add(reviewMapper.toDTO(oneReview));
         }
 
         return allReviewDTOs;
@@ -72,7 +72,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public WordDTO processReviewAction(Long reviewId, String answer) {
+    public Map<String, Object> processReviewAction(Long reviewId, String answer) {
         Review review = getReview(reviewId);
         if (answer != null) {
             List<Word> listOfWords = new ArrayList<>(review.getListOfWords());
@@ -90,7 +90,17 @@ public class ReviewService {
             review.setListOfWords(listOfWords);
             review = reviewRepository.save(review);
         }
-        return showOneReviewWord(review);
+
+        WordDTO reviewWordDTO = showOneReviewWord(review);
+
+        Map<String, Object> map = null;
+        if (reviewWordDTO != null) {
+            map = new HashMap<>();
+            map.put("reviewWordDTO", reviewWordDTO);
+            map.put("reviewUpdatedSize", review.getListOfWords().size());
+        }
+
+        return map;
     }
 
     public ReviewStatisticsDTO getReviewStatistics(Long userId, Long reviewId) {

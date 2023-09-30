@@ -29,17 +29,4 @@ public class ReviewMapper implements Mapper<Review, ReviewDTO> {
     public Review toEntity(ReviewDTO reviewDTO) {
         throw new RuntimeException("NOT YET IMPLEMENTED");
     }
-
-    public ReviewDTO toDTOShort(Review entity) {
-        return new ReviewDTO(
-                entity.getId(),
-                null,
-                entity.getMaxNewWordsPerDay(),
-                entity.getMaxReviewWordsPerDay(),
-                entity.getWordPack().getName(),
-                null,
-                entity.getDateLastCompleted(),
-                null
-        );
-    }
 }

@@ -3,7 +3,6 @@ package my.project.chineseflashcards.controller;
 import lombok.RequiredArgsConstructor;
 import my.project.chineseflashcards.model.dto.ResponseDTO;
 import my.project.chineseflashcards.model.dto.ReviewDTO;
-import my.project.chineseflashcards.model.dto.WordDTO;
 import my.project.chineseflashcards.service.ReviewService;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -64,14 +63,13 @@ public class ReviewController {
             @PathVariable("reviewId") Long reviewId,
             @RequestParam(value = "answer", required = false) String answer
     ) {
-        WordDTO reviewWord = reviewService.processReviewAction(reviewId, answer);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResponseDTO.builder()
                         .timeStamp(LocalDateTime.now())
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage("response.review.startReview", null, Locale.getDefault()))
-                        .data((reviewWord != null) ? Map.of("reviewWordDTO", reviewWord) : null)
+                        .data(reviewService.processReviewAction(reviewId, answer))
                         .build());
     }
 

@@ -61,6 +61,7 @@ export default function ReviewCard({reviewDTO, fetchAllReviewsDTO}) {
                                     isOpen={isOpenStartButton}
                                     onClose={onCloseStartButton}
                                     button={startButton}
+                                    totalReviewWords={reviewDTO.listOfWordId.length}
                                 />
                             </Stack>
                             <Stack ml={5}>
