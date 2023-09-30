@@ -8,11 +8,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @AllArgsConstructor
-public class NotificationConsumer {
+public class AmqpConsumer {
 
     private final NotificationService notificationService;
 
-    @RabbitListener(queues = "${rabbitmq.queues.notification}")
+    @RabbitListener(queues = "${rabbitmq.queues.send-welcome-notification}")
     public void consumer(NotificationRequest notificationRequest) {
         notificationService.send(notificationRequest);
     }

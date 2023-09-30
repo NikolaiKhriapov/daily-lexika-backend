@@ -117,55 +117,6 @@ public class ReviewService {
         );
     }
 
-    private WordDTO showOneReviewWord(Review review) {
-        if (!review.getListOfWords().isEmpty()) {
-            Word word = review.getListOfWords().get(0);
-            return wordMapper.toDTO(word);
-        }
-        review.setDateLastCompleted(LocalDate.now());
-        return null;
-    }
-
-    private void updateWordForYesAnswer(Word thisWord, List<Word> listOfWords) {
-        if (thisWord.getStatus().equals(NEW) || thisWord.getStatus().equals(KNOWN)) {
-            thisWord.setStatus(KNOWN);
-            thisWord.setCurrentStreak(0);
-            thisWord.setOccurrence(0);
-            thisWord.setDateOfLastOccurrence(LocalDate.now());
-            listOfWords.remove(thisWord);
-        }
-
-        if (thisWord.getStatus().equals(IN_REVIEW)) {
-            if (thisWord.getCurrentStreak() < 3) {
-                thisWord.setCurrentStreak(thisWord.getCurrentStreak() + 1);
-            }
-            if (thisWord.getCurrentStreak() == 3) {
-                thisWord.setTotalStreak(thisWord.getTotalStreak() + 1);
-                if (thisWord.getTotalStreak() >= 5) {
-                    thisWord.setStatus(KNOWN);
-                }
-                thisWord.setCurrentStreak(0);
-                thisWord.setOccurrence(0);
-                thisWord.setDateOfLastOccurrence(LocalDate.now());
-                listOfWords.remove(thisWord);
-            }
-        }
-
-        Collections.rotate(listOfWords, -1);
-    }
-
-    private void updateWordForNoAnswer(Word thisWord, List<Word> listOfWords) {
-        if (thisWord.getStatus().equals(NEW)) {
-            thisWord.setStatus(IN_REVIEW);
-        }
-
-        thisWord.setTotalStreak(0);
-        thisWord.setCurrentStreak(0);
-        thisWord.setStatus(IN_REVIEW);
-        listOfWords.remove(0);
-        listOfWords.add(Math.min(listOfWords.size(), 3), thisWord);
-    }
-
     public Review generateReview(ReviewDTO reviewDTO, Long userId) {
         WordPack wordPack = wordPackService.getWordPackByName(reviewDTO.wordPackName());
         List<Word> listOfWords = generateListOfWordsForReview(userId, wordPack, reviewDTO);
@@ -256,5 +207,58 @@ public class ReviewService {
         });
 
         return listOfWords;
+    }
+
+    public void deleteAllByUserId(Long userId) {
+        reviewRepository.deleteAllByUserId(userId);
+    }
+
+    private WordDTO showOneReviewWord(Review review) {
+        if (!review.getListOfWords().isEmpty()) {
+            Word word = review.getListOfWords().get(0);
+            return wordMapper.toDTO(word);
+        }
+        review.setDateLastCompleted(LocalDate.now());
+        return null;
+    }
+
+    private void updateWordForYesAnswer(Word thisWord, List<Word> listOfWords) {
+        if (thisWord.getStatus().equals(NEW) || thisWord.getStatus().equals(KNOWN)) {
+            thisWord.setStatus(KNOWN);
+            thisWord.setCurrentStreak(0);
+            thisWord.setOccurrence(0);
+            thisWord.setDateOfLastOccurrence(LocalDate.now());
+            listOfWords.remove(thisWord);
+        }
+
+        if (thisWord.getStatus().equals(IN_REVIEW)) {
+            if (thisWord.getCurrentStreak() < 3) {
+                thisWord.setCurrentStreak(thisWord.getCurrentStreak() + 1);
+            }
+            if (thisWord.getCurrentStreak() == 3) {
+                thisWord.setTotalStreak(thisWord.getTotalStreak() + 1);
+                if (thisWord.getTotalStreak() >= 5) {
+                    thisWord.setStatus(KNOWN);
+                }
+                thisWord.setCurrentStreak(0);
+                thisWord.setOccurrence(0);
+                thisWord.setDateOfLastOccurrence(LocalDate.now());
+                listOfWords.remove(thisWord);
+            }
+        }
+
+        Collections.rotate(listOfWords, -1);
+    }
+
+    private void updateWordForNoAnswer(Word thisWord, List<Word> listOfWords) {
+        if (thisWord.getStatus().equals(NEW)) {
+            thisWord.setStatus(IN_REVIEW);
+        }
+
+        thisWord.setTotalStreak(0);
+        thisWord.setCurrentStreak(0);
+        thisWord.setStatus(IN_REVIEW);
+        listOfWords.remove(0);
+        listOfWords.add(Math.min(listOfWords.size(), 3), thisWord);
     }
 }

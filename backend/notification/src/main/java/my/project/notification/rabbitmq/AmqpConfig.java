@@ -1,4 +1,4 @@
-package my.project.notification;
+package my.project.notification.rabbitmq;
 
 import lombok.Getter;
 import org.springframework.amqp.core.Binding;
@@ -11,15 +11,15 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Getter
-public class NotificationConfig {
+public class AmqpConfig {
 
-    @Value("${rabbitmq.exchanges.internal}")
+    @Value("${rabbitmq.exchanges.notification}")
     private String internalExchange;
 
-    @Value("${rabbitmq.queues.notification}")
+    @Value("${rabbitmq.queues.send-welcome-notification}")
     private String notificationQueue;
 
-    @Value("${rabbitmq.routing-keys.internal-notification}")
+    @Value("${rabbitmq.routing-keys.send-welcome-notification}")
     private String internalNotificationRoutingKey;
 
     @Bean

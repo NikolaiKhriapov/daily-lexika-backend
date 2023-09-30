@@ -13,4 +13,6 @@ public interface WordRepository extends JpaRepository<Word, Long> {
     List<Word> findByUserIdAndWordIdIn(Long userId, List<Long> wordDataIds);
 
     List<Word> findAllByUserIdAndStatusIs(Long userId, Status status);
+
+    void deleteAllByUserId(Long userId);
 }

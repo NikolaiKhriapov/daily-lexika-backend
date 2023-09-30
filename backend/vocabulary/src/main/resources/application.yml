@@ -22,5 +22,13 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 
+rabbitmq:
+  exchanges:
+    vocabulary: vocabulary.exchange
+  queues:
+    delete-chinese-flashcards: vocabulary.delete-chinese-flashcards.queue
+  routing-keys:
+    delete-chinese-flashcards: vocabulary.delete-chinese-flashcards.routing-key
+
 file-location:
   data-excel: "backend/vocabulary/src/main/resources/static/data/Data.xlsx"

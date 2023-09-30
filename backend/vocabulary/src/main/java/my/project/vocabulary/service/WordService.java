@@ -17,4 +17,8 @@ public class WordService {
                 wordRepository.findAllByUserIdAndStatusIs(userId, Status.KNOWN).size()
         );
     }
+
+    public void deleteAllByUserId(Long userId) {
+        wordRepository.deleteAllByUserId(userId);
+    }
 }

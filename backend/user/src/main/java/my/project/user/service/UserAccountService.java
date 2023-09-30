@@ -2,6 +2,8 @@ package my.project.user.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import my.project.amqp.RabbitMQMessageProducer;
+import my.project.clients.chineseflashcards.DeleteChineseFlashcardsRequest;
 import my.project.user.model.entity.User;
 import my.project.user.model.dto.UserDTO;
 import my.project.user.model.mapper.UserMapper;
@@ -19,6 +21,7 @@ public class UserAccountService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RabbitMQMessageProducer rabbitMQMessageProducer;
 
     public UserDTO getUser() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -45,9 +48,20 @@ public class UserAccountService {
     public void deleteAccount() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        // TODO::: delete word data
+        deleteChineseFlashcardsForUser(user);
 
         userRepository.delete(user);
+    }
+
+    private void deleteChineseFlashcardsForUser(User user) {
+        DeleteChineseFlashcardsRequest deleteChineseFlashcardsRequest = new DeleteChineseFlashcardsRequest(
+                user.getId()
+        );
+        rabbitMQMessageProducer.publish(
+                deleteChineseFlashcardsRequest,
+                "vocabulary.exchange",
+                "vocabulary.delete-chinese-flashcards.routing-key"
+        );
     }
 }
 

@@ -51,7 +51,7 @@ public class AuthenticationService {
         userRepository.save(user);
 
         checkWhetherIsFraudster(user);
-        sendNotification(user);
+        sendWelcomeNotificationToUser(user);
 
         String jwtToken = jwtService.generateToken(user);
 
@@ -87,7 +87,7 @@ public class AuthenticationService {
         }
     }
 
-    private void sendNotification(User user) {
+    private void sendWelcomeNotificationToUser(User user) {
         NotificationRequest notificationRequest = new NotificationRequest(
                 user.getId(),
                 user.getEmail(),
@@ -95,8 +95,8 @@ public class AuthenticationService {
         );
         rabbitMQMessageProducer.publish(
                 notificationRequest,
-                "internal.exchange",
-                "internal.notification.routing-key"
+                "notification.exchange",
+                "notification.send-welcome-notification.routing-key"
         );
     }
 }
