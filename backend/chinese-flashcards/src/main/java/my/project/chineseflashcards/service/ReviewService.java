@@ -103,6 +103,11 @@ public class ReviewService {
         return map;
     }
 
+    public List<WordDTO> getAllWordsForReview(Long reviewId) {
+        Review review = getReview(reviewId);
+        return wordMapper.toDTOShortList(review.getListOfWords());
+    }
+
     public ReviewStatisticsDTO getReviewStatistics(Long userId, Long reviewId) {
         List<WordData> listOfWordData = getReview(reviewId).getWordPack().getListOfWordData();
 
@@ -124,19 +129,6 @@ public class ReviewService {
                 (int) reviewWords,
                 (int) knownWords,
                 listOfWordData.size()
-        );
-    }
-
-    public Review generateReview(ReviewDTO reviewDTO, Long userId) {
-        WordPack wordPack = wordPackService.getWordPackByName(reviewDTO.wordPackName());
-        List<Word> listOfWords = generateListOfWordsForReview(userId, wordPack, reviewDTO);
-
-        return new Review(
-                userId,
-                reviewDTO.maxNewWordsPerDay(),
-                reviewDTO.maxReviewWordsPerDay(),
-                wordPack,
-                listOfWords
         );
     }
 
@@ -230,6 +222,19 @@ public class ReviewService {
         }
         review.setDateLastCompleted(LocalDate.now());
         return null;
+    }
+
+    private Review generateReview(ReviewDTO reviewDTO, Long userId) {
+        WordPack wordPack = wordPackService.getWordPackByName(reviewDTO.wordPackName());
+        List<Word> listOfWords = generateListOfWordsForReview(userId, wordPack, reviewDTO);
+
+        return new Review(
+                userId,
+                reviewDTO.maxNewWordsPerDay(),
+                reviewDTO.maxReviewWordsPerDay(),
+                wordPack,
+                listOfWords
+        );
     }
 
     private void updateWordForYesAnswer(Word thisWord, List<Word> listOfWords) {
