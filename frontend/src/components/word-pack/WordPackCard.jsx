@@ -1,6 +1,6 @@
 import {Heading, Box, Center, Flex, Text, Stack, Tag, useColorMode, Button, useDisclosure} from '@chakra-ui/react';
 import {useEffect, useState} from 'react';
-import {errorNotification} from '../../services/notification.js';
+import {errorNotification} from '../../services/popup-notification.js';
 import CreateReviewWindow from "../review/CreateReviewWindow.jsx";
 import {CopyIcon} from "@chakra-ui/icons";
 import ReviewWordPackWindow from "./ReviewWordPackWindow.jsx";

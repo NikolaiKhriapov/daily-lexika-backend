@@ -24,9 +24,4 @@ public class ReviewMapper implements Mapper<Review, ReviewDTO> {
                 entity.getDateGenerated()
         );
     }
-
-    @Override
-    public Review toEntity(ReviewDTO reviewDTO) {
-        throw new RuntimeException("NOT YET IMPLEMENTED");
-    }
 }

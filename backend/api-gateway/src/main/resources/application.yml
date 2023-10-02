@@ -29,6 +29,17 @@ spring:
               allowedOrigins: '*'
               allowedMethods: '*'
               allowedHeaders: '*'
+        - id: notifications
+          uri: lb://NOTIFICATION
+          predicates:
+            - Path=/api/v1/notifications/**
+          filters:
+            - AuthenticationFilter
+          metadata:
+            cors:
+              allowedOrigins: '*'
+              allowedMethods: '*'
+              allowedHeaders: '*'
         - id: chinese-flashcards
           uri: lb://CHINESE-FLASHCARDS
           predicates:

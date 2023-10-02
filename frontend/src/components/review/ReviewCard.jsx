@@ -3,7 +3,7 @@ import {
     AlertDialogHeader, AlertDialogContent, AlertDialogBody, AlertDialogFooter
 } from '@chakra-ui/react';
 import {useRef} from "react";
-import {errorNotification, successNotification} from "../../services/notification.js";
+import {errorNotification, successNotification} from "../../services/popup-notification.js";
 import {deleteReview} from "../../services/review.js";
 import {CopyIcon} from "@chakra-ui/icons";
 import StartReviewWindow from "./StartReviewWindow.jsx";

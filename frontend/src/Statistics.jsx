@@ -3,7 +3,7 @@ import {BsFire} from 'react-icons/bs';
 import {ImFire} from 'react-icons/im';
 import StatsCard from "./components/review/StatsCard.jsx";
 import SidebarWithHeader from "./shared/SideBar.jsx";
-import {errorNotification} from "./services/notification.js";
+import {errorNotification} from "./services/popup-notification.js";
 import {useEffect, useState} from "react";
 import {getUserStatistics} from "./services/user.js";
 import {getWordStatistics} from "./services/word.js";

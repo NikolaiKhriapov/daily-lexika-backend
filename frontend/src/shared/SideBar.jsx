@@ -1,14 +1,17 @@
 import React, {useEffect, useState} from 'react';
 import {
-    IconButton, Avatar, Box, CloseButton, Flex, HStack, Icon, useColorModeValue, Drawer, DrawerContent, Text,
-    useDisclosure, Menu, MenuButton, Link, VStack, MenuItem, MenuList, MenuDivider, Button, useColorMode,
+    Avatar, Box, Button, CloseButton, Drawer, DrawerContent, Flex, HStack, Icon, IconButton, Link, Menu, MenuButton,
+    MenuDivider, MenuItem, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader,
+    ModalOverlay, Text, useColorMode, useColorModeValue, useDisclosure,
 } from '@chakra-ui/react';
-import {FiMenu, FiBell} from 'react-icons/fi';
+import {FiBell, FiMenu} from 'react-icons/fi';
 import {useAuth} from "../components/context/AuthContext.jsx";
 import {MoonIcon, SunIcon} from "@chakra-ui/icons";
 import {showUserAccount} from "../services/user.js";
-import {errorNotification} from "../services/notification.js";
+import {errorNotification} from "../services/popup-notification.js";
 import UserAccountWindow from "../components/user/UserAccountWindow.jsx";
+import {getAllNotifications, readNotification} from "../services/notification.js";
+import NotificationWindow from "../components/notification/NotificationWindow.jsx";
 
 const LinkItems = [
     {name: 'Daily Reviews', route: '/reviews', icon: FiMenu},
@@ -20,26 +23,17 @@ export default function SidebarWithHeader({children}) {
     const {isOpen, onOpen, onClose} = useDisclosure();
     return (
         <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
-            <SidebarContent
-                onClose={() => onClose}
-                display={{base: 'none', md: 'block'}}
-            />
+            <SidebarContent onClose={onClose} display={{base: 'none', md: 'block'}}/>
             <Drawer
-                autoFocus={false}
-                isOpen={isOpen}
-                placement="left"
-                onClose={onClose}
-                returnFocusOnClose={false}
-                onOverlayClick={onClose}
-                size="full">
+                isOpen={isOpen} onClose={onClose} onOverlayClick={onClose}
+                autoFocus={false} returnFocusOnClose={false}
+                placement="left" size="full">
                 <DrawerContent>
                     <SidebarContent onClose={onClose}/>
                 </DrawerContent>
             </Drawer>
             <MobileNav onOpen={onOpen}/>
-            <Box ml={{base: 0, md: 60}} p="4">
-                {children}
-            </Box>
+            <Box ml={{base: 0, md: 60}} p="4">{children}</Box>
         </Box>
     );
 }
@@ -91,7 +85,14 @@ const MobileNav = ({onOpen, ...rest}) => {
         const {colorMode, toggleColorMode} = useColorMode();
         const {logout, user} = useAuth();
         const [userDTO, setUserDTO] = useState([]);
+        const [allNotificationsDTO, setAllNotificationsDTO] = useState([]);
+        const [selectedNotification, setSelectedNotification] = useState(null);
         const {isOpen: isOpenAccount, onOpen: onOpenAccount, onClose: onCloseAccount} = useDisclosure()
+        const {
+            isOpen: isOpenAllNotifications,
+            onOpen: onOpenAllNotifications,
+            onClose: onCloseAllNotifications
+        } = useDisclosure()
 
         const fetchUserDTO = () => {
             showUserAccount()
@@ -99,13 +100,52 @@ const MobileNav = ({onOpen, ...rest}) => {
                 .catch(error => errorNotification(error.code, error.response.data.message))
         }
 
+        const fetchAllNotificationsDTO = () => {
+            getAllNotifications()
+                .then(response => {
+                    const allNotificationsDTO = response.data.data.allNotificationsDTO;
+                    const allNotificationsDTOSorted = allNotificationsDTO.slice()
+                        .sort((a, b) => {
+                            return new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime()
+                        })
+                    setAllNotificationsDTO(allNotificationsDTOSorted)
+                })
+                .catch(error => errorNotification(error.code, error.response.data.message))
+        }
+
         useEffect(() => {
-            fetchUserDTO();
+            fetchUserDTO()
+            fetchAllNotificationsDTO()
         }, [])
 
-        const updateUserAndName = (updatedUserDTO) => {
-            setUserDTO(updatedUserDTO);
+        const updateUserAndName = (updatedUserDTO) => setUserDTO(updatedUserDTO)
+
+        const handleNotificationClick = (notificationDTO) => {
+            readNotification(notificationDTO.notificationId)
+            setSelectedNotification(notificationDTO)
+            setAllNotificationsDTO(prevNotificationsDTO => {
+                return prevNotificationsDTO.map(notification => {
+                    if (notification.notificationId === notificationDTO.notificationId) {
+                        return {...notification, isRead: true};
+                    }
+                    return notification;
+                });
+            });
         };
+        const handleCloseNotificationModal = () => setSelectedNotification(null)
+
+        function formatDate(dateString) {
+            const options = {year: 'numeric', month: 'short', day: 'numeric'};
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        function formatDateTime(dateString) {
+            const options = {year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric'};
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        const totalUnreadNotifications = allNotificationsDTO
+            .filter((notification) => notification.isRead !== true).length
 
         return (
             <Flex
@@ -115,20 +155,87 @@ const MobileNav = ({onOpen, ...rest}) => {
                 bg={useColorModeValue('white', 'gray.900')}
                 {...rest}>
                 <IconButton
-                    display={{base: 'flex', md: 'none'}} variant="outline" aria-label="open menu"
-                    onClick={onOpen}
+                    display={{base: 'flex', md: 'none'}} variant="outline" aria-label="open menu" onClick={onOpen}
                 />
 
-                <Text
-                    display={{base: 'flex', md: 'none'}}
-                    fontSize="2xl"
-                    fontFamily="monospace"
-                    fontWeight="bold">
-                    Logo
-                </Text>
-
                 <HStack spacing={{base: '0', md: '6'}}>
-                    <IconButton size="lg" variant="ghost" aria-label="open menu" icon={<FiBell/>}/>
+                    <Flex alignItems={'center'}>
+                        <Menu>
+                            <MenuButton>
+                                <FiBell/>
+                                {totalUnreadNotifications > 0
+                                    && (<Box w="7px" h="7px" bg="red.500" borderRadius="full"
+                                             position="absolute" mx={"3"} my={"-5"}/>)}
+                            </MenuButton>
+                            <MenuList bg={useColorModeValue('white', 'gray.900')} minWidth="400px"
+                                      borderColor={useColorModeValue('gray.200', 'gray.700')}>
+                                {totalUnreadNotifications > 0
+                                    ? (allNotificationsDTO
+                                        .filter((notificationDTO) => notificationDTO.isRead !== true)
+                                        .map((notificationDTO, index) => (
+                                            <React.Fragment key={index}>
+                                                <MenuItem position="relative" style={{justifyContent: 'space-between'}}
+                                                          onClick={() => handleNotificationClick(notificationDTO)}>
+                                                    <div>{notificationDTO.subject}</div>
+                                                    <div>
+                                                        <Box w="7px" h="7px" bg="red.500" borderRadius="full"
+                                                             position="absolute" top="3px" right="10px"/>
+                                                    </div>
+                                                    <div
+                                                        style={{fontSize: '14px', color: 'lightgray', marginRight: '15px'}}>
+                                                        {formatDate(notificationDTO.sentAt)}
+                                                    </div>
+                                                </MenuItem>
+                                                {index < allNotificationsDTO.length - 1 && <MenuDivider/>}
+                                            </React.Fragment>
+                                        )))
+                                    : (<Text textAlign="center" my={'5'}>No new notifications</Text>)
+                                }
+                                <Flex justifyContent={"center"}>
+                                    <Button onClick={onOpenAllNotifications} size={'sm'}>Show all notifications</Button>
+                                </Flex>
+                                <Modal isOpen={isOpenAllNotifications} onClose={onCloseAllNotifications} size={"lg"}
+                                       isCentered>
+                                    <ModalOverlay/>
+                                    <ModalContent rounded={"lg"}>
+                                        <ModalCloseButton/>
+                                        <ModalHeader>Notifications</ModalHeader>
+                                        <ModalBody>
+                                            {allNotificationsDTO.map((notificationDTO, index) => (
+                                                <React.Fragment key={index}>
+                                                    <MenuItem position="relative" style={{justifyContent: 'space-between'}}
+                                                              onClick={() => handleNotificationClick(notificationDTO)}>
+                                                        <div>{notificationDTO.subject}</div>
+                                                        <div>
+                                                            {!notificationDTO.isRead && (
+                                                                <Box w="7px" h="7px" bg="red.500" borderRadius="full"
+                                                                     position="absolute" top="3px" right="10px"/>
+                                                            )}
+                                                        </div>
+                                                        <div style={{
+                                                            fontSize: '14px',
+                                                            color: 'lightgray',
+                                                            marginRight: '15px'
+                                                        }}>
+                                                            {formatDate(notificationDTO.sentAt)}
+                                                        </div>
+                                                    </MenuItem>
+                                                    {index < allNotificationsDTO.length - 1 && <MenuDivider/>}
+                                                </React.Fragment>
+                                            ))}
+                                        </ModalBody>
+                                        <ModalFooter/>
+                                    </ModalContent>
+                                </Modal>
+                                <NotificationWindow
+                                    formatDateTime={formatDateTime}
+                                    handleCloseNotificationModal={handleCloseNotificationModal}
+                                    selectedNotification={selectedNotification}
+                                />
+                            </MenuList>
+                            <br/>
+                        </Menu>
+                    </Flex>
 
                     <Button onClick={toggleColorMode}>
                         {colorMode === 'light' ? <MoonIcon/> : <SunIcon/>}
@@ -141,17 +248,8 @@ const MobileNav = ({onOpen, ...rest}) => {
                                 transition="all 0.3s"
                                 _focus={{boxShadow: 'none'}}>
                                 <HStack>
-                                    <Avatar
-                                        size="md"
-                                        src={`data:image/png;base64`}
-                                    />
-                                    <VStack
-                                        display={{base: 'none', md: 'flex'}} alignItems="flex-start"
-                                        spacing="1px" ml="2">
-                                        <Text fontSize="sm">{userDTO.name}</Text>
-                                        <Text fontSize="sm">{user?.username}</Text>
-                                    </VStack>
-                                    <Box width={"10"}/>
+                                    <Avatar size="md"/>
+                                    <Box width={"5"}/>
                                 </HStack>
                             </MenuButton>
                             <MenuList

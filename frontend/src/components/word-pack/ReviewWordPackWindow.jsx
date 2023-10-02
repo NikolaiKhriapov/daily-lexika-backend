@@ -2,7 +2,7 @@ import {Badge, Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay} f
 import {CopyIcon} from "@chakra-ui/icons";
 import {useEffect, useState, useRef} from "react";
 import {getAllWordsForWordPack} from "../../services/word-pack.js";
-import {errorNotification} from "../../services/notification.js";
+import {errorNotification} from "../../services/popup-notification.js";
 
 const ReviewWordPackWindow = ({button, isOpen, onClose, wordPackDTO}) => {
 

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Box, Flex, Progress, Stat, StatLabel, StatNumber, useColorModeValue, useDisclosure} from '@chakra-ui/react';
-import {errorNotification} from "../../services/notification.js";
+import {errorNotification} from "../../services/popup-notification.js";
 import {getReviewStatistics} from "../../services/review.js";
 import {AiOutlineQuestionCircle} from "react-icons/ai";
 import StatsReviewWindow from "./StatsReviewWindow.jsx";

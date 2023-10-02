@@ -4,7 +4,7 @@ import {
 import {Form, Formik, useField} from "formik";
 import * as Yup from 'yup';
 import {useAuth} from "../context/AuthContext.jsx";
-import {errorNotification} from "../../services/notification.js";
+import {errorNotification} from "../../services/popup-notification.js";
 import {useNavigate} from "react-router-dom";
 import {useEffect} from "react";
 
@@ -45,17 +45,10 @@ const LoginForm = () => {
             initialValues={{email: '', password: ''}}
             onSubmit={(values, {setSubmitting}) => {
                 setSubmitting(true);
-                login(values).then(response => {
-                    navigate("/reviews")
-                    console.log("Successfully logged in")
-                }).catch(error => {
-                    errorNotification(
-                        error.code,
-                        error.response.data.message
-                    )
-                }).finally(() => {
-                    setSubmitting(false);
-                })
+                login(values)
+                    .then(() => navigate("/reviews"))
+                    .catch(error => errorNotification(error.code, error.response.data.message))
+                    .finally(() => setSubmitting(false))
             }}
         >
             {({isValid, isSubmitting, dirty}) => (

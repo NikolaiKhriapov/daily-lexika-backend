@@ -16,6 +16,8 @@ spring:
         show_sql: 'false'
     hibernate:
       ddl-auto: create-drop
+  rabbitmq:
+    addresses: localhost:5672
 
 eureka:
   client:

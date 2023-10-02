@@ -91,6 +91,7 @@ public class AuthenticationService {
         NotificationRequest notificationRequest = new NotificationRequest(
                 user.getId(),
                 user.getEmail(),
+                "Welcome to Chinese Learning App!",
                 "Hi, %s, welcome to Chinese Learning App!".formatted(user.getName())
         );
         rabbitMQMessageProducer.publish(

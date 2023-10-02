@@ -4,7 +4,7 @@ import {
 import React, {useEffect, useState} from "react";
 import {processReviewAction} from "../../services/review.js";
 import {updateUserStreak} from "../../services/user.js";
-import {errorNotification, successNotification} from "../../services/notification.js";
+import {errorNotification, successNotification} from "../../services/popup-notification.js";
 import ReviewWordCard from "./ReviewWordCard.jsx";
 
 const StartReviewWindow = ({reviewId, isOpen, onClose, button, totalReviewWords}) => {
@@ -74,7 +74,7 @@ const StartReviewWindow = ({reviewId, isOpen, onClose, button, totalReviewWords}
                     <ModalCloseButton/>
                     <ModalBody display="flex" flexDirection="column" justifyContent="center">
                         {!isFormVisible && isReviewComplete ? (
-                            <Text fontSize="xl" textAlign="center" mt={10}>Daily Review Complete</Text>
+                            <Text fontSize="xl" textAlign="center">Daily Review Complete</Text>
                         ) : (
                             <>
                                 <Stack spacing={2} mb={90} ml={10} mr={10}>

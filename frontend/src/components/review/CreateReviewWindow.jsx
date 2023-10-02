@@ -6,7 +6,7 @@ import {CopyIcon} from "@chakra-ui/icons";
 import {Form, Formik, useField} from "formik";
 import * as Yup from "yup";
 import {createReview} from "../../services/review.js";
-import {errorNotification, successNotification} from "../../services/notification.js";
+import {errorNotification, successNotification} from "../../services/popup-notification.js";
 
 const CreateReviewWindow = ({button, isOpen, onClose, wordPackDTO, fetchAllWordPacksDTO, fetchAllReviewsDTO}) => {
 

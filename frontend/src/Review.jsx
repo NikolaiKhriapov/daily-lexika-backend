@@ -1,7 +1,7 @@
 import {Wrap, WrapItem, Spinner, chakra} from '@chakra-ui/react'
 import SidebarWithHeader from "./shared/SideBar.jsx";
 import {useEffect, useState} from "react";
-import {errorNotification} from "./services/notification.js";
+import {errorNotification} from "./services/popup-notification.js";
 import ReviewCard from "./components/review/ReviewCard.jsx";
 import {getAllReviews} from "./services/review.js";
 

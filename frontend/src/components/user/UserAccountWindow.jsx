@@ -5,7 +5,7 @@ import {
 } from "@chakra-ui/react";
 import {Form, Formik, useField} from "formik";
 import * as Yup from "yup";
-import {errorNotification, successNotification} from "../../services/notification.js";
+import {errorNotification, successNotification} from "../../services/popup-notification.js";
 import React, {useRef} from "react";
 import {deleteAccount, updateUserInfo} from "../../services/user.js";
 
@@ -67,7 +67,7 @@ const UserAccountWindow = ({button, isOpen, onClose, userDTO, updateUserAndName}
                 <ModalHeader>Account</ModalHeader>
                 <ModalBody>
                     <Flex justifyContent="center" alignItems="baseline">
-                        <Avatar size="2xl" src={`data:image/png;base64`}/>
+                        <Avatar size="2xl"/>
                     </Flex>
                     <br/>
                     <Formik
