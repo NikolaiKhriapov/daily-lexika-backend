@@ -73,6 +73,18 @@ public class ReviewController {
                         .build());
     }
 
+    @GetMapping("/{reviewId}/words")
+    public ResponseEntity<ResponseDTO> getAllWordsForReview(@PathVariable("reviewId") Long reviewId) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResponseDTO.builder()
+                        .timeStamp(LocalDateTime.now())
+                        .statusCode(HttpStatus.OK.value())
+                        .message(messageSource.getMessage("response.review.getAllWordsForReview", null, Locale.getDefault()))
+                        .data(Map.of("wordsForReviewDTO", reviewService.getAllWordsForReview(reviewId)))
+                        .build());
+    }
+
     @GetMapping("/statistics/{reviewId}")
     public ResponseEntity<ResponseDTO> getReviewStatistics(@RequestHeader("userId") Long userId,
                                                            @PathVariable("reviewId") Long reviewId) {
@@ -81,7 +93,7 @@ public class ReviewController {
                 .body(ResponseDTO.builder()
                         .timeStamp(LocalDateTime.now())
                         .statusCode(HttpStatus.OK.value())
-                        .message(messageSource.getMessage("response.review.getAllReviews", null, Locale.getDefault()))
+                        .message(messageSource.getMessage("response.review.getReviewStatistics", null, Locale.getDefault()))
                         .data(Map.of("reviewStatisticsDTO", reviewService.getReviewStatistics(userId, reviewId)))
                         .build());
     }

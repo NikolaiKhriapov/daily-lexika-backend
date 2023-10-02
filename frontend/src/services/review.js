@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "axios"
 
 const getAuthConfig = () => ({
     headers: {
@@ -13,7 +13,7 @@ export const getAllReviews = async () => {
             getAuthConfig()
         )
     } catch (error) {
-        throw error;
+        throw error
     }
 }
 
@@ -25,7 +25,7 @@ export const createReview = async (review) => {
             getAuthConfig()
         )
     } catch (error) {
-        throw error;
+        throw error
     }
 }
 
@@ -36,21 +36,32 @@ export const deleteReview = async (reviewId) => {
             getAuthConfig()
         )
     } catch (error) {
-        throw error;
+        throw error
     }
 }
 
 export const processReviewAction = async (reviewId, answer = null) => {
     try {
-        let url = `${import.meta.env.VITE_API_BASE_URL}/api/v1/chinese-flashcards/reviews/${reviewId}/action`;
+        let url = `${import.meta.env.VITE_API_BASE_URL}/api/v1/chinese-flashcards/reviews/${reviewId}/action`
 
         if (answer !== null) {
-            url += `?answer=${answer}`;
+            url += `?answer=${answer}`
         }
 
-        return await axios.get(url, getAuthConfig());
+        return await axios.get(url, getAuthConfig())
     } catch (error) {
-        throw error;
+        throw error
+    }
+}
+
+export const getWordsForReview = async (reviewId) => {
+    try {
+        return await axios.get(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/chinese-flashcards/reviews/${reviewId}/words`,
+            getAuthConfig()
+        )
+    } catch (error) {
+        throw error
     }
 }
 
@@ -61,6 +72,6 @@ export const getReviewStatistics = async (reviewId) => {
             getAuthConfig()
         )
     } catch (error) {
-        throw error;
+        throw erro
     }
 }

@@ -1,18 +1,31 @@
 import {
     Heading, Box, Center, Flex, Text, Stack, Tag, Button, useDisclosure, AlertDialog, AlertDialogOverlay,
     AlertDialogHeader, AlertDialogContent, AlertDialogBody, AlertDialogFooter
-} from '@chakra-ui/react';
-import {useRef} from "react";
-import {errorNotification, successNotification} from "../../services/popup-notification.js";
-import {deleteReview} from "../../services/review.js";
-import {CopyIcon} from "@chakra-ui/icons";
-import StartReviewWindow from "./StartReviewWindow.jsx";
+} from '@chakra-ui/react'
+import {useEffect, useRef, useState} from "react"
+import {errorNotification, successNotification} from "../../services/popup-notification.js"
+import {deleteReview, getWordsForReview} from "../../services/review.js"
+import {CopyIcon} from "@chakra-ui/icons"
+import StartReviewWindow from "./StartReviewWindow.jsx"
 
 export default function ReviewCard({reviewDTO, fetchAllReviewsDTO}) {
 
+    const [wordsForReviewDTO, setWordsForReviewDTO] = useState([])
     const {isOpen: isOpenRemoveButton, onOpen: onOpenRemoveButton, onClose: onCloseRemoveButton} = useDisclosure()
     const {isOpen: isOpenStartButton, onOpen: onOpenStartButton, onClose: onCloseStartButton} = useDisclosure()
+    const [reviewRemoved, setReviewRemoved] = useState(false)
     const cancelRef = useRef()
+
+    const fetchWordsForReviewDTO = (reviewDTO) => {
+        getWordsForReview(reviewDTO.id)
+            .then(response => setWordsForReviewDTO(response.data.data.wordsForReviewDTO))
+            .catch(error => errorNotification(error.code, error.response.data.message))
+    }
+    useEffect(() => {
+        if (!reviewRemoved) {
+            fetchWordsForReviewDTO(reviewDTO)
+        }
+    }, [wordsForReviewDTO])
 
     const startButton = (
         <Button
@@ -47,10 +60,12 @@ export default function ReviewCard({reviewDTO, fetchAllReviewsDTO}) {
                     </Stack>
                     <Stack spacing={2} align={'left'} mb={30}>
                         <Text color={'gray.500'}>
-                            New Words: <Tag borderRadius={'full'}><CopyIcon/>{reviewDTO.maxNewWordsPerDay}</Tag>
+                            New Words: <Tag borderRadius={'full'}><CopyIcon/>
+                            {wordsForReviewDTO.filter((wordDTO) => wordDTO.status === "NEW").length}</Tag>
                         </Text>
                         <Text color={'gray.500'}>
-                            Review Words: <Tag borderRadius={'full'}><CopyIcon/>{reviewDTO.maxReviewWordsPerDay}</Tag>
+                            Review Words: <Tag borderRadius={'full'}><CopyIcon/>
+                            {wordsForReviewDTO.filter((wordDTO) => wordDTO.status === "IN_REVIEW" || wordDTO.status === "KNOWN").length}</Tag>
                         </Text>
                     </Stack>
                     <Stack spacing={2} align={'center'}>
@@ -81,6 +96,7 @@ export default function ReviewCard({reviewDTO, fetchAllReviewsDTO}) {
                                             <AlertDialogFooter>
                                                 <Button ref={cancelRef} onClick={onCloseRemoveButton}>Cancel</Button>
                                                 <Button colorScheme='red' onClick={() => {
+                                                    setReviewRemoved(true)
                                                     deleteReview(reviewDTO.id)
                                                         .then(() => {
                                                             successNotification(
@@ -105,5 +121,5 @@ export default function ReviewCard({reviewDTO, fetchAllReviewsDTO}) {
                 </Box>
             </Flex>
         </Center>
-    );
+    )
 }
