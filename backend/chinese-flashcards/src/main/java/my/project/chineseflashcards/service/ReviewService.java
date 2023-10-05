@@ -49,6 +49,10 @@ public class ReviewService {
         return allReviewDTOs;
     }
 
+    public ReviewDTO getReviewById(Long reviewId) {
+        return reviewMapper.toDTO(getReview(reviewId));
+    }
+
     public void createReview(ReviewDTO newReviewDTO, Long userId) {
         List<Review> existingReviews = reviewRepository.findAllByUserId(userId);
         if (existingReviews
@@ -63,12 +67,6 @@ public class ReviewService {
 
     public void deleteReview(Long reviewId) {
         reviewRepository.delete(getReview(reviewId));
-    }
-
-    public Review getReview(Long reviewId) {
-        return reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
-                        "exception.review.notFound", null, Locale.getDefault())));
     }
 
     @Transactional
@@ -213,6 +211,12 @@ public class ReviewService {
 
     public void deleteAllByUserId(Long userId) {
         reviewRepository.deleteAllByUserId(userId);
+    }
+
+    private Review getReview(Long reviewId) {
+        return reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
+                        "exception.review.notFound", null, Locale.getDefault())));
     }
 
     private WordDTO showOneReviewWord(Review review) {

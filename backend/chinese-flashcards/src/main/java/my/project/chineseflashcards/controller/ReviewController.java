@@ -33,6 +33,18 @@ public class ReviewController {
                         .build());
     }
 
+    @GetMapping("/{reviewId}")
+    public ResponseEntity<ResponseDTO> getReview(@PathVariable("reviewId") Long reviewId) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResponseDTO.builder()
+                        .timeStamp(LocalDateTime.now())
+                        .statusCode(HttpStatus.OK.value())
+                        .message(messageSource.getMessage("response.review.getReview", null, Locale.getDefault()))
+                        .data(Map.of("reviewDTO", reviewService.getReviewById(reviewId)))
+                        .build());
+    }
+
     @PostMapping
     public ResponseEntity<ResponseDTO> createReview(@RequestHeader("userId") Long userId,
                                                     @RequestBody ReviewDTO newReviewDTO) {
