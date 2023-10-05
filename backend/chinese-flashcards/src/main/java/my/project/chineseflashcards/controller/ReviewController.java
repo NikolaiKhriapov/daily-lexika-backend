@@ -58,6 +58,19 @@ public class ReviewController {
                         .build());
     }
 
+    @PatchMapping("/{reviewId}")
+    public ResponseEntity<ResponseDTO> refreshReview(@RequestHeader("userId") Long userId,
+                                                     @PathVariable("reviewId") Long reviewId) {
+        reviewService.refreshReview(userId, reviewId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ResponseDTO.builder()
+                        .timeStamp(LocalDateTime.now())
+                        .statusCode(HttpStatus.OK.value())
+                        .message(messageSource.getMessage("response.review.refreshReview", null, Locale.getDefault()))
+                        .build());
+    }
+
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<ResponseDTO> deleteReview(@PathVariable("reviewId") Long reviewId) {
         reviewService.deleteReview(reviewId);

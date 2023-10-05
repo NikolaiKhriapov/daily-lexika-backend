@@ -65,6 +65,17 @@ public class ReviewService {
         reviewRepository.save(newReview);
     }
 
+    @Transactional
+    public void refreshReview(Long userId, Long reviewId) {
+        Review review = getReview(reviewId);
+
+        List<Word> listOfWords = generateListOfWordsForReview(userId, review.getWordPack(), reviewMapper.toDTO(review));
+
+        review.setDateLastCompleted(null); // TODO::: fix this workaround
+        review.setListOfWords(listOfWords);
+        reviewRepository.save(review);
+    }
+
     public void deleteReview(Long reviewId) {
         reviewRepository.delete(getReview(reviewId));
     }

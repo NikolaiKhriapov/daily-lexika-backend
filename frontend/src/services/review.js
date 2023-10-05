@@ -40,6 +40,18 @@ export const createReview = async (review) => {
     }
 }
 
+export const refreshReview = async (reviewId) => {
+    try {
+        return await axios.patch(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/chinese-flashcards/reviews/${reviewId}`,
+            '',
+            getAuthConfig()
+        )
+    } catch (error) {
+        throw error
+    }
+}
+
 export const removeReview = async (reviewId) => {
     try {
         return await axios.delete(
@@ -83,6 +95,6 @@ export const getReviewStatistics = async (reviewId) => {
             getAuthConfig()
         )
     } catch (error) {
-        throw erro
+        throw error
     }
 }
