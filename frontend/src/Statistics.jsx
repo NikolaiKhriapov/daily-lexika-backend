@@ -44,7 +44,7 @@ const Statistics = () => {
     const fetchAllReviewsDTO = () => {
         setLoading(true);
         getAllReviews()
-            .then(response => setAllReviewsDTO(response.data.data.allReviewsDTO))
+            .then(response => setAllReviewsDTO(response.data.data.allReviewsDTO.sort((a, b) => a.id - b.id)))
             .catch(error => {
                 setError((error.response.data.message))
                 errorNotification(error.code, error.response.data.message)
