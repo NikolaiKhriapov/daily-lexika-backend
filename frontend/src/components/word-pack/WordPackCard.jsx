@@ -42,7 +42,7 @@ export default function WordPackCard({wordPackDTO, fetchAllWordPacksDTO}) {
                 shadow={'2xl'} border={'1px solid'} rounded={'lg'} width="210px" height="270px" p={6} align={'center'}
                 borderColor={useColorModeValue('gray.800', 'gray.500')}
             >
-                <Flex justifyContent="right">
+                <Flex justifyContent="right" mr={'-15px'} mt={'-15px'} mb={'15px'}>
                     <AiOutlineQuestionCircle size="1em" onClick={onOpenPreviewButton} cursor={'pointer'}/>
                     <ReviewWordPackWindow
                         isOpen={isOpenPreviewButton}
@@ -68,8 +68,7 @@ export default function WordPackCard({wordPackDTO, fetchAllWordPacksDTO}) {
                                 borderColor={'gray.400'}
                             >
                                 <FaCheck color="gray.500" style={{marginRight: '5px'}}/>Added
-                            </Text>
-                        )
+                            </Text>)
                         : (
                             <CreateReviewWindow
                                 button={createButton}
