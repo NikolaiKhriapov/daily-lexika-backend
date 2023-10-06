@@ -4,7 +4,7 @@ import {Box, Flex, Stat, StatLabel, StatNumber, useColorModeValue} from '@chakra
 export default function StatsCard({title, stat, icon}) {
     return (
         <Box width="220px">
-            <Stat px={{md: 4}} py={'5'} shadow={'xl'} border={'1px solid'} rounded={'lg'}
+            <Stat px={{md: 4}} py={'5'} shadow={'2xl'} border={'1px solid'} rounded={'lg'}
                   borderColor={useColorModeValue('gray.800', 'gray.500')}>
                 <Flex justifyContent={'left'}>
                     <Box my={'auto'} color={useColorModeValue('black', 'gray.200')} alignContent={'center'}>

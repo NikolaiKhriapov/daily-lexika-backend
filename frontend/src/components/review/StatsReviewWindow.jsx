@@ -24,7 +24,7 @@ const StatsReviewWindow = ({isOpen, onClose, reviewDTO, reviewStatisticsDTO, wor
                         <Flex justifyContent="space-between" alignItems="baseline">
                             <StatLabel fontSize={'2xl'}>Pack Progress</StatLabel>
                             <ReviewWordPackWindow
-                                button={(<AiOutlineQuestionCircle size="1em" onClick={onOpenDrawer}/>)}
+                                button={(<AiOutlineQuestionCircle size="1em" onClick={onOpenDrawer} cursor={'pointer'}/>)}
                                 isOpen={isOpenDrawer}
                                 onClose={onCloseDrawer}
                                 wordPackDTO={wordPackDTO}

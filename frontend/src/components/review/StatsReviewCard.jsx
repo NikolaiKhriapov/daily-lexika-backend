@@ -33,11 +33,11 @@ export default function StatsReviewCard({reviewDTO}) {
     return (
         <Box width="220px">
             <Stat
-                px={'4'} py={'3.5'} shadow={'xl'} border={'1px solid'} rounded={'lg'}
+                px={'4'} py={'3.5'} shadow={'2xl'} border={'1px solid'} rounded={'lg'}
                 borderColor={useColorModeValue('gray.800', 'gray.500')}>
                 <Flex justifyContent="space-between" alignItems="center">
                     <StatLabel fontSize={'large'} fontWeight={'bold'}>{reviewDTO.wordPackName}</StatLabel>
-                    <AiOutlineQuestionCircle size="1em" onClick={onOpen}/>
+                    <AiOutlineQuestionCircle size="1em" onClick={onOpen} cursor={'pointer'}/>
                     <StatsReviewWindow
                         isOpen={isOpen}
                         onClose={onClose}
