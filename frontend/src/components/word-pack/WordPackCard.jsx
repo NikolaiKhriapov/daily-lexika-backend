@@ -30,6 +30,7 @@ export default function WordPackCard({wordPackDTO, fetchAllWordPacksDTO}) {
         <Button
             bg={"grey"} rounded={"lg"} size={"sm"} background={'gray.200'}
             borderColor={useColorModeValue('gray.400', 'gray.500')} borderWidth={'0.5px'}
+            _hover={{bg: 'gray.400', borderColor: 'gray.500'}}
             onClick={onOpenCreateButton}
         >
             Create Daily Review

@@ -49,8 +49,9 @@ export default function ReviewCard({reviewDTO, fetchAllReviewsDTO}) {
 
     const startButton = (
         <Button
-            bg={"red.400"} rounded={"lg"} background={'gray.200'}
+            bg={"grey"} rounded={"lg"} size={"sm"} background={'gray.200'}
             borderColor={useColorModeValue('gray.400', 'gray.500')} borderWidth={'0.5px'}
+            _hover={{bg: 'gray.400', borderColor: 'gray.500'}}
             onClick={() => isDateLastCompletedToday ? requestRefreshReview(reviewDTO.id) : onOpenStartButton()}
         >
             {!isDateLastCompletedToday ? 'Start' : 'Refresh'}
@@ -114,7 +115,7 @@ export default function ReviewCard({reviewDTO, fetchAllReviewsDTO}) {
                 <Flex justifyContent="center">
                     <Heading fontSize={'2xl'} fontWeight={500} fontFamily={'body'}>{reviewDTO.wordPackName}</Heading>
                 </Flex>
-                <Flex justifyContent="center" height="140px" flexDirection="column">
+                <Flex justifyContent="center" height="150px" flexDirection="column">
                     <Flex alignItems="baseline" justifyContent="center">
                         <StatNumber fontSize={'2xl'}>
                             {wordsForReviewDTO.filter((wordDTO) => wordDTO.status === "NEW").length}
