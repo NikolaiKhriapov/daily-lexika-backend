@@ -55,20 +55,21 @@ const StartReviewWindow = ({reviewId, isOpen, onClose, button, totalReviewWords}
 
     const forgotButton = (
         <Button
-            bg={"grey"} rounded={"lg"} background={'gray.200'} boxShadow={"lg"} ml={5}
-            borderColor={useColorModeValue('gray.400', 'gray.500')} borderWidth={'0.5px'}
-            _hover={{bg: 'red.300', borderColor: 'gray.500'}}
+            rounded={"lg"} shadow={'2xl'}
+            color={useColorModeValue('black', 'white')}
+            bg={useColorModeValue('gray.300', 'rgba(60,60,60)')}
+            _hover={{bg: useColorModeValue('red.300', 'red.400')}}
             onClick={() => pressButton("no")}
         >
             Forgot
         </Button>
     )
     const rememberedButton = (
-        <Button
-            bg={"grey"} rounded={"lg"} background={'gray.200'} boxShadow={"lg"} ml={5}
-            borderColor={useColorModeValue('gray.400', 'gray.500')} borderWidth={'0.5px'}
-            _hover={{bg: 'gray.400', borderColor: 'gray.500'}}
-            onClick={() => pressButton("yes")} disabled={!reviewWordDTO}
+        <Button rounded={"lg"} shadow={'2xl'} ml={5}
+                color={useColorModeValue('black', 'white')}
+                bg={useColorModeValue('gray.300', 'rgba(60,60,60)')}
+                _hover={{bg: useColorModeValue('gray.400', 'rgba(80,80,80)')}}
+                onClick={() => pressButton("yes")} disabled={!reviewWordDTO}
         >
             Remembered
         </Button>
@@ -79,33 +80,39 @@ const StartReviewWindow = ({reviewId, isOpen, onClose, button, totalReviewWords}
     return (
         <>
             {button}
-                <Modal isOpen={isOpen} onClose={onClose} size={"6xl"} isCentered>
-                    <ModalOverlay/>
-                    <ModalContent maxH="80vh" minH="80vh" minW="80vh" maxW="80vh" rounded={'lg'}>
-                        <ModalCloseButton/>
-                        <ModalBody display="flex" flexDirection="column" justifyContent="center">
-                            {!isFormVisible && isReviewComplete ? null : (
-                                <>
-                                    <Stack spacing={2} mb={90} ml={10} mr={10}>
-                                        <Progress colorScheme='gray' size='sm' rounded={'md'} value={reviewProgress}/>
-                                    </Stack>
-                                    <ReviewWordCard
-                                        reviewWordDTO={reviewWordDTO}
-                                        isFlipped={isFlipped}
-                                        setIsFlipped={setIsFlipped}
-                                    />
-                                    <Stack align={"center"}>
-                                        <Flex>
-                                            {forgotButton}
-                                            {rememberedButton}
-                                        </Flex>
-                                    </Stack>
-                                </>
-                            )}
-                        </ModalBody>
-                        <ModalFooter height={90}/>
-                    </ModalContent>
-                </Modal>
+            <Modal isOpen={isOpen} onClose={onClose} size={"6xl"} isCentered>
+                <ModalOverlay/>
+                <ModalContent shadow={'2xl'} border={'1px solid'} rounded={'lg'} width="80vh" height="80vh" p={6}
+                              align={'center'}
+                              borderColor={useColorModeValue('gray.400', 'rgba(80,80,80)')}
+                              bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}
+                >
+                    <ModalCloseButton/>
+                    <ModalBody display="flex" flexDirection="column" justifyContent="center">
+                        {!isFormVisible && isReviewComplete ? null : (
+                            <>
+                                <Stack spacing={2} mb={90} ml={10} mr={10}>
+                                    <Progress value={reviewProgress} size='sm' rounded={'md'}
+                                              colorScheme={useColorModeValue('gray', 'gray')}
+                                              bg={useColorModeValue('gray.200', 'rgba(80,80,80)')}/>
+                                </Stack>
+                                <ReviewWordCard
+                                    reviewWordDTO={reviewWordDTO}
+                                    isFlipped={isFlipped}
+                                    setIsFlipped={setIsFlipped}
+                                />
+                                <Stack align={"center"}>
+                                    <Flex>
+                                        {forgotButton}
+                                        {rememberedButton}
+                                    </Flex>
+                                </Stack>
+                            </>
+                        )}
+                    </ModalBody>
+                    <ModalFooter height={90}/>
+                </ModalContent>
+            </Modal>
         </>
     )
 }

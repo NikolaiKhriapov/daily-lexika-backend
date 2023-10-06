@@ -3,9 +3,11 @@ import {Box, Flex, Stat, StatLabel, StatNumber, useColorModeValue} from '@chakra
 
 export default function StatsCard({title, stat, icon}) {
     return (
-        <Box width="220px">
-            <Stat px={{md: 4}} py={'5'} shadow={'2xl'} border={'1px solid'} rounded={'lg'}
-                  borderColor={useColorModeValue('gray.800', 'gray.500')}>
+        <Box>
+            <Stat shadow={'2xl'} border={'1px solid'} rounded={'lg'} px={'4'} py={'5'} width="220px"
+                  borderColor={useColorModeValue('gray.400', 'rgba(80,80,80)')}
+                  bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}
+            >
                 <Flex justifyContent={'left'}>
                     <Box my={'auto'} color={useColorModeValue('black', 'gray.200')} alignContent={'center'}>
                         {icon}

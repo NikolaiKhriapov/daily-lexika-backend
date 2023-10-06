@@ -1,4 +1,6 @@
-import {Badge, Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay} from "@chakra-ui/react";
+import {
+    Badge, Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay, useColorModeValue
+} from "@chakra-ui/react";
 import {CopyIcon} from "@chakra-ui/icons";
 import {useEffect, useState, useRef} from "react";
 import {getAllWordsForWordPack} from "../../services/word-pack.js";
@@ -34,7 +36,9 @@ const ReviewWordPackWindow = ({button, isOpen, onClose, wordPackDTO}) => {
             {button}
             <Modal isOpen={isOpen} onClose={onClose} size={"3xl"} isCentered>
                 <ModalOverlay/>
-                <ModalContent rounded={'lg'}>
+                <ModalContent shadow={'2xl'} border={'1px solid'} rounded={'lg'}
+                              borderColor={useColorModeValue('gray.400', 'rgba(80,80,80)')}
+                              bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}>
                     <ModalCloseButton/>
                     <ModalBody>
                         <div style={{margin: "15px 0", fontSize: "20px", fontWeight: "bold"}}>{wordPackDTO.name}</div>

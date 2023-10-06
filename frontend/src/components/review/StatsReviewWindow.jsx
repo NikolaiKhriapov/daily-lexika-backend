@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Flex, StatNumber, StatLabel,
-    Progress, CircularProgress, CircularProgressLabel, Box, useDisclosure
+    Progress, CircularProgress, CircularProgressLabel, Box, useDisclosure, useColorModeValue
 } from '@chakra-ui/react';
 import {AiOutlineQuestionCircle} from "react-icons/ai";
 import ReviewWordPackWindow from "../word-pack/ReviewWordPackWindow.jsx";
@@ -16,7 +16,9 @@ const StatsReviewWindow = ({isOpen, onClose, reviewDTO, reviewStatisticsDTO, wor
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="xl" isCentered>
             <ModalOverlay/>
-            <ModalContent rounded={'lg'}>
+            <ModalContent shadow={'2xl'} rounded={'lg'}
+                          borderColor={useColorModeValue('gray.400', 'rgba(80,80,80)')}
+                          bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}>
                 <ModalHeader>{reviewDTO.wordPackName}</ModalHeader>
                 <ModalCloseButton/>
                 <ModalBody>
@@ -39,14 +41,20 @@ const StatsReviewWindow = ({isOpen, onClose, reviewDTO, reviewStatisticsDTO, wor
                                 {reviewStatisticsDTO.wordsKnown}/{reviewStatisticsDTO.wordsTotal}
                             </StatLabel>
                         </Flex>
-                        <Progress value={wordsKnownPercentage} color='blue' size='md' rounded={'md'}/>
+                        <Progress value={wordsKnownPercentage}
+                                  color={useColorModeValue('blue', 'blue')}
+                                  bgColor={useColorModeValue('gray.200', 'rgba(80,80,80)')}
+                                  size='md' rounded={'md'}/>
                     </div>
                     <div style={{border: "1px solid #ccc", borderRadius: "10px", padding: "15px", marginBottom: "15px"}}>
                         <Flex justifyContent="space-between" alignItems="baseline">
                             <StatLabel fontSize={'2xl'}>Review Status</StatLabel>
                         </Flex>
                         <Flex>
-                            <CircularProgress value={wordsKnownPercentage} color='blue' size='175px' thickness='6px'>
+                            <CircularProgress value={wordsKnownPercentage}
+                                              color={useColorModeValue('blue.500', 'blue.200')}
+                                              trackColor={useColorModeValue('gray.200', 'rgba(80,80,80)')}
+                                              size='175px' thickness='6px'>
                                 <CircularProgressLabel>{wordsInReviewPercentage}%
                                     <div style={{fontSize: '14px', fontWeight: 'medium'}}> In Review</div>
                                 </CircularProgressLabel>

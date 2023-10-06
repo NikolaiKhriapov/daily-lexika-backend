@@ -1,6 +1,6 @@
 import {
     Alert, AlertIcon, Box, Button, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter,
-    ModalOverlay, Stack
+    ModalOverlay, Stack, useColorModeValue
 } from "@chakra-ui/react";
 import {CopyIcon} from "@chakra-ui/icons";
 import {Form, Formik, useField} from "formik";
@@ -30,7 +30,9 @@ const CreateReviewWindow = ({button, isOpen, onClose, wordPackDTO, fetchAllWordP
         {button}
         <Modal isOpen={isOpen} onClose={onClose} size={"md"} isCentered>
             <ModalOverlay/>
-            <ModalContent rounded={'lg'}>
+            <ModalContent shadow={'2xl'} border={'1px solid'} rounded={'lg'}
+                          borderColor={useColorModeValue('gray.400', 'rgba(80,80,80)')}
+                          bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}>
                 <ModalCloseButton/>
                 <ModalBody>
                     <div style={{margin: '15px 0', fontSize: '20px', fontWeight: 'bold'}}>{wordPackDTO.name}</div>
@@ -81,7 +83,12 @@ const CreateReviewWindow = ({button, isOpen, onClose, wordPackDTO, fetchAllWordP
                                             type="number"
                                             placeholder="1"
                                         />
-                                        <Button isDisabled={!(isValid) || isSubmitting} type="submit">Submit</Button>
+                                        <Button isDisabled={!(isValid) || isSubmitting} type="submit"
+                                                shadow={'2xl'}
+                                                color={useColorModeValue('black', 'white')}
+                                                bg={useColorModeValue('gray.300', 'rgba(60,60,60)')}
+                                                _hover={{bg: useColorModeValue('gray.400', 'rgba(80,80,80)')}}
+                                        >Submit</Button>
                                     </Stack>
                                 </Form>
                             )}

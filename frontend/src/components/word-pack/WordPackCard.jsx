@@ -26,12 +26,12 @@ export default function WordPackCard({wordPackDTO, fetchAllWordPacksDTO}) {
         fetchAllReviewsDTO();
     }, []);
 
-
     const createButton = (
         <Button
-            bg={"grey"} rounded={"lg"} size={"sm"} background={'gray.200'} color={'black'}
-            borderColor={useColorModeValue('gray.400', 'gray.500')} borderWidth={'0.5px'}
-            _hover={{bg: 'gray.400', borderColor: 'gray.500'}}
+            rounded={"lg"} size={"sm"} shadow={'2xl'}
+            color={useColorModeValue('black', 'white')}
+            bg={useColorModeValue('gray.300', 'rgba(60,60,60)')}
+            _hover={{bg: useColorModeValue('gray.400', 'rgba(80,80,80)')}}
             onClick={onOpenCreateButton}
         >
             Create Daily Review
@@ -41,8 +41,9 @@ export default function WordPackCard({wordPackDTO, fetchAllWordPacksDTO}) {
     return (
         <Box m={'5px'} mt='50px'>
             <Stat
-                shadow={'2xl'} border={'1px solid'} rounded={'lg'} width="210px" height="270px" p={6} align={'center'}
-                borderColor={useColorModeValue('gray.800', 'gray.500')}
+                shadow={'2xl'} border={'1px solid'} rounded={'lg'} width="220px" height="270px" p={6} align={'center'}
+                borderColor={useColorModeValue('gray.400', 'rgba(80,80,80)')}
+                bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}
             >
                 <Flex justifyContent="right" mr={'-15px'} mt={'-15px'} mb={'15px'}>
                     <AiOutlineQuestionCircle size="1em" onClick={onOpenPreviewButton} cursor={'pointer'}/>
@@ -64,13 +65,13 @@ export default function WordPackCard({wordPackDTO, fetchAllWordPacksDTO}) {
                 <Flex justifyContent="center">
                     {isReviewExists
                         ? (
-                            <Text
-                                rounded={"lg"} width={'90px'} borderWidth={'1px'} display="flex" alignItems="center"
-                                fontSize={'sm'} bg={'gray.100'} p={'1.5'} fontWeight={'600'} justifyContent="center"
-                                borderColor={'gray.400'} color={'black'}
+                            <Flex
+                                rounded={"lg"} width={'90px'} borderWidth={'1px'} borderColor={'gray.500'}
+                                display="flex" alignItems="center" justifyContent="center"
+                                fontSize={'sm'} p={'1.5'} fontWeight={'600'}
                             >
-                                <FaCheck color="gray.500" style={{marginRight: '5px'}}/>Added
-                            </Text>)
+                                <FaCheck style={{marginRight: '5px'}}/>Added
+                            </Flex>)
                         : (
                             <CreateReviewWindow
                                 button={createButton}

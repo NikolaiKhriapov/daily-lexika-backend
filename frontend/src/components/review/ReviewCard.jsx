@@ -49,9 +49,13 @@ export default function ReviewCard({reviewDTO, fetchAllReviewsDTO}) {
 
     const startButton = (
         <Button
-            rounded={"lg"} size={"sm"} background={'gray.200'} color={'black'}
-            borderColor={useColorModeValue('gray.400', 'gray.500')} borderWidth={'0.5px'}
-            _hover={{bg: 'gray.400', borderColor: 'gray.500'}}
+            rounded={"lg"} size={"sm"}
+            color={useColorModeValue('black', 'white')}
+            bg={useColorModeValue('gray.300', 'rgba(60,60,60)')}
+            _hover={{
+                bg: useColorModeValue('gray.400', 'rgba(80,80,80)'),
+            }}
+            shadow={'2xl'}
             onClick={() => isDateLastCompletedToday ? requestRefreshReview(reviewDTO.id) : onOpenStartButton()}
         >
             {!isDateLastCompletedToday ? 'Start' : 'Refresh'}
@@ -59,10 +63,11 @@ export default function ReviewCard({reviewDTO, fetchAllReviewsDTO}) {
     )
 
     return (
-        <Box marginTop="50px">
+        <Box m={'5px'} mt='50px'>
             <Stat
-                shadow={'2xl'} border={'1px solid'} rounded={'lg'} width="210px" height="270px" p={6} align={'center'}
-                borderColor={useColorModeValue('gray.800', 'gray.500')}
+                shadow={'2xl'} border={'1px solid'} rounded={'lg'} width="220px" height="270px" p={6} align={'center'}
+                borderColor={useColorModeValue('gray.400', 'rgba(80,80,80)')}
+                bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}
             >
                 <Flex justifyContent={"space-between"}>
                     <Flex justifyContent="left" height="15px" ml={'-30px'} mt={'-3px'} mb={'3px'}>
@@ -82,30 +87,38 @@ export default function ReviewCard({reviewDTO, fetchAllReviewsDTO}) {
                             onClose={onCloseRemoveButton}
                             leastDestructiveRef={cancelRef}>
                             <AlertDialogOverlay>
-                                <AlertDialogContent>
+                                <AlertDialogContent bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}>
                                     <AlertDialogHeader fontSize='lg' fontWeight='bold'>Remove Review</AlertDialogHeader>
                                     <AlertDialogBody>
                                         Are you sure you want to remove '{reviewDTO.wordPackName}'?
                                         You can't undo this action.
                                     </AlertDialogBody>
                                     <AlertDialogFooter>
-                                        <Button ref={cancelRef} onClick={onCloseRemoveButton}>Cancel</Button>
-                                        <Button colorScheme='red' onClick={() => {
-                                            setReviewRemoved(true)
-                                            removeReview(reviewDTO.id)
-                                                .then(() => {
-                                                    successNotification(
-                                                        "Review removed successfully",
-                                                        `${reviewDTO.wordPackName} removed successfully`
-                                                    )
-                                                    fetchAllReviewsDTO()
-                                                })
-                                                .catch(error =>
-                                                    errorNotification(error.code, error.response.data.message))
-                                                .finally(() => onCloseRemoveButton())
-                                        }} ml={3}>
-                                            Remove
-                                        </Button>
+                                        <Button rounded={"lg"} shadow={'2xl'} ml={5}
+                                                color={useColorModeValue('black', 'white')}
+                                                bg={useColorModeValue('gray.300', 'rgba(60,60,60)')}
+                                                _hover={{bg: useColorModeValue('gray.400', 'rgba(80,80,80)')}}
+                                                ref={cancelRef} onClick={onCloseRemoveButton}
+                                        >Cancel</Button>
+                                        <Button rounded={"lg"} shadow={'2xl'}
+                                                color={useColorModeValue('black', 'white')}
+                                                bg={useColorModeValue('gray.300', 'rgba(60,60,60)')}
+                                                _hover={{bg: useColorModeValue('red.300', 'red.400')}}
+                                                onClick={() => {
+                                                    setReviewRemoved(true)
+                                                    removeReview(reviewDTO.id)
+                                                        .then(() => {
+                                                            successNotification(
+                                                                "Review removed successfully",
+                                                                `${reviewDTO.wordPackName} removed successfully`
+                                                            )
+                                                            fetchAllReviewsDTO()
+                                                        })
+                                                        .catch(error =>
+                                                            errorNotification(error.code, error.response.data.message))
+                                                        .finally(() => onCloseRemoveButton())
+                                                }} ml={3}
+                                        >Remove</Button>
                                     </AlertDialogFooter>
                                 </AlertDialogContent>
                             </AlertDialogOverlay>
