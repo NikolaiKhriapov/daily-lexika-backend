@@ -1,5 +1,5 @@
 import {
-    Button, Flex, FormLabel, Heading, Input, Stack, Image, Box, Alert, AlertIcon, Link,
+    Button, Flex, FormLabel, Heading, Input, Stack, Box, Alert, AlertIcon, Link, useColorModeValue
 } from '@chakra-ui/react';
 import {Form, Formik, useField} from "formik";
 import * as Yup from 'yup';
@@ -32,6 +32,10 @@ const LoginForm = () => {
     return (
         <Formik
             validateOnMount={true}
+            initialValues={{
+                email: '',
+                password: ''
+            }}
             validationSchema={
                 Yup.object({
                     email: Yup.string()
@@ -42,7 +46,6 @@ const LoginForm = () => {
                         .max(20, 'Must be 20 characters or less')
                         .required('Required')
                 })}
-            initialValues={{email: '', password: ''}}
             onSubmit={(values, {setSubmitting}) => {
                 setSubmitting(true);
                 login(values)
@@ -58,14 +61,14 @@ const LoginForm = () => {
                             label="Email"
                             name="email"
                             type="email"
-                            placeholder="jane@formik.com"
+                            placeholder="Email address"
                         />
 
                         <MyTextInput
                             label="Password"
                             name="password"
                             type="password"
-                            placeholder="password"
+                            placeholder="Password"
                         />
 
                         <Button isDisabled={!(isValid && dirty) || isSubmitting} type="submit">Login</Button>
@@ -87,27 +90,25 @@ const Login = () => {
     })
 
     return (
-        <Stack minH={'100vh'} direction={{base: 'column', md: 'row'}}>
-            <Flex p={8} flex={1} align={'center'} justify={'center'}>
-                <Stack spacing={4} w={'full'} maxW={'md'}>
-                    <Heading fontSize={'2xl'}>Log in to your account</Heading>
-                    <LoginForm/>
-                    <Link color={"blue.500"} href={"/register"}>
-                        Don't have an account? Register now
-                    </Link>
+        <Flex
+            minH={'100vh'} align={'center'} justify={'center'}
+            bg={useColorModeValue('rgba(237,238,240)', 'rgba(20,20,20)')}
+        >
+            <Stack spacing={8} mx={'auto'} w={'430px'} py={12} px={6}>
+                <Stack align={'center'}>
+                    <Heading fontSize={'4xl'}>Sign in to your account</Heading>
                 </Stack>
-            </Flex>
-            <Flex flex={1}>
-                <Image
-                    alt={'Login Image'}
-                    objectFit={'cover'}
-                    src={
-                        'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1352&q=80'
-                    }
-                />
-            </Flex>
-        </Stack>
-    );
+                <Box rounded={'2xl'} boxShadow={'2xl'} p={8}
+                     bg={useColorModeValue('white', 'rgba(40,40,40)')}>
+                    <LoginForm/>
+                </Box>
+                <Link href={"/register"} color={"blue.500"} align={'center'}>
+                    Don't have an account? Register now
+                </Link>
+            </Stack>
+        </Flex>
+    )
+
 }
 
 export default Login;
