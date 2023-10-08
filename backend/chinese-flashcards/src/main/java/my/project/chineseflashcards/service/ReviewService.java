@@ -264,6 +264,12 @@ public class ReviewService {
         if (thisWord.getStatus().equals(IN_REVIEW)) {
             if (thisWord.getCurrentStreak() < 3) {
                 thisWord.setCurrentStreak(thisWord.getCurrentStreak() + 1);
+                if (thisWord.getCurrentStreak() == 1) {
+                    listOfWords.remove(0);
+                    listOfWords.add(Math.min(listOfWords.size(), 3), thisWord);
+                } else {
+                    Collections.rotate(listOfWords, -1);
+                }
             }
             if (thisWord.getCurrentStreak() == 3) {
                 thisWord.setTotalStreak(thisWord.getTotalStreak() + 1);
@@ -277,17 +283,13 @@ public class ReviewService {
             }
         }
 
-        Collections.rotate(listOfWords, -1);
     }
 
     private void updateWordForNoAnswer(Word thisWord, List<Word> listOfWords) {
-        if (thisWord.getStatus().equals(NEW)) {
-            thisWord.setStatus(IN_REVIEW);
-        }
-
+        thisWord.setStatus(IN_REVIEW);
         thisWord.setTotalStreak(0);
         thisWord.setCurrentStreak(0);
-        thisWord.setStatus(IN_REVIEW);
+
         listOfWords.remove(0);
         listOfWords.add(Math.min(listOfWords.size(), 3), thisWord);
     }

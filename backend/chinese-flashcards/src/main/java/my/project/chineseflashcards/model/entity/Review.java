@@ -31,6 +31,7 @@ public class Review {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @ToString.Exclude
+    @OrderColumn
     private List<Word> listOfWords;
 
     private LocalDate dateLastCompleted;
