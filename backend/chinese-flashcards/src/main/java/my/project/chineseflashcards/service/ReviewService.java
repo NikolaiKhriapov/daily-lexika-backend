@@ -169,48 +169,17 @@ public class ReviewService {
                 .filter(word -> word.getStatus().equals(Status.NEW))
                 .limit(reviewDTO.maxNewWordsPerDay())
                 .toList();
-        List<Word> reviewWords = tempListOfWords.stream()
-                .filter(word -> word.getStatus().equals(Status.IN_REVIEW))
+        List<Word> reviewAndKnownWords = tempListOfWords.stream()
+                .filter(word -> word.getStatus().equals(Status.IN_REVIEW) || word.getStatus().equals(KNOWN))
                 .filter(word -> DAYS.between(word.getDateOfLastOccurrence(), LocalDate.now())
-                        >= word.getTotalStreak() * 2)
+                        >= (int) Math.pow(2, word.getTotalStreak()))
                 .sorted(Comparator.comparing(Word::getDateOfLastOccurrence).reversed())
                 .limit(reviewDTO.maxReviewWordsPerDay())
                 .toList();
-        List<Word> knownWords = tempListOfWords.stream()
-                .filter(word -> word.getStatus().equals(Status.KNOWN))
-                .filter(word -> DAYS.between(word.getDateOfLastOccurrence(), LocalDate.now())
-                        >= word.getTotalStreak())
-                .sorted(Comparator.comparing(Word::getDateOfLastOccurrence).reversed())
-                .limit(reviewDTO.maxReviewWordsPerDay())
-                .toList();
-
-        int totalReviewWords = reviewWords.size();
-        int totalKnownWords = knownWords.size();
-
-        boolean totalReviewWordsIsEnough = totalReviewWords > reviewDTO.maxReviewWordsPerDay() * 0.7;
-        boolean totalKnownWordsIsEnough = totalKnownWords > reviewDTO.maxReviewWordsPerDay() * 0.3;
-
-        int selectedReviewWords;
-        int selectedKnownWords;
-
-        if (totalReviewWordsIsEnough && totalKnownWordsIsEnough) {
-            selectedReviewWords = (int) (reviewDTO.maxReviewWordsPerDay() * 0.7);
-            selectedKnownWords = reviewDTO.maxReviewWordsPerDay() - selectedReviewWords;
-        } else if (totalReviewWordsIsEnough) {
-            selectedKnownWords = totalKnownWords;
-            selectedReviewWords = reviewDTO.maxReviewWordsPerDay() - selectedKnownWords;
-        } else if (totalKnownWordsIsEnough) {
-            selectedReviewWords = totalReviewWords;
-            selectedKnownWords = reviewDTO.maxReviewWordsPerDay() - selectedReviewWords;
-        } else {
-            selectedReviewWords = totalReviewWords;
-            selectedKnownWords = totalKnownWords;
-        }
 
         List<Word> listOfWords = new ArrayList<>();
         listOfWords.addAll(newWords);
-        listOfWords.addAll(reviewWords.stream().limit(selectedReviewWords).toList());
-        listOfWords.addAll(knownWords.stream().limit(selectedKnownWords).toList());
+        listOfWords.addAll(reviewAndKnownWords);
 
         listOfWords.forEach(word -> {
             word.setOccurrence(0);
@@ -254,6 +223,12 @@ public class ReviewService {
 
     private void updateWordForYesAnswer(Word thisWord, List<Word> listOfWords) {
         if (thisWord.getStatus().equals(NEW) || thisWord.getStatus().equals(KNOWN)) {
+            if (thisWord.getStatus().equals(NEW)) {
+                thisWord.setTotalStreak(5);
+            }
+            if (thisWord.getStatus().equals(KNOWN)) {
+                thisWord.setTotalStreak(thisWord.getTotalStreak() + 1);
+            }
             thisWord.setStatus(KNOWN);
             thisWord.setCurrentStreak(0);
             thisWord.setOccurrence(0);
@@ -262,7 +237,8 @@ public class ReviewService {
         }
 
         if (thisWord.getStatus().equals(IN_REVIEW)) {
-            if (thisWord.getCurrentStreak() < 3) {
+            if ((thisWord.getCurrentStreak() > 0 && thisWord.getCurrentStreak() < 3) ||
+                    (thisWord.getCurrentStreak() == 0 && thisWord.getOccurrence() > 1)) {
                 thisWord.setCurrentStreak(thisWord.getCurrentStreak() + 1);
                 if (thisWord.getCurrentStreak() == 1) {
                     listOfWords.remove(0);
@@ -271,7 +247,8 @@ public class ReviewService {
                     Collections.rotate(listOfWords, -1);
                 }
             }
-            if (thisWord.getCurrentStreak() == 3) {
+            if (thisWord.getCurrentStreak() == 3 ||
+                    (thisWord.getCurrentStreak() == 0 && thisWord.getOccurrence() == 1)) {
                 thisWord.setTotalStreak(thisWord.getTotalStreak() + 1);
                 if (thisWord.getTotalStreak() >= 5) {
                     thisWord.setStatus(KNOWN);
@@ -282,7 +259,6 @@ public class ReviewService {
                 listOfWords.remove(thisWord);
             }
         }
-
     }
 
     private void updateWordForNoAnswer(Word thisWord, List<Word> listOfWords) {
