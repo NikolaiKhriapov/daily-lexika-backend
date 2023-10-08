@@ -1,12 +1,13 @@
 import {
     Heading, Box, Flex, Button, useDisclosure, AlertDialog, AlertDialogOverlay, AlertDialogHeader, AlertDialogContent,
-    AlertDialogBody, AlertDialogFooter, Badge, useColorModeValue, Stat, StatNumber, StatLabel
+    AlertDialogBody, AlertDialogFooter, useColorModeValue, Stat, StatNumber, StatLabel
 } from '@chakra-ui/react'
 import React, {useEffect, useRef, useState} from "react"
 import {errorNotification, successNotification} from "../../services/popup-notification.js"
 import {removeReview, getWordsForReview, getReview, refreshReview} from "../../services/review.js"
 import StartReviewWindow from "./StartReviewWindow.jsx"
 import {AiOutlineCloseCircle} from "react-icons/ai";
+import {BsCheck2Circle} from "react-icons/bs";
 
 export default function ReviewCard({reviewDTO, fetchAllReviewsDTO}) {
 
@@ -70,13 +71,9 @@ export default function ReviewCard({reviewDTO, fetchAllReviewsDTO}) {
                 bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}
             >
                 <Flex justifyContent={"space-between"}>
-                    <Flex justifyContent="left" height="15px" ml={'-30px'} mt={'-3px'} mb={'3px'}>
+                    <Flex justifyContent="left" height="15px" ml={'-10px'} mt={'-10px'} mb={'10px'}>
                         {isDateLastCompletedToday
-                            ? (
-                                <Badge color={"green"} border={'1px'} fontSize={'9'}
-                                       style={{transform: 'rotate(-45deg)'}}>
-                                    Completed
-                                </Badge>)
+                            ? <BsCheck2Circle color={"green"} size={30}/>
                             : null
                         }
                     </Flex>
