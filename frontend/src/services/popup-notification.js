@@ -2,8 +2,14 @@ import {createStandaloneToast} from '@chakra-ui/react'
 
 const {toast} = createStandaloneToast()
 
+let currentToast = null
+
 const popupNotification = (title, description, status, color) => {
-    toast({
+    if (currentToast) {
+        toast.close(currentToast)
+    }
+
+    currentToast = toast({
         title,
         description,
         status,
