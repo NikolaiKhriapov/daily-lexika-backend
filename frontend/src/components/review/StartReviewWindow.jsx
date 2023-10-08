@@ -82,8 +82,8 @@ const StartReviewWindow = ({reviewId, isOpen, onClose, button, totalReviewWords}
             {button}
             <Modal isOpen={isOpen} onClose={onClose} size={"6xl"} isCentered>
                 <ModalOverlay/>
-                <ModalContent shadow={'2xl'} border={'1px solid'} rounded={'lg'} width="80vh" height="80vh" p={6}
-                              align={'center'}
+                <ModalContent border={'1px solid'} rounded={'lg'} width="80vh" height="80vh" maxW="90%" maxH="90%"
+                              shadow={'2xl'} align={'center'}  p={6}
                               borderColor={useColorModeValue('gray.400', 'rgba(80,80,80)')}
                               bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}
                 >

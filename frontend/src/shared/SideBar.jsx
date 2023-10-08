@@ -27,7 +27,7 @@ export default function SidebarWithHeader({children}) {
             <Drawer
                 isOpen={isOpen} onClose={onClose} onOverlayClick={onClose}
                 autoFocus={false} returnFocusOnClose={false}
-                placement="left" size="full">
+                placement="left" size="xs">
                 <DrawerContent>
                     <SidebarContent onClose={onClose}/>
                 </DrawerContent>
@@ -43,10 +43,12 @@ const SidebarContent = ({onClose, ...rest}) => {
         <Box
             w={{base: 'full', md: 60}} pos="fixed" h="full"
             bg={useColorModeValue('rgba(237,238,240)', 'rgba(20,20,20)')}
-            {...rest}
-        >
-            <Flex flexDirection="column" alignItems="center" py={'35px'}
-                  bg={useColorModeValue('white', 'rgba(40,40,40)')}/>
+            {...rest}>
+            <Flex alignItems="center" py={{base: '15px', md: '35'}} bg={useColorModeValue('white', 'rgba(40,40,40)')}>
+                <IconButton display={{base: 'flex', md: 'none'}} ml={4} variant="outline" aria-label="close menu"
+                            onClick={onClose}
+                ><FiMenu/></IconButton>
+            </Flex>
             <Flex py={'10px'}/>
             {LinkItems.map((link) => (
                 <NavItem key={link.name} route={link.route} icon={link.icon}>
@@ -148,11 +150,10 @@ const MobileNav = ({onOpen, ...rest}) => {
             justifyContent={{base: 'space-between', md: 'flex-end'}}
             bg={useColorModeValue('white', 'rgba(40,40,40)')}
             {...rest}>
-            <IconButton
-                display={{base: 'flex', md: 'none'}} variant="outline" aria-label="open menu" onClick={onOpen}
-            />
-
-            <HStack spacing={{base: '0', md: '6'}}>
+            <IconButton display={{base: 'flex', md: 'none'}} variant="outline" aria-label="open menu" onClick={onOpen}>
+                <FiMenu/>
+            </IconButton>
+            <HStack spacing="6">
                 <Flex alignItems={'center'}>
                     <Menu>
                         <MenuButton>
@@ -215,7 +216,7 @@ const MobileNav = ({onOpen, ...rest}) => {
                                                                  position="absolute" top="7px" right="7px"/>
                                                         )}
                                                     </div>
-                                                    <div style={{fontSize: '14px', color: 'lightgray', marginRight: '5px'}}>
+                                                    <div style={{ fontSize: '14px', color: 'lightgray', marginRight: '5px'}}>
                                                         {formatDate(notificationDTO.sentAt)}
                                                     </div>
                                                 </Button>
