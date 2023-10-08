@@ -17,11 +17,18 @@ const StartReviewWindow = ({reviewId, isOpen, onClose, button, totalReviewWords}
     const [isFlipped, setIsFlipped] = useState(false);
 
     const fetchReviewAction = (answer) => {
-        if (((reviewWordDTO.status === 'NEW') || (reviewWordDTO.status === 'IN_REVIEW' && reviewWordDTO.totalStreak === 4))
+        if (((reviewWordDTO.status === 'NEW') ||
+                (reviewWordDTO.status === 'IN_REVIEW' && reviewWordDTO.totalStreak === 4))
             && answer === 'yes') {
             successNotification(
                 `${reviewWordDTO.nameChineseSimplified} is a known word.`,
                 "This word will still be shown occasionally during reviews"
+            )
+        }
+        if (reviewWordDTO.status === 'KNOWN' && answer === 'no') {
+            successNotification(
+                `Keep reviewing ${reviewWordDTO.nameChineseSimplified}`,
+                "This word will be shown more frequently so that you can relearn it"
             )
         }
         processReviewAction(reviewId, answer)
@@ -83,7 +90,7 @@ const StartReviewWindow = ({reviewId, isOpen, onClose, button, totalReviewWords}
             <Modal isOpen={isOpen} onClose={onClose} size={"6xl"} isCentered>
                 <ModalOverlay/>
                 <ModalContent border={'1px solid'} rounded={'lg'} width="80vh" height="80vh" maxW="90%" maxH="90%"
-                              shadow={'2xl'} align={'center'}  p={6}
+                              shadow={'2xl'} align={'center'} p={6}
                               borderColor={useColorModeValue('gray.400', 'rgba(80,80,80)')}
                               bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}
                 >
