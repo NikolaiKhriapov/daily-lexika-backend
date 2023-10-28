@@ -1,30 +1,32 @@
-import axios from "axios";
+import axios from 'axios';
+
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 const getAuthConfig = () => ({
     headers: {
-        Authorization: `Bearer ${localStorage.getItem("access_token")}`
-    }
-})
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+    },
+});
 
 export const getAllNotifications = async () => {
     try {
         return await axios.get(
-            `${import.meta.env.VITE_API_BASE_URL}/api/v1/notifications`,
-            getAuthConfig()
-        )
+            `${BASE_URL}/notifications`,
+            getAuthConfig(),
+        );
     } catch (error) {
         throw error;
     }
-}
+};
 
 export const readNotification = async (notificationId) => {
     try {
         return await axios.patch(
-            `${import.meta.env.VITE_API_BASE_URL}/api/v1/notifications/read/${notificationId}`,
+            `${BASE_URL}/notifications/read/${notificationId}`,
             '',
-            getAuthConfig()
-        )
+            getAuthConfig(),
+        );
     } catch (error) {
         throw error;
     }
-}
+};
