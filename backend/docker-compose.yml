@@ -25,8 +25,12 @@ services:
       - spring
 
   eureka-server:
+#    build:
+#      context: ./eureka-server
+#      dockerfile: ./Dockerfile
     image: kolyakhryapov/eureka-server:0.0.20231014
     container_name: eureka-server
+    platform: linux/amd64
     ports:
       - "8761:8761"
     environment:
@@ -34,8 +38,12 @@ services:
     networks:
       - spring
   api-gateway:
+#    build:
+#      context: ./api-gateway
+#      dockerfile: ./Dockerfile
     image: kolyakhryapov/api-gateway:0.0.20231014
     container_name: api-gateway
+    platform: linux/amd64
     ports:
       - "8080:8080"
     environment:
@@ -46,8 +54,12 @@ services:
       - eureka-server
 
   fraud-check:
+#    build:
+#      context: ./fraud-check/
+#      dockerfile: ./Dockerfile
     image: kolyakhryapov/fraud-check:0.0.20231014
     container_name: fraud-check
+    platform: linux/amd64
     ports:
       - "8082:8082"
     environment:
@@ -61,7 +73,11 @@ services:
       - rabbitmq
       - api-gateway
   notification:
+#    build:
+#      context: ./notification/
+#      dockerfile: ./Dockerfile
     image: kolyakhryapov/notification:0.0.20231014
+    platform: linux/amd64
     container_name: notification
     ports:
       - "8083:8083"
@@ -76,8 +92,12 @@ services:
       - eureka-server
       - api-gateway
   file-storage:
+#    build:
+#      context: ./file-storage/
+#      dockerfile: ./Dockerfile
     image: kolyakhryapov/file-storage:0.0.20231014
     container_name: file-storage
+    platform: linux/amd64
     ports:
       - "8084:8084"
     environment:
@@ -92,8 +112,12 @@ services:
       - api-gateway
 
   user:
+#    build:
+#      context: ./user/
+#      dockerfile: ./Dockerfile
     image: kolyakhryapov/user:0.0.20231014
     container_name: user
+    platform: linux/amd64
     ports:
       - "8081:8081"
     environment:
@@ -111,8 +135,12 @@ services:
       - file-storage
 
   chinese-flashcards:
+#    build:
+#      context: ./chinese-flashcards/
+#      dockerfile: ./Dockerfile
     image: kolyakhryapov/chinese-flashcards:0.0.20231014
     container_name: chinese-flashcards
+    platform: linux/amd64
     ports:
       - "8085:8085"
     environment:
