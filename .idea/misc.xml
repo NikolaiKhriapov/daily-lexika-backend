@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/backend/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/vocabulary/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/authorization-server/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/file-storage/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/amqp/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/eureka-server/pom.xml" />
+      </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/backend/api-gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/authorization-server/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/chinese-flashcards/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/clients/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/fraud-check/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/notification/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/pom.xml" />
+        <option value="$PROJECT_DIR$/backend/user/pom.xml" />
+      </set>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_20" default="true" project-jdk-name="openjdk-20" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="jpab" />
+  </component>
+</project>

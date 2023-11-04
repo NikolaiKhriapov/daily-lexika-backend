@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <excludeFromCompile>
+      <directory url="file://$PROJECT_DIR$/backend/eureka-server/src/main/resources/archetype-resources" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/backend/clients/src/main/resources/archetype-resources" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/backend/notification/src/main/resources/archetype-resources" includeSubdirectories="true" />
+      <directory url="file://$PROJECT_DIR$/backend/api-gateway/src/main/resources/archetype-resources" includeSubdirectories="true" />
+    </excludeFromCompile>
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="shared" />
+        <module name="backend" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="amqp" target="17" />
+      <module name="api-gateway" target="17" />
+      <module name="application-user" target="17" />
+      <module name="authentication-service" target="17" />
+      <module name="authorization-server" target="17" />
+      <module name="backend" target="17" />
+      <module name="chinese-character" target="17" />
+      <module name="chinese-flashcards" target="17" />
+      <module name="chinese-learning-app-backend" target="17" />
+      <module name="clients" target="17" />
+      <module name="eureka-server" target="17" />
+      <module name="file-storage" target="17" />
+      <module name="fraud-check" target="17" />
+      <module name="notification" target="17" />
+      <module name="shared" target="17" />
+      <module name="user" target="17" />
+      <module name="vocabulary" target="17" />
+      <module name="word" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="amqp" options="" />
+      <module name="api-gateway" options="" />
+      <module name="authentication-service" options="" />
+      <module name="backend" options="-parameters" />
+      <module name="chinese-flashcards" options="" />
+      <module name="clients" options="" />
+      <module name="eureka-server" options="" />
+      <module name="file-storage" options="" />
+      <module name="fraud-check" options="" />
+      <module name="notification" options="" />
+      <module name="user" options="" />
+    </option>
+  </component>
+</project>

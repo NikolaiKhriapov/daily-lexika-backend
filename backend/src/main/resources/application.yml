@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: chinese-learning-app
+  datasource:
+    url: jdbc:postgresql://localhost:5432/chinese_learning_app
+    username: 'postgres'
+    password: '1478236950'
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: 'true'
+        show-sql: 'true'
+    hibernate:
+      ddl-auto: create-drop
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  codec:
+    max-in-memory-size: 10MB
+
+cors:
+  allowed-origins: "*"
+  allowed-methods: "*"
+  allowed-headers: "*"
+  exposed-headers: "*"
+
+file-location:
+  data-excel: "src/main/resources/static/data/Data.xlsx"
+
+#file-storage:
+#  profile-photo-directory: "backend/file-storage/src/main/resources/static/images/user-%s/profile-photo/"
+#  profile-photo-name: "%s-profile-photo%s"

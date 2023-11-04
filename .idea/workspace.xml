@@ -1,0 +1,1212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="def86328-47f3-4b37-aafc-6953948d871e" name="Changes" comment="Task #65: Migration to TS">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/amqp/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/amqp/src/main/java/my/project/amqp/RabbitMQConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/amqp/src/main/java/my/project/amqp/RabbitMQMessageProducer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api-gateway/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api-gateway/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api-gateway/src/main/java/my/project/apigateway/ApiGatewayApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api-gateway/src/main/java/my/project/apigateway/config/MessageSourceConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api-gateway/src/main/java/my/project/apigateway/jwt/AuthenticationFilter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api-gateway/src/main/java/my/project/apigateway/jwt/JwtService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api-gateway/src/main/java/my/project/apigateway/jwt/RouteValidator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api-gateway/src/main/resources/application-docker.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api-gateway/src/main/resources/application.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api-gateway/src/main/resources/banner.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/api-gateway/src/main/resources/exceptions.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/ChineseFlashcardsApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/config/MessageSourceConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/controller/ReviewController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/controller/WordController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/controller/WordPackController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/data/ExcelDataHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/data/WordsLoader.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/exception/ApiErrorDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/exception/DefaultExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/exception/ResourceNotFoundException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/exception/ReviewAlreadyExistsException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/dto/ResponseDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/dto/ReviewDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/dto/ReviewStatisticsDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/dto/WordDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/dto/WordPackDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/dto/WordStatisticsDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/entity/Category.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/entity/ChineseCharacter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/entity/Review.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/entity/Status.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/entity/Word.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/entity/WordData.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/entity/WordPack.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/mapper/Mapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/mapper/ReviewMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/mapper/WordMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/model/mapper/WordPackMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/rabbitmq/AmqpConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/rabbitmq/AmqpConsumer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/repository/ReviewRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/repository/WordDataRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/repository/WordPackRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/repository/WordRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/service/ChineseFlashcardsService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/service/ReviewService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/service/WordDataService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/service/WordPackService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/java/my/project/chineseflashcards/service/WordService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/resources/application-docker.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/resources/application.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/resources/banner.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/resources/exceptions.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/resources/messages.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chinese-flashcards/src/main/resources/responses.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/clients/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/clients/src/main/java/my/project/clients/chineseflashcards/DeleteChineseFlashcardsRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/clients/src/main/java/my/project/clients/filestorage/DeletePhotoRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/clients/src/main/java/my/project/clients/filestorage/FileStorageClient.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/clients/src/main/java/my/project/clients/filestorage/GetPhotoRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/clients/src/main/java/my/project/clients/filestorage/GetPhotoResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/clients/src/main/java/my/project/clients/filestorage/PutProfilePhotoRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/clients/src/main/java/my/project/clients/filestorage/PutProfilePhotoResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/clients/src/main/java/my/project/clients/fraudcheck/FraudCheckClient.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/clients/src/main/java/my/project/clients/fraudcheck/FraudCheckResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/clients/src/main/java/my/project/clients/notification/NotificationRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/eureka-server/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/eureka-server/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/eureka-server/src/main/java/my/project/eurekaserver/EurekaServerApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/eureka-server/src/main/resources/application.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/eureka-server/src/main/resources/banner.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/file-storage/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/file-storage/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/file-storage/src/main/java/my/project/filestorage/FileStorageApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/file-storage/src/main/java/my/project/filestorage/FileStorageController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/file-storage/src/main/java/my/project/filestorage/FileStorageProperties.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/file-storage/src/main/java/my/project/filestorage/FileStorageService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/file-storage/src/main/java/my/project/filestorage/exception/ApiErrorWrapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/file-storage/src/main/java/my/project/filestorage/exception/DefaultExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/file-storage/src/main/java/my/project/filestorage/exception/ResourceNotFoundException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/file-storage/src/main/resources/application-docker.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/file-storage/src/main/resources/application.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/file-storage/src/main/resources/banner.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/file-storage/src/main/resources/exceptions.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/fraud-check/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/fraud-check/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/fraud-check/src/main/java/my/project/fraudcheck/FraudCheckApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/fraud-check/src/main/java/my/project/fraudcheck/FraudCheckHistory.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/fraud-check/src/main/java/my/project/fraudcheck/FraudCheckHistoryController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/fraud-check/src/main/java/my/project/fraudcheck/FraudCheckHistoryRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/fraud-check/src/main/java/my/project/fraudcheck/FraudCheckHistoryService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/fraud-check/src/main/resources/application-docker.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/fraud-check/src/main/resources/application.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/fraud-check/src/main/resources/banner.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/java/my/project/notification/NotificationApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/java/my/project/notification/config/MessageSourceConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/java/my/project/notification/controller/NotificationController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/java/my/project/notification/exception/ApiErrorDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/java/my/project/notification/exception/DefaultExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/java/my/project/notification/exception/ResourceNotFoundException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/java/my/project/notification/model/dto/NotificationDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/java/my/project/notification/model/dto/ResponseDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/java/my/project/notification/model/entity/Notification.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/java/my/project/notification/model/mapper/Mapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/java/my/project/notification/model/mapper/NotificationMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/java/my/project/notification/rabbitmq/AmqpConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/java/my/project/notification/rabbitmq/AmqpConsumer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/java/my/project/notification/repository/NotificationRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/java/my/project/notification/service/NotificationService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/resources/application-docker.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/resources/application.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/resources/banner.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/resources/exceptions.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/notification/src/main/resources/responses.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/UserApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/config/MessageSourceConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/controller/AuthenticationController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/controller/UserAccountController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/controller/UserStatisticsController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/exception/ApiErrorDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/exception/DefaultExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/exception/ResourceNotFoundException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/exception/UserAlreadyExistsException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/model/dto/AuthenticationRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/model/dto/AuthenticationResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/model/dto/RegistrationRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/model/dto/ResponseDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/model/dto/UserDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/model/entity/User.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/model/entity/UserRole.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/model/mapper/Mapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/model/mapper/UserMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/repository/UserRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/security/UserUserDetailsService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/security/config/CorsConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/security/config/SecurityConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/security/config/SecurityFilterChainConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/security/jwt/JwtAuthenticationFilter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/security/jwt/JwtService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/service/AuthenticationService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/service/UserAccountService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/java/my/project/user/service/UserStatisticsService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/resources/application-docker.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/resources/application.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/resources/banner.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/resources/exceptions.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/resources/extensions.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user/src/main/resources/responses.properties" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager">
+    <option name="groupingKeys">
+      <option value="directory" />
+      <option value="module" />
+    </option>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="Interface" />
+        <option value="Record" />
+        <option value="JavaScript File" />
+        <option value="Class" />
+        <option value="JUnit5 Test Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="monolythic-architecture" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="recentNewPullRequestHead">
+      <RepoCoordinatesHolder>
+        <option name="owner" value="NikolaiKhriapov" />
+        <option name="repository" value="chinese-learning-app" />
+      </RepoCoordinatesHolder>
+    </option>
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="2b735f49-8035-4345-9176-1416630d2931" />
+        <option name="url" value="git@github.com:NikolaiKhriapov/chinese-learning-app.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
+  <component name="JpbToolWindowState">
+    <option name="isToolWindowVisible" value="false" />
+  </component>
+  <component name="KubernetesApiProvider">{
+  &quot;contexts&quot;: [
+    {
+      &quot;name&quot;: &quot;minikube&quot;,
+      &quot;originalNamespace&quot;: &quot;default&quot;
+    }
+  ],
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="KubernetesSettings">
+    <option name="contextName" value="minikube" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2R0idSBdaJckhqhB9eZ6CvStdjX" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Docker.backend.api-gateway: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.backend.chinese-flashcards: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.backend.eureka-server: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.backend.file-storage: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.backend.fraud-check: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.backend.notification: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.backend.pgadmin: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.backend.postgres: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.backend.rabbitmq: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Docker.backend.user: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ReviewServiceTest.testGenerateListOfWordsForReview.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.backend [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.backend [install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.backend [package].executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;Spring Boot.ApiGatewayApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.ChineseFlashcardsApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.EurekaServerApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.FileStorageApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.FraudCheckApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.NotificationApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.UserApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.VocabularyApplication.executor&quot;: &quot;Run&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary&quot;: &quot;JUnit5&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5&quot;: &quot;&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;openjdk-20&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/Nikolai/Documents/JavaWorkspaces/MyWorkspace/chinese-learning-app/backend/src/main/resources&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.26666668&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
+    &quot;spring.configuration.checksum&quot;: &quot;7753581d93688bb05adb0c263d4ae1f5&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/Nikolai/Applications/JetBrains Toolbox/IntelliJ IDEA Ultimate.app/Contents/plugins/javascript-impl/jsLanguageServicesImpl/external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;redshift&quot;,
+      &quot;postgresql&quot;
+    ],
+    &quot;GitStage.ChangesTree.GroupingKeys&quot;: [
+      &quot;directory&quot;,
+      &quot;module&quot;,
+      &quot;repository&quot;
+    ]
+  }
+}</component>
+  <component name="ReactBuddySettings">
+    <option name="extensionsIgnore" value="true" />
+  </component>
+  <component name="ReactDesignerToolWindowState">
+    <option name="myId2Visible">
+      <map>
+        <entry key="com.haulmont.rcb.reactComponents" value="false" />
+        <entry key="com.haulmont.rcb.reactInspector" value="false" />
+        <entry key="com.haulmont.rcb.storybook" value="false" />
+      </map>
+    </option>
+  </component>
+  <component name="ReactorSettings">
+    <option name="notificationShown" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="my.project.vocabulary.wordpack" />
+      <recent name="" />
+      <recent name="my.project.user" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/backend/src/main/resources" />
+      <recent name="$PROJECT_DIR$/frontend-react/public" />
+      <recent name="$PROJECT_DIR$/backend/user" />
+      <recent name="$PROJECT_DIR$/backend/notification/src/main/resources" />
+      <recent name="$PROJECT_DIR$/backend/notification/src/main/java/my/project/notification" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/backend" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/backend/src/main/java/my/project/chineseflashcards" />
+      <recent name="$PROJECT_DIR$/backend/src/main/java/my/project/fraudcheck/dto" />
+      <recent name="$PROJECT_DIR$/backend/src/main/java/my/project/notification/model/dto" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="my.project.vocabulary" />
+      <recent name="my.project.vocabulary.service" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="my.project.chineseflashcards.service" />
+      <recent name="my.project.vocabulary.service" />
+    </key>
+    <key name="CopyKotlinDeclarationDialog.RECENTS_KEY">
+      <recent name="my.project.vocabulary.converter" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="my.project.notification.model.dto" />
+      <recent name="my.project.notification.config" />
+      <recent name="my.project.vocabulary.service" />
+      <recent name="my.project.vocabulary.rabbitmq" />
+      <recent name="my.project.clients.chineseflashcards" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+  </component>
+  <component name="RunManager" selected="Spring Boot.ChineseLearningApp">
+    <configuration name="backend [install]" type="MavenRunConfiguration" factoryName="Maven">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="cmdOptions" />
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list>
+                <option value="install" />
+                <option value="-U" />
+              </list>
+            </option>
+            <option name="pomFileName" value="pom.xml" />
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="projectsCmdOptionValues">
+              <list />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="$PROJECT_DIR$/backend" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <extension name="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+        </ENTRIES>
+      </extension>
+      <method v="2" />
+    </configuration>
+    <configuration name="ApiGatewayApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" folderName="chinese-learning-app" nameIsGenerated="true">
+      <module name="api-gateway" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="my.project.apigateway.ApiGatewayApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="my.project.apigateway.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+        </ENTRIES>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ChineseFlashcardsApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" folderName="chinese-learning-app" nameIsGenerated="true">
+      <module name="chinese-flashcards" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="my.project.chineseflashcards.ChineseFlashcardsApplication" />
+      <extension name="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+        </ENTRIES>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ChineseLearningApp" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" temporary="true" nameIsGenerated="true">
+      <module name="backend" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="my.project.ChineseLearningApp" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="my.project.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EurekaServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" folderName="chinese-learning-app" nameIsGenerated="true">
+      <module name="eureka-server" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="my.project.eurekaserver.EurekaServerApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="my.project.eurekaserver.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+        </ENTRIES>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="FileStorageApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" folderName="chinese-learning-app" nameIsGenerated="true">
+      <module name="file-storage" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="my.project.filestorage.FileStorageApplication" />
+      <extension name="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+        </ENTRIES>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="FraudCheckApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" folderName="chinese-learning-app" nameIsGenerated="true">
+      <module name="fraud-check" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="my.project.fraudcheck.FraudCheckApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="my.project.fraudcheck.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+        </ENTRIES>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="NotificationApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" folderName="chinese-learning-app" nameIsGenerated="true">
+      <module name="notification" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="my.project.notification.NotificationApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="my.project.notification.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+        </ENTRIES>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" folderName="chinese-learning-app" nameIsGenerated="true">
+      <module name="user" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="my.project.user.UserApplication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="my.project.user.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <extension name="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+        </ENTRIES>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-image" temporary="true">
+      <deployment type="docker-image">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="dockerfile" temporary="true">
+      <deployment type="dockerfile">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml.eureka-server: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="eureka-server" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml.fraud-check: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="fraud-check" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="docker-compose.yml.postgres: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="services">
+            <list>
+              <option value="postgres" />
+            </list>
+          </option>
+          <option name="sourceFilePath" value="docker-compose.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Spring Boot.ChineseLearningApp" />
+        <item itemvalue="Docker.docker-compose.yml: Compose Deployment" />
+        <item itemvalue="Docker.docker-compose.yml.postgres: Compose Deployment" />
+        <item itemvalue="Docker.docker-compose.yml.fraud-check: Compose Deployment" />
+        <item itemvalue="Docker.docker-compose.yml.eureka-server: Compose Deployment" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="jdk-20.0.2-azul-20.0.2-e051c37f9593-ba5dc671" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SpringBootOptions">
+    <option name="showAdditionalConfigNotification" value="false" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="def86328-47f3-4b37-aafc-6953948d871e" name="Changes" comment="" />
+      <created>1686393486326</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1686393486326</updated>
+      <workItem from="1686393488024" duration="149000" />
+      <workItem from="1686393640863" duration="100000" />
+      <workItem from="1686393743659" duration="202000" />
+      <workItem from="1686393989548" duration="86000" />
+      <workItem from="1686394079268" duration="827000" />
+      <workItem from="1686394920548" duration="157000" />
+      <workItem from="1686395084950" duration="8024000" />
+      <workItem from="1686409149213" duration="5578000" />
+      <workItem from="1686414743681" duration="716000" />
+      <workItem from="1686415464536" duration="288000" />
+      <workItem from="1686415755815" duration="3588000" />
+      <workItem from="1687100919736" duration="5593000" />
+      <workItem from="1687136252982" duration="1154000" />
+      <workItem from="1687137413045" duration="285000" />
+      <workItem from="1687137701307" duration="7971000" />
+      <workItem from="1687148420131" duration="34120000" />
+      <workItem from="1687419917077" duration="1556000" />
+      <workItem from="1687423222771" duration="3674000" />
+      <workItem from="1687502184429" duration="1242000" />
+      <workItem from="1687503434250" duration="18062000" />
+      <workItem from="1687534841615" duration="195000" />
+      <workItem from="1687535046262" duration="77000" />
+      <workItem from="1687535127004" duration="44831000" />
+      <workItem from="1687661758918" duration="28138000" />
+      <workItem from="1687704531970" duration="1408000" />
+      <workItem from="1687707734968" duration="1334000" />
+      <workItem from="1687751022918" duration="595000" />
+      <workItem from="1688346891157" duration="55667000" />
+      <workItem from="1688544850317" duration="3325000" />
+      <workItem from="1688626466620" duration="3947000" />
+      <workItem from="1688705123796" duration="1638000" />
+      <workItem from="1688747425799" duration="4029000" />
+      <workItem from="1688788828388" duration="400000" />
+      <workItem from="1688963178682" duration="63805000" />
+      <workItem from="1689350580253" duration="788000" />
+      <workItem from="1689830396937" duration="1502000" />
+      <workItem from="1689835753599" duration="60000" />
+      <workItem from="1689839549675" duration="800000" />
+      <workItem from="1690208297549" duration="10000" />
+      <workItem from="1693123529079" duration="16883000" />
+      <workItem from="1693198202185" duration="283000" />
+      <workItem from="1693277203965" duration="1466000" />
+      <workItem from="1693278834722" duration="4852000" />
+      <workItem from="1693285963661" duration="1999000" />
+      <workItem from="1693288193615" duration="999000" />
+      <workItem from="1693366464983" duration="24000" />
+      <workItem from="1693571991976" duration="29968000" />
+      <workItem from="1693624481305" duration="7093000" />
+      <workItem from="1693644441806" duration="15796000" />
+      <workItem from="1693709551273" duration="28801000" />
+      <workItem from="1693757132797" duration="1727000" />
+      <workItem from="1694162940369" duration="195000" />
+      <workItem from="1694184965955" duration="17286000" />
+      <workItem from="1694246777062" duration="2275000" />
+      <workItem from="1694249092271" duration="14068000" />
+      <workItem from="1694271250864" duration="23752000" />
+      <workItem from="1694341093079" duration="431000" />
+      <workItem from="1694341533759" duration="16438000" />
+      <workItem from="1694440503753" duration="12200000" />
+      <workItem from="1694500012690" duration="50000" />
+      <workItem from="1694523323029" duration="14759000" />
+      <workItem from="1694619009581" duration="6340000" />
+      <workItem from="1694790634646" duration="28000" />
+      <workItem from="1694927587412" duration="51000" />
+      <workItem from="1694930138002" duration="20223000" />
+      <workItem from="1695043985663" duration="10995000" />
+      <workItem from="1695055091973" duration="49000" />
+      <workItem from="1695055192807" duration="8398000" />
+      <workItem from="1695133601232" duration="12817000" />
+      <workItem from="1695805419973" duration="2529000" />
+      <workItem from="1695863275985" duration="1102000" />
+      <workItem from="1695983219193" duration="44179000" />
+      <workItem from="1696074865036" duration="15355000" />
+      <workItem from="1696148913177" duration="9175000" />
+      <workItem from="1696210546367" duration="6340000" />
+      <workItem from="1696246021499" duration="14118000" />
+      <workItem from="1696425488586" duration="6550000" />
+      <workItem from="1696435650546" duration="2002000" />
+      <workItem from="1696439795528" duration="3276000" />
+      <workItem from="1696484517099" duration="19942000" />
+      <workItem from="1696519262932" duration="13931000" />
+      <workItem from="1696577565572" duration="35819000" />
+      <workItem from="1696649805155" duration="7060000" />
+      <workItem from="1696699250194" duration="32440000" />
+      <workItem from="1696825877670" duration="1643000" />
+      <workItem from="1696831482842" duration="2634000" />
+      <workItem from="1696906570318" duration="1370000" />
+      <workItem from="1697263769606" duration="25994000" />
+      <workItem from="1697450214435" duration="618000" />
+      <workItem from="1697463566531" duration="8000" />
+      <workItem from="1697468847371" duration="4353000" />
+      <workItem from="1698483113113" duration="629000" />
+      <workItem from="1698584011628" duration="11016000" />
+      <workItem from="1698661122210" duration="13000" />
+      <workItem from="1698807179853" duration="607000" />
+      <workItem from="1698989679869" duration="5497000" />
+      <workItem from="1699021224370" duration="20386000" />
+      <workItem from="1699104600034" duration="165000" />
+    </task>
+    <task id="LOCAL-00001" summary="1. Created microservice 'user';&#10;2. Created microservice 'vocabulary';&#10;3. Created class User.">
+      <created>1686398009783</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1686398009783</updated>
+    </task>
+    <task id="LOCAL-00002" summary="1. Created microservice 'user';&#10;2. Created microservice 'vocabulary';&#10;3. Created class User.">
+      <created>1686398100063</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1686398100063</updated>
+    </task>
+    <task id="LOCAL-00003" summary="1. Fixed maven dependencies.">
+      <created>1686398246688</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1686398246688</updated>
+    </task>
+    <task id="LOCAL-00004" summary="1. Created microservice 'fraud-check';&#10;2. Created docker-compose.yml;&#10;3. Added corresponding controllers, services, repositories.">
+      <created>1686413266839</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1686413266840</updated>
+    </task>
+    <task id="LOCAL-00005" summary="1. Set up eureka;&#10;2. Set up feign;&#10;3. Added check isFraudster upon registration;&#10;4. Added new microservice 'clients';&#10;5. Added new microservice 'eureka-server'.">
+      <created>1686419342610</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1686419342610</updated>
+    </task>
+    <task id="LOCAL-00006" summary="1. Added new microservice 'notification'.">
+      <created>1687106514282</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1687106514282</updated>
+    </task>
+    <task id="LOCAL-00007" summary="1. Minor changes.">
+      <created>1687140019670</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1687140019670</updated>
+    </task>
+    <task id="LOCAL-00008" summary="1. Added new microservice 'api-gateway';&#10;2. Added new microservice 'amqp';&#10;3. Added all microservices to docker-compose.yml;&#10;4. Configured jib;&#10;5. Added .properties files for Docker.">
+      <created>1687198037845</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1687198037845</updated>
+    </task>
+    <task id="LOCAL-00036" summary="Task #28: logic for CurrentStreak and RecordStreak">
+      <option name="closed" value="true" />
+      <created>1694321385792</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1694321385792</updated>
+    </task>
+    <task id="LOCAL-00037" summary="Task #28: logic for CurrentStreak and RecordStreak">
+      <option name="closed" value="true" />
+      <created>1694321405203</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1694321405203</updated>
+    </task>
+    <task id="LOCAL-00038" summary="Task #28: logic for CurrentStreak and RecordStreak">
+      <option name="closed" value="true" />
+      <created>1694321416927</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1694321416927</updated>
+    </task>
+    <task id="LOCAL-00039" summary="Task #28: CurrentStreak, RecordStreak;&#10;Task #36: done;">
+      <option name="closed" value="true" />
+      <created>1694477685993</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1694477685993</updated>
+    </task>
+    <task id="LOCAL-00040" summary="Task #28: CurrentStreak, RecordStreak;&#10;Task #36: done;">
+      <option name="closed" value="true" />
+      <created>1694477713161</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1694477713161</updated>
+    </task>
+    <task id="LOCAL-00041" summary="Task #28: CurrentStreak, RecordStreak, Vocabulary;&#10;Task #36: done;&#10;Task #37: done.">
+      <option name="closed" value="true" />
+      <created>1694537467668</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1694537467668</updated>
+    </task>
+    <task id="LOCAL-00042" summary="Task #28: CurrentStreak, RecordStreak, Vocabulary;&#10;Task #36: done;&#10;Task #37: done;&#10;Task #38: done.">
+      <option name="closed" value="true" />
+      <created>1695063553763</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1695063553763</updated>
+    </task>
+    <task id="LOCAL-00043" summary="task #34">
+      <option name="closed" value="true" />
+      <created>1695141240028</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1695141240028</updated>
+    </task>
+    <task id="LOCAL-00044" summary="design improvements">
+      <option name="closed" value="true" />
+      <created>1695143346465</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1695143346465</updated>
+    </task>
+    <task id="LOCAL-00045" summary="1. Removed 'surname' and 'gender' for User;&#10;2. Notification when the word status changes;&#10;3. In reviews, for new words, red frame and badge;&#10;4. Dots for IN_REVIEW words;&#10;5. User account functionality.">
+      <option name="closed" value="true" />
+      <created>1696050415729</created>
+      <option name="number" value="00045" />
+      <option name="presentableId" value="LOCAL-00045" />
+      <option name="project" value="LOCAL" />
+      <updated>1696050415729</updated>
+    </task>
+    <task id="LOCAL-00046" summary="1. All user data related to Chinese Flashcards is now deleted when the Account is deleted.">
+      <option name="closed" value="true" />
+      <created>1696059563292</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1696059563292</updated>
+    </task>
+    <task id="LOCAL-00047" summary="Task #9: Renamed 'vocabulary' into 'chinese-flashcards'">
+      <option name="closed" value="true" />
+      <created>1696061919723</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1696061919723</updated>
+    </task>
+    <task id="LOCAL-00048" summary="Task #41: Progress bar during review.">
+      <option name="closed" value="true" />
+      <created>1696065698639</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1696065698639</updated>
+    </task>
+    <task id="LOCAL-00049" summary="Task #25: Notifications.">
+      <option name="closed" value="true" />
+      <created>1696216519723</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1696216519723</updated>
+    </task>
+    <task id="LOCAL-00050" summary="Task #46: On the Review cards, display remaining 'New Words' and 'Review Words'.">
+      <option name="closed" value="true" />
+      <created>1696255685263</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1696255685264</updated>
+    </task>
+    <task id="LOCAL-00051" summary="Task #46: tmp commit">
+      <option name="closed" value="true" />
+      <created>1696484679638</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1696484679639</updated>
+    </task>
+    <task id="LOCAL-00052" summary="Task #46, #47: review card: badge 'Completed', remaining and new word count">
+      <option name="closed" value="true" />
+      <created>1696490229298</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1696490229298</updated>
+    </task>
+    <task id="LOCAL-00053" summary="Task #20: refresh for reviews">
+      <option name="closed" value="true" />
+      <created>1696505905743</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1696505905743</updated>
+    </task>
+    <task id="LOCAL-00054" summary="Task #49: design of word packs">
+      <option name="closed" value="true" />
+      <created>1696572329507</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1696572329509</updated>
+    </task>
+    <task id="LOCAL-00055" summary="Task #49: design of review cards">
+      <option name="closed" value="true" />
+      <created>1696579801027</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1696579801027</updated>
+    </task>
+    <task id="LOCAL-00056" summary="Task #49: sort of reviews">
+      <option name="closed" value="true" />
+      <created>1696580592094</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1696580592094</updated>
+    </task>
+    <task id="LOCAL-00057" summary="Task #49: buttons, hovers">
+      <option name="closed" value="true" />
+      <created>1696581085218</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1696581085218</updated>
+    </task>
+    <task id="LOCAL-00058" summary="Task #49: review card design">
+      <option name="closed" value="true" />
+      <created>1696588351052</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1696588351052</updated>
+    </task>
+    <task id="LOCAL-00059" summary="Task #49: card sorting in review and statistics">
+      <option name="closed" value="true" />
+      <created>1696589272883</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1696589272883</updated>
+    </task>
+    <task id="LOCAL-00060" summary="Task #49: review ending">
+      <option name="closed" value="true" />
+      <created>1696589528672</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1696589528672</updated>
+    </task>
+    <task id="LOCAL-00061" summary="Task #49: notifications">
+      <option name="closed" value="true" />
+      <created>1696590945360</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1696590945360</updated>
+    </task>
+    <task id="LOCAL-00062" summary="Task #49: minor changes">
+      <option name="closed" value="true" />
+      <created>1696596624733</created>
+      <option name="number" value="00062" />
+      <option name="presentableId" value="LOCAL-00062" />
+      <option name="project" value="LOCAL" />
+      <updated>1696596624733</updated>
+    </task>
+    <task id="LOCAL-00063" summary="Task #49: minor changes">
+      <option name="closed" value="true" />
+      <created>1696597526705</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1696597526705</updated>
+    </task>
+    <task id="LOCAL-00064" summary="Task #49: themes">
+      <option name="closed" value="true" />
+      <created>1696614296291</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1696614296291</updated>
+    </task>
+    <task id="LOCAL-00065" summary="Task #49: themes">
+      <option name="closed" value="true" />
+      <created>1696616017000</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1696616017001</updated>
+    </task>
+    <task id="LOCAL-00066" summary="Task #49: themes">
+      <option name="closed" value="true" />
+      <created>1696649293957</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1696649293957</updated>
+    </task>
+    <task id="LOCAL-00067" summary="Task #49: login and registration pages">
+      <option name="closed" value="true" />
+      <created>1696651812158</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1696651812159</updated>
+    </task>
+    <task id="LOCAL-00068" summary="Task #42: Fixed order of words in reviews">
+      <option name="closed" value="true" />
+      <created>1696751591896</created>
+      <option name="number" value="00068" />
+      <option name="presentableId" value="LOCAL-00068" />
+      <option name="project" value="LOCAL" />
+      <updated>1696751591897</updated>
+    </task>
+    <task id="LOCAL-00069" summary="Task #51: review word list logic">
+      <option name="closed" value="true" />
+      <created>1696769651790</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1696769651791</updated>
+    </task>
+    <task id="LOCAL-00070" summary="Task #52: limit notifications to one at a time">
+      <option name="closed" value="true" />
+      <created>1696771272700</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1696771272700</updated>
+    </task>
+    <task id="LOCAL-00071" summary="Task #53: &#10;1. Fixed topnav buttons overlay when screen width is small;&#10;2. Sidebar open/close button.">
+      <option name="closed" value="true" />
+      <created>1696775134827</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1696775134827</updated>
+    </task>
+    <task id="LOCAL-00072" summary="Task #54: Display notification when the word is added to IN_REVIEW;">
+      <option name="closed" value="true" />
+      <created>1696779987249</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1696779987249</updated>
+    </task>
+    <task id="LOCAL-00073" summary="Task #55: Changed badge 'Completed' to an icon">
+      <option name="closed" value="true" />
+      <created>1696781425160</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1696781425160</updated>
+    </task>
+    <task id="LOCAL-00074" summary="docker-compose">
+      <option name="closed" value="true" />
+      <created>1698992674748</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1698992674749</updated>
+    </task>
+    <task id="LOCAL-00075" summary="docker-compose">
+      <option name="closed" value="true" />
+      <created>1699100663127</created>
+      <option name="number" value="00075" />
+      <option name="presentableId" value="LOCAL-00075" />
+      <option name="project" value="LOCAL" />
+      <updated>1699100663128</updated>
+    </task>
+    <task id="LOCAL-00076" summary="Task #65: Migration to TS">
+      <option name="closed" value="true" />
+      <created>1699100816377</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1699100816377</updated>
+    </task>
+    <option name="localTasksCounter" value="77" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="main" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Task #41: Progress bar during review." />
+    <MESSAGE value="Task #25: Notifications." />
+    <MESSAGE value="Task #46: On the Review cards, display remaining 'New Words' and 'Review Words'." />
+    <MESSAGE value="Task #46: tmp commit" />
+    <MESSAGE value="Task #46, #47: review card: badge 'Completed', remaining and new word count" />
+    <MESSAGE value="Task #20: refresh for reviews" />
+    <MESSAGE value="Task #49: design of word packs" />
+    <MESSAGE value="Task #49: design of review cards" />
+    <MESSAGE value="Task #49: sort of reviews" />
+    <MESSAGE value="Task #49: buttons, hovers" />
+    <MESSAGE value="Task #49: review card design" />
+    <MESSAGE value="Task #49: card sorting in review and statistics" />
+    <MESSAGE value="Task #49: review ending" />
+    <MESSAGE value="Task #49: notifications" />
+    <MESSAGE value="Task #49: minor changes" />
+    <MESSAGE value="Task #49: themes" />
+    <MESSAGE value="Task #49: login and registration pages" />
+    <MESSAGE value="Task #42: Fixed order of words in reviews" />
+    <MESSAGE value="Task #51: review word list logic" />
+    <MESSAGE value="Task #52: limit notifications to one at a time" />
+    <MESSAGE value="Task #53: &#10;1. Fixed topnav buttons overlay when screen width is small;&#10;2. Sidebar open/close button." />
+    <MESSAGE value="Task #54: Display notification when the word is added to IN_REVIEW;" />
+    <MESSAGE value="Task #55: Changed badge 'Completed' to an icon" />
+    <MESSAGE value="docker-compose" />
+    <MESSAGE value="Task #65: Migration to TS" />
+    <option name="LAST_COMMIT_MESSAGE" value="Task #65: Migration to TS" />
+  </component>
+</project>

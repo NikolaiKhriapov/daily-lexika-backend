@@ -1,0 +1,6 @@
+file-location:
+  data-excel: "Data.xlsx"
+
+#file-storage:
+#  profile-photo-directory: "static/images/user-%s/profile-photo/"
+#  profile-photo-name: "%s-profile-photo%s"
