@@ -1,8 +1,0 @@
-#file-storage:
-#  profile-photo-directory: "static/images/user-%s/profile-photo/"
-#  profile-photo-name: "%s-profile-photo%s"
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://eureka-server:8761/eureka/

@@ -14,7 +14,7 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+backend/.idea
 *.iws
 *.iml
 *.ipr
@@ -32,6 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 /frontend/node_modules/
+/backend/src/main/resources/static/data/Data.xlsx
+/docker-compose2.yml
 /frontend/.env
-/backend/chinese-flashcards/src/main/resources/static/data/Data.xlsx
-/backend/file-storage/src/main/resources/static/
+/frontend/.env.production
+/frontend/.idea
+/frontend/.nvmrc
+.idea
