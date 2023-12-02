@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { ApiEndpointsReviews } from '../API/apiMethods';
 import { ReviewDTO } from '../types/types';
+import { LocalStorage } from '../utils/constants';
 
 const getAuthConfig = () => ({
   headers: {
-    Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+    Authorization: `Bearer ${localStorage.getItem(LocalStorage.ACCESS_TOKEN)}`,
   },
 });
 

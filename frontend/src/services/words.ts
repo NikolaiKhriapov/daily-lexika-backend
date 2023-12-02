@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { ApiEndpointsWords } from '../API/apiMethods';
+import { LocalStorage } from '../utils/constants';
 
 const getAuthConfig = () => ({
   headers: {
-    Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+    Authorization: `Bearer ${localStorage.getItem(LocalStorage.ACCESS_TOKEN)}`,
   },
 });
 

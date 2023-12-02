@@ -1,0 +1,42 @@
+@import '../../styles/globals';
+
+.ReviewWordCard {
+  border-width: $borderWidth;
+  border-style: $borderStyle;
+  border-radius: $borderRadius;
+  justify-content: center;
+  align-items: center;
+  height: 500px;
+  width: 400px;
+  transition: transform 0.3s;
+  transform: rotateY(0deg);
+  padding: 10px;
+
+  &.light {
+    background-color: $lightTheme-reviewWordCard-bgColor;
+    border-color: $lightTheme-borderColor;
+
+    &.isNewStatus {
+      border-color: $lightTheme-reviewWordCard-badgeRedColor;
+    }
+  }
+
+  &.dark {
+    background-color: $darkTheme-reviewWordCard-bgColor;
+    border-color: $darkTheme-borderColor;
+
+    &.isNewStatus {
+      border-color: $darkTheme-reviewWordCard-badgeRedColor;
+    }
+  }
+
+  &.isFlipped {
+    transform: rotateY(180deg) scaleX(-1);
+  }
+
+  .contents_container {
+    text-align: center;
+    margin-bottom: 30px;
+    width: 80%;
+  }
+}

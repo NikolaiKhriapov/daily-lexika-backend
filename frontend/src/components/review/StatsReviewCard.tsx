@@ -1,13 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Flex, Progress, Stat, StatLabel, StatNumber, useColorModeValue, useDisclosure } from '@chakra-ui/react';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
+import { useEffect, useState } from 'react';
+import { Box, Flex, Stat, useColorMode, useDisclosure } from '@chakra-ui/react';
 import { errorNotification } from '../../services/popup-notification';
 import { getReviewStatistics } from '../../services/reviews';
 import StatsReviewWindow from './StatsReviewWindow';
 import { getWordPack } from '../../services/word-packs';
 import { ReviewDTO, ReviewStatisticsDTO, WordPackDTO } from '../../types/types';
+import { TextSize } from '../../utils/constants';
+import Text from '../common/basic/Text';
+import ProgressBar from '../common/basic/ProgressBar';
+import InfoButton from '../common/basic/InfoButton';
 
-export default function StatsReviewCard({ reviewDTO }: { reviewDTO: ReviewDTO }) {
+interface StatsReviewCardProps {
+  reviewDTO: ReviewDTO;
+}
+
+function StatsReviewCard(props: StatsReviewCardProps) {
+  const { reviewDTO } = props;
+
+  const { colorMode } = useColorMode();
   const [reviewStatisticsDTO, setReviewStatisticsDTO] = useState<ReviewStatisticsDTO>();
   const [wordPackDTO, setWordPackDTO] = useState<WordPackDTO>();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -17,6 +27,7 @@ export default function StatsReviewCard({ reviewDTO }: { reviewDTO: ReviewDTO })
       .then((response) => setWordPackDTO(response.data.data.wordPackDTO))
       .catch((e) => errorNotification(e.code, e.response.data.message));
   };
+
   const fetchReviewStatisticsDTO = () => {
     getReviewStatistics(reviewDTO.id!)
       .then((response) => setReviewStatisticsDTO(response.data.data.reviewStatisticsDTO))
@@ -28,23 +39,15 @@ export default function StatsReviewCard({ reviewDTO }: { reviewDTO: ReviewDTO })
     fetchWordPackDTO(reviewDTO.wordPackName);
   }, []);
 
-  const wordsKnownPercentage = reviewStatisticsDTO && Math.round((reviewStatisticsDTO.wordsKnown / reviewStatisticsDTO.wordsTotal) * 100);
+  const wordsKnownPercentage = reviewStatisticsDTO
+    && Math.round((reviewStatisticsDTO.wordsKnown / reviewStatisticsDTO.wordsTotal) * 100);
 
   return (
     <Box>
-      <Stat
-        shadow='2xl'
-        border='1px solid'
-        rounded='lg'
-        px={{ md: 4 }}
-        py='3.5'
-        width='220px'
-        borderColor={useColorModeValue('gray.400', 'rgba(80,80,80)')}
-        bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}
-      >
-        <Flex justifyContent='space-between' alignItems='center'>
-          <StatLabel fontSize='large' fontWeight='bold'>{reviewDTO.wordPackName}</StatLabel>
-          <AiOutlineQuestionCircle size='1em' onClick={onOpen} cursor='pointer' />
+      <Stat className={`StatsReviewCard_container ${colorMode}`} shadow='2xl'>
+        <Flex className='wordPackNameAndInfoButton'>
+          <Text size={TextSize.LARGE} text={reviewDTO.wordPackName} isBold />
+          <InfoButton onOpen={onOpen} />
           <StatsReviewWindow
             isOpen={isOpen}
             onClose={onClose}
@@ -53,17 +56,21 @@ export default function StatsReviewCard({ reviewDTO }: { reviewDTO: ReviewDTO })
             wordPackDTO={wordPackDTO!}
           />
         </Flex>
-        <Flex justifyContent='space-between' alignItems='baseline'>
-          <StatNumber fontSize='2xl'>
-            {wordsKnownPercentage}%
-            <StatLabel as='span' fontWeight='medium'> known</StatLabel>
-          </StatNumber>
-          <StatLabel fontWeight='bold'>
-            {reviewStatisticsDTO && `${reviewStatisticsDTO.wordsKnown}/${reviewStatisticsDTO.wordsTotal}`}
-          </StatLabel>
+        <Flex className='stats'>
+          <span>
+            <Text size={TextSize.LARGE} text={`${wordsKnownPercentage}%`} isBold />
+            <Text size={TextSize.SMALL} text=' known' isBold />
+          </span>
+          <Text
+            size={TextSize.SMALL}
+            text={reviewStatisticsDTO && `${reviewStatisticsDTO.wordsKnown}/${reviewStatisticsDTO.wordsTotal}`}
+            isBold
+          />
         </Flex>
-        <Progress colorScheme='blue' size='sm' rounded='md' value={wordsKnownPercentage} />
+        <ProgressBar value={wordsKnownPercentage || 0} />
       </Stat>
     </Box>
   );
 }
+
+export default StatsReviewCard;

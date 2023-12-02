@@ -1,0 +1,57 @@
+@import '../../styles/globals';
+
+.ReviewCard_container {
+  border-width: $borderWidth;
+  border-style: $borderStyle;
+  border-radius: $borderRadius;
+  width: 220px;
+  height: 280px;
+  padding: 0 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  &.light {
+    background-color: $lightTheme-bgColor;
+    border-color: $lightTheme-borderColor;
+  }
+
+  &.dark {
+    background-color: $darkTheme-bgColor;
+    border-color: $darkTheme-borderColor;
+  }
+
+  .completedIconAndCloseButton_container {
+    justify-content: space-between;
+
+    .completedIcon_container {
+      height: 15px;
+      margin-top: -10px;
+      margin-bottom: 10px;
+      margin-left: -10px;
+    }
+
+    .closeButton_container {
+      height: 15px;
+      margin-top: -15px;
+      margin-bottom: 15px;
+      margin-right: -15px;
+    }
+  }
+
+  .wordPackName_container {
+    justify-content: center;
+  }
+
+  .wordsCount_container {
+    justify-content: center;
+    height: 150px;
+    flex-direction: column;
+
+    .words_container {
+      justify-content: center;
+      align-items: baseline;
+      gap: 4px;
+    }
+  }
+}

@@ -1,0 +1,17 @@
+@import '../../../styles/globals';
+
+.alertDialogContent {
+  border-width: $borderWidth;
+  border-style: $borderStyle;
+  border-radius: $borderRadius;
+
+  &.light {
+    background-color: $lightTheme-bgColor;
+    border-color: $lightTheme-borderColor;
+  }
+
+  &.dark {
+    background-color: $darkTheme-bgColor;
+    border-color: $darkTheme-borderColor;
+  }
+}

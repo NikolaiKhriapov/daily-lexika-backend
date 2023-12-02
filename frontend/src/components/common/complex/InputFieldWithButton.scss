@@ -1,0 +1,18 @@
+@import '../../../styles/globals';
+
+.InputFieldWithButton {
+  display: flex;
+  flex-direction: column;
+
+  &_container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  &__inputElements {
+    flex: 1;
+    margin-right: 10px;
+  }
+}

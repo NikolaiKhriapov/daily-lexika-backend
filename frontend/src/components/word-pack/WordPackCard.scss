@@ -1,0 +1,65 @@
+@import '../../styles/globals';
+
+.WordPackCard_container {
+  border-width: $borderWidth;
+  border-style: $borderStyle;
+  border-radius: $borderRadius;
+  width: 220px;
+  height: 280px;
+  padding: 0 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  &.light {
+    background-color: $lightTheme-bgColor;
+    border-color: $lightTheme-borderColor;
+  }
+
+  &.dark {
+    background-color: $darkTheme-bgColor;
+    border-color: $darkTheme-borderColor;
+  }
+
+  .infoButton_container {
+    justify-content: right;
+
+    .infoButton_container1 {
+      height: 15px;
+      margin-top: -15px;
+      margin-bottom: 15px;
+      margin-right: -15px;
+    }
+  }
+
+  .wordPackName_container {
+    justify-content: center;
+  }
+
+  .wordsCount_container {
+    justify-content: center;
+    align-items: center;
+  }
+
+  .description_container {
+    justify-content: center;
+    align-items: center;
+    height: 110px;
+    text-align: center;
+  }
+
+  .wordPackCard__addedSign {
+    border-width: $borderWidth;
+    border-style: $borderStyle;
+    border-radius: $borderRadius;
+    width: 90px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    font-size: $buttonFontSize;
+    font-weight: $buttonFontWeight;
+    padding: 6px;
+  }
+}

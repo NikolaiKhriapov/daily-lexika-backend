@@ -1,29 +1,34 @@
-import React from 'react';
-import { Box, Flex, Stat, StatLabel, StatNumber, useColorModeValue } from '@chakra-ui/react';
+import { Box, Flex, useColorMode } from '@chakra-ui/react';
+import { TextSize } from '../../utils/constants';
+import Heading from '../common/basic/Heading';
+import Text from '../common/basic/Text';
 
-export default function StatsCard({ icon, stat, title }: { icon: any, stat: number | string, title: string }) {
+interface StatsCardProps {
+  icon: any;
+  stat?: number;
+  title: string;
+}
+
+function StatsCard(props: StatsCardProps) {
+  const { icon, stat, title } = props;
+
+  const { colorMode } = useColorMode();
+
   return (
     <Box>
-      <Stat
-        shadow='2xl'
-        border='1px solid'
-        rounded='lg'
-        px='4'
-        py='5'
-        width='220px'
-        borderColor={useColorModeValue('gray.400', 'rgba(80,80,80)')}
-        bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}
-      >
-        <Flex justifyContent='left'>
-          <Box my='auto' color={useColorModeValue('black', 'gray.200')} alignContent='center'>
-            {icon}
-          </Box>
-          <Box pl={{ md: 4 }}>
-            <StatNumber fontSize='2xl' fontWeight='medium'>{stat}</StatNumber>
-            <StatLabel fontWeight='medium' isTruncated>{title}</StatLabel>
-          </Box>
+      <Flex className={`StatsCard_container ${colorMode}`} shadow='2xl'>
+        <Flex className={`icon ${colorMode}`}>{icon}</Flex>
+        <Flex className='stats'>
+          <Heading level={3} text={stat} />
+          <Text size={TextSize.SMALL} text={title} isBold />
         </Flex>
-      </Stat>
+      </Flex>
     </Box>
   );
 }
+
+StatsCard.defaultProps = {
+  stat: '–––',
+};
+
+export default StatsCard;

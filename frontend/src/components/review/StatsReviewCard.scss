@@ -1,0 +1,33 @@
+@import '../../styles/globals';
+
+.StatsReviewCard_container {
+  border: $borderWidth $borderStyle;
+  border-radius: $borderRadius;
+  padding: 15px;
+  width: 220px;
+  height: 100px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+
+  &.light {
+    background-color: $lightTheme-bgColor;
+    border-color: $lightTheme-borderColor;
+  }
+
+  &.dark {
+    background-color: $darkTheme-bgColor;
+    border-color: $darkTheme-borderColor;
+  }
+
+  .wordPackNameAndInfoButton {
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .stats {
+    justify-content: space-between;
+    align-items: baseline;
+  }
+}

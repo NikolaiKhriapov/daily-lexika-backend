@@ -1,0 +1,11 @@
+@import '../../../styles/globals';
+
+.progressBar {
+  &.light {
+    background-color: $lightTheme-progressBarBgColor;
+  }
+
+  &.dark {
+    background-color: $darkTheme-progressBarBgColor;
+  }
+}

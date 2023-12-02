@@ -1,0 +1,67 @@
+@import '../../styles/globals';
+
+.Sidebar_container {
+  position: fixed;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &.light {
+    background-color: $lightTheme-background;
+  }
+
+  &.dark {
+    background-color: $darkTheme-background;
+  }
+
+  .corner {
+    align-items: center;
+    padding-top: 70px;
+
+    &.light {
+      background-color: $lightTheme-bgColor;
+    }
+
+    &.dark {
+      background-color: $darkTheme-bgColor;
+    }
+  }
+
+  .space {
+    height: 40px;
+  }
+
+  .item {
+    color-scheme: black;
+
+    :focus {
+      box-shadow: none;
+    }
+
+    .container {
+      border-radius: $borderRadius;
+      align-items: center;
+      padding: 16px;
+      margin: 0 20px;
+      cursor: pointer;
+
+      .icon {
+        font-size: 16px;
+        margin-right: 16px;
+      }
+
+      &:hover {
+        border-width: $borderWidth;
+        border-style: $borderStyle;
+
+        &.light {
+          background-color: $lightTheme-bgColor;
+        }
+
+        &.dark {
+          background-color: $darkTheme-bgColor;
+        }
+      }
+    }
+  }
+}

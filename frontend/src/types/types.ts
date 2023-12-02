@@ -84,9 +84,9 @@ export interface NotificationDTO {
 }
 
 export enum Status {
-  'NEW', // TODO::: remove
-  'IN_REVIEW',
-  'KNOWN',
+  NEW = 'NEW',
+  IN_REVIEW = 'IN_REVIEW',
+  KNOWN = 'KNOWN',
 }
 
 export enum Category {

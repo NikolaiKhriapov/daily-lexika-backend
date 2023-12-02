@@ -1,0 +1,32 @@
+@import '../../../styles/globals';
+
+.Modal {
+  &__ModalContent {
+    border-width: $borderWidth;
+    border-style: $borderStyle;
+    border-radius: $borderRadius;
+    padding: 6px;
+
+    &.light {
+      background-color: $lightTheme-bgColor;
+      border-color: $lightTheme-borderColor;
+    }
+
+    &.dark {
+      background-color: $darkTheme-bgColor;
+      border-color: $darkTheme-borderColor;
+    }
+  }
+
+  &__ModalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  &__ModalBody {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+}

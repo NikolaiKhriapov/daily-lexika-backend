@@ -1,0 +1,75 @@
+$h1FontSize: 35px;
+$h1FontWeight: 600;
+
+$h2FontSize: 28px;
+$h2FontWeight: 600;
+
+$h3FontSize: 24px;
+$h3FontWeight: 500;
+
+$h4FontSize: 20px;
+$h4FontWeight: 600;
+
+$textXlFontSize: 24px;
+$textXlFontWeight: 250;
+
+$textLargeFontSize: 20px;
+$textLargeFontWeight: 250;
+
+$textMediumFontSize: 16px;
+$textMediumFontWeight: 400;
+
+$textSmallFontSize: 14px;
+$textSmallFontWeight: 400;
+
+$buttonFontSize:14px;
+$buttonFontWeight: 600;
+
+$borderWidth: 1px;
+$borderStyle: solid;
+$borderRadius: 10px;
+
+$lightTheme-background: rgb(237,238,240);
+$lightTheme-borderColor: #CBD5E0;
+$lightTheme-bgColor: #F7FAFC;
+$lightTheme-hoverBgColor: #E3E8EF;
+$lightTheme-button-color: #000000;
+$lightTheme-button-bgColor: #CBD5E0;
+$lightTheme-button-hoverBgColor: #A0AEC0;
+$lightTheme-button-removeHoverBgColor: #F56565;
+$lightTheme-reviewWordCard-bgColor: #E3E8EF;
+$lightTheme-reviewWordCard-badgeRedColor: #EF4444;
+$lightTheme-progressBarBgColor: #E4E8EE;
+
+$darkTheme-background: rgb(20,20,20);
+$darkTheme-borderColor: #505050;
+$darkTheme-bgColor: #282828;
+$darkTheme-hoverBgColor: #3C3C3C;
+$darkTheme-button-color: #FFFFFF;
+$darkTheme-button-bgColor: #3C3C3C;
+$darkTheme-button-hoverBgColor: #505050;
+$darkTheme-button-removeHoverBgColor: #EF4444;
+$darkTheme-reviewWordCard-bgColor: #1E1E1E;
+$darkTheme-reviewWordCard-badgeRedColor: #800000;
+$darkTheme-progressBarBgColor: #505050;
+//bg={useColorModeValue('white', 'rgba(40,40,40)')}
+
+$dark100: #1E1E1E;
+$dark200: #282828;
+$dark300: #3C3C3C;
+$dark400: #505050;
+$dark500: #595959;
+$dark600: #666666;
+$dark700: #767676;
+$dark800: #808080;
+$dark900: #8C8C8C;
+
+$light100: #F7FAFC;
+$light200: #FAFBFC;
+$light300: #F0F3F7;
+$light400: #E9EDF1;
+$light500: #E3E8EF;
+$light600: #E4E8EE;
+$light700: #CBD5E0;
+$light800: #A0AEC0;
+$light900: #A0AEC0;

@@ -1,30 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Button,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalOverlay,
-  Progress,
-  Stack,
-  useColorModeValue,
-} from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { Flex } from '@chakra-ui/react';
 import { processReviewAction } from '../../services/reviews';
 import { updateUserStreak } from '../../services/user';
 import { errorNotification, successNotification } from '../../services/popup-notification';
 import ReviewWordCard from './ReviewWordCard';
 import { Status, WordDTO } from '../../types/types';
+import { ButtonSize, ButtonType } from '../../utils/constants';
+import Modal from '../common/complex/Modal';
+import Button from '../common/basic/Button';
+import ProgressBar from '../common/basic/ProgressBar';
 
-function StartReviewWindow({ reviewId, isOpen, onClose, button, totalReviewWords }: {
+interface StartReviewWindowProps {
   reviewId: number;
   isOpen: boolean;
   onClose: any;
   button: any;
   totalReviewWords: number;
-}) {
+}
+
+function StartReviewWindow(props: StartReviewWindowProps) {
+  const { reviewId, isOpen, onClose, button, totalReviewWords } = props;
+
   const [reviewWordDTO, setReviewWordDTO] = useState<WordDTO | null>(null);
   const [reviewUpdatedSize, setReviewUpdatedSize] = useState<number>(0);
   const [isFormVisible, setIsFormVisible] = useState(true);
@@ -32,17 +28,14 @@ function StartReviewWindow({ reviewId, isOpen, onClose, button, totalReviewWords
   const [isFlipped, setIsFlipped] = useState(false);
 
   const fetchReviewAction = (answer: string | null) => {
-    if (
-      (reviewWordDTO !== null && (reviewWordDTO.status.toString() === Status[Status.NEW]
-          || (reviewWordDTO.status.toString() === Status[Status.IN_REVIEW] && reviewWordDTO.totalStreak === 4))
-        && answer === 'yes')
-    ) {
+    if ((answer === 'yes' && reviewWordDTO !== null && (reviewWordDTO.status.toString() === Status[Status.NEW]
+      || (reviewWordDTO.status.toString() === Status[Status.IN_REVIEW] && reviewWordDTO.totalStreak === 4)))) {
       successNotification(
         `${reviewWordDTO.nameChineseSimplified} is a known word.`,
         'This word will still be shown occasionally during reviews',
       );
     }
-    if (reviewWordDTO !== null && (reviewWordDTO.status.toString() === 'KNOWN' && answer === 'no')) {
+    if (answer === 'no' && reviewWordDTO !== null && (reviewWordDTO.status.toString() === Status[Status.KNOWN])) {
       successNotification(
         `Keep reviewing ${reviewWordDTO.nameChineseSimplified}`,
         'This word will be shown more frequently so that you can relearn it',
@@ -77,85 +70,48 @@ function StartReviewWindow({ reviewId, isOpen, onClose, button, totalReviewWords
     setIsFlipped(false);
   };
 
-  const forgotButton = (
-    <Button
-      rounded='lg'
-      shadow='2xl'
-      color={useColorModeValue('black', 'white')}
-      bg={useColorModeValue('gray.300', 'rgba(60,60,60)')}
-      _hover={{ bg: useColorModeValue('red.300', 'red.400') }}
-      onClick={() => pressButton('no')}
-    >
-      Forgot
-    </Button>
-  );
-  const rememberedButton = (
-    <Button
-      rounded='lg'
-      shadow='2xl'
-      ml={5}
-      color={useColorModeValue('black', 'white')}
-      bg={useColorModeValue('gray.300', 'rgba(60,60,60)')}
-      _hover={{ bg: useColorModeValue('gray.400', 'rgba(80,80,80)') }}
-      onClick={() => pressButton('yes')}
-      disabled={!reviewWordDTO}
-    >
-      Remembered
-    </Button>
-  );
-
   const reviewProgress = ((totalReviewWords - reviewUpdatedSize) / totalReviewWords) * 100;
-  const colorScheme = useColorModeValue('gray', 'gray');
-  const bgColor = useColorModeValue('gray.200', 'rgba(80,80,80)');
 
   return (
     <>
       {button}
-      <Modal isOpen={isOpen} onClose={onClose} size='6xl' isCentered>
-        <ModalOverlay />
-        <ModalContent
-          border='1px solid'
-          rounded='lg'
-          width='80vh'
-          height='80vh'
-          maxW='90%'
-          maxH='90%'
-          shadow='2xl'
-          // align='center'
-          p={6}
-          borderColor={useColorModeValue('gray.400', 'rgba(80,80,80)')}
-          bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}
-        >
-          <ModalCloseButton />
-          <ModalBody display='flex' flexDirection='column' justifyContent='center'>
+      <Modal
+        size='6xl'
+        isOpen={isOpen}
+        onClose={onClose}
+        header={null}
+        body={(
+          <div>
             {!isFormVisible && isReviewComplete ? null : (
               <>
-                <Stack spacing={2} mb={90} ml={10} mr={10}>
-                  <Progress
-                    value={reviewProgress}
-                    size='sm'
-                    rounded='md'
-                    colorScheme={colorScheme}
-                    bg={bgColor}
+                <ProgressBar value={reviewProgress} margin='20px 50px' />
+                <Flex className='ReviewWordCard_container'>
+                  <ReviewWordCard
+                    reviewWordDTO={reviewWordDTO!}
+                    isFlipped={isFlipped}
+                    setIsFlipped={setIsFlipped}
                   />
-                </Stack>
-                <ReviewWordCard
-                  reviewWordDTO={reviewWordDTO!}
-                  isFlipped={isFlipped}
-                  setIsFlipped={setIsFlipped}
-                />
-                <Stack align='center'>
-                  <Flex>
-                    {forgotButton}
-                    {rememberedButton}
+                  <Flex className='buttons_container'>
+                    <Button
+                      content='Forgot'
+                      size={ButtonSize.MEDIUM}
+                      type={ButtonType.BUTTON_RED}
+                      onClick={() => pressButton('no')}
+                    />
+                    <Button
+                      content='Remembered'
+                      size={ButtonSize.MEDIUM}
+                      type={ButtonType.BUTTON}
+                      onClick={() => pressButton('yes')}
+                      isDisabled={!reviewWordDTO}
+                    />
                   </Flex>
-                </Stack>
+                </Flex>
               </>
             )}
-          </ModalBody>
-          <ModalFooter height={90} />
-        </ModalContent>
-      </Modal>
+          </div>
+        )}
+      />
     </>
   );
 }

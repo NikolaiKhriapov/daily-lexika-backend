@@ -38,10 +38,11 @@
     "react/jsx-no-constructed-context-values": "off",
     //    "operator-linebreak": "error",
     //    "@typescript-eslint/comma-dangle": "error",
+    "react/no-array-index-key": "off",
     "no-multi-spaces": "error",
     "react/jsx-indent": "error",
-    "@typescript-eslint/indent": "error",
     "no-multiple-empty-lines": "error",
+    "@typescript-eslint/indent": "error",
     "unused-imports/no-unused-imports": "error"
   }
 }

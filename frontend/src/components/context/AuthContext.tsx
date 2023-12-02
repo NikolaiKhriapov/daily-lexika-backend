@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import jwtDecode, { JwtPayload } from 'jwt-decode';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { login as performLogin } from '../../services/authorization';
 import { AuthenticatedUser, AuthenticationRequest } from '../../types/types';
+import { LocalStorage } from '../../utils/constants';
 
 interface AuthContextProps {
   user: AuthenticatedUser | null;
@@ -28,7 +29,7 @@ function AuthProvider({ children }: {
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
 
   const setUserFromToken = () => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem(LocalStorage.ACCESS_TOKEN);
     if (token) {
       const jwtToken: JwtPayload = jwtDecode(token);
       setUser({ username: jwtToken.sub! });
@@ -43,7 +44,7 @@ function AuthProvider({ children }: {
     performLogin(authenticationRequest)
       .then((response) => {
         let jwtToken = response.data.data.authenticationResponse.token;
-        localStorage.setItem('access_token', jwtToken);
+        localStorage.setItem(LocalStorage.ACCESS_TOKEN, jwtToken);
 
         jwtToken = jwtDecode(jwtToken);
 
@@ -54,12 +55,12 @@ function AuthProvider({ children }: {
   });
 
   const logout = () => {
-    localStorage.removeItem('access_token');
+    localStorage.removeItem(LocalStorage.ACCESS_TOKEN);
     setUser(null);
   };
 
   const isUserAuthenticated = () => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem(LocalStorage.ACCESS_TOKEN);
     if (!token) {
       return false;
     }

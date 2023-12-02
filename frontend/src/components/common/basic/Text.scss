@@ -1,0 +1,75 @@
+@import '../../../styles/globals';
+
+.textSmall {
+  font-size: $textSmallFontSize;
+  font-weight: $textSmallFontWeight;
+
+  &.isBold {
+    font-weight: 600;
+  }
+}
+
+.textMedium {
+  font-size: $textMediumFontSize;
+  font-weight: $textMediumFontWeight;
+
+  &.isBold {
+    font-weight: 600;
+  }
+}
+
+.textLarge {
+  font-size: $textLargeFontSize;
+  font-weight: $textLargeFontWeight;
+
+  &.isBold {
+    font-weight: 600;
+  }
+}
+
+.textXl {
+  font-size: $textXlFontSize;
+  font-weight: $textXlFontWeight;
+
+  &.isBold {
+    font-weight: 600;
+  }
+}
+
+.textReviewWordCardWord {
+  font-size: $textXlFontSize;
+  font-weight: $textXlFontWeight;
+
+  &.isBold {
+    font-weight: 600;
+  }
+}
+
+.textReviewWordCardPinyin {
+  font-size: $textXlFontSize;
+  font-weight: $textXlFontWeight;
+
+  &.isBold {
+    font-weight: 600;
+  }
+}
+
+.textReviewWordCardTranslation {
+  font-size: 30px;
+  font-weight: 400;
+  font-family: "Roboto Light", serif;
+}
+
+.textReviewWordCardPinyin {
+  font-size: 40px;
+  font-weight: 400;
+  font-family: "Roboto Light", serif;
+  margin-bottom: 40px;
+}
+
+.textReviewWordCardWord {
+  font-size: 72px;
+  font-weight: 400;
+  font-family: "Roboto Light", serif;
+  margin-bottom: 40px;
+}

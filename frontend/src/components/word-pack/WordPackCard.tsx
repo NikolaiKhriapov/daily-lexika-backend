@@ -1,20 +1,30 @@
-import { Heading, Box, Flex, Text, Button, useDisclosure, useColorModeValue, Stat } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
+import { Flex, useColorMode, useDisclosure } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
 import { FaCheck } from 'react-icons/fa';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import { TbCards } from 'react-icons/tb';
 import { errorNotification } from '../../services/popup-notification';
 import CreateReviewWindow from '../review/CreateReviewWindow';
 import ReviewWordPackWindow from './ReviewWordPackWindow';
 import { getAllReviews } from '../../services/reviews';
 import { ReviewDTO, WordPackDTO } from '../../types/types';
+import { ButtonType, TextSize } from '../../utils/constants';
+import Button from '../common/basic/Button';
+import InfoButton from '../common/basic/InfoButton';
+import Heading from '../common/basic/Heading';
+import Text from '../common/basic/Text';
 
-export default function WordPackCard({ wordPackDTO, fetchAllWordPacksDTO }: {
-  wordPackDTO: WordPackDTO, fetchAllWordPacksDTO: any
-}) {
-  const [allReviewsDTO, setAllReviewsDTO] = useState<[ReviewDTO]>();
+interface WordPackCardProps {
+  wordPackDTO: WordPackDTO;
+  fetchAllWordPacksDTO: any;
+}
+
+function WordPackCard(props: WordPackCardProps) {
+  const { wordPackDTO, fetchAllWordPacksDTO } = props;
+
+  const { colorMode } = useColorMode();
   const { isOpen: isOpenPreviewButton, onOpen: onOpenPreviewButton, onClose: onClosePreviewButton } = useDisclosure();
   const { isOpen: isOpenCreateButton, onOpen: onOpenCreateButton, onClose: onCloseCreateButton } = useDisclosure();
+  const [allReviewsDTO, setAllReviewsDTO] = useState<[ReviewDTO]>();
 
   const isReviewExists = allReviewsDTO?.some((review: ReviewDTO) => review.wordPackName === wordPackDTO.name);
 
@@ -29,34 +39,14 @@ export default function WordPackCard({ wordPackDTO, fetchAllWordPacksDTO }: {
   }, []);
 
   const createButton = (
-    <Button
-      rounded='lg'
-      size='sm'
-      shadow='2xl'
-      color={useColorModeValue('black', 'white')}
-      bg={useColorModeValue('gray.300', 'rgba(60,60,60)')}
-      _hover={{ bg: useColorModeValue('gray.400', 'rgba(80,80,80)') }}
-      onClick={onOpenCreateButton}
-    >
-      Create Daily Review
-    </Button>
+    <Button content='Create Daily Review' type={ButtonType.BUTTON} onClick={onOpenCreateButton} />
   );
 
   return (
-    <Box m='5px' mt='50px'>
-      <Stat
-        shadow='2xl'
-        border='1px solid'
-        rounded='lg'
-        width='220px'
-        height='270px'
-        p={6}
-        textAlign='center'
-        borderColor={useColorModeValue('gray.400', 'rgba(80,80,80)')}
-        bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}
-      >
-        <Flex justifyContent='right' mr='-15px' mt='-15px' mb='15px'>
-          <AiOutlineQuestionCircle size='1em' onClick={onOpenPreviewButton} cursor='pointer' />
+    <Flex className={`WordPackCard_container ${colorMode}`}>
+      <Flex className='infoButton_container'>
+        <Flex className='infoButton_container1'>
+          <InfoButton onOpen={onOpenPreviewButton} />
           <ReviewWordPackWindow
             button={null}
             isOpen={isOpenPreviewButton}
@@ -64,45 +54,32 @@ export default function WordPackCard({ wordPackDTO, fetchAllWordPacksDTO }: {
             wordPackDTO={wordPackDTO}
           />
         </Flex>
-        <Flex justifyContent='center'>
-          <Heading fontSize='2xl' fontWeight={500} fontFamily='body'>{wordPackDTO.name}</Heading>
-        </Flex>
-        <Flex justifyContent='center'>
-          <Text fontSize='15' display='flex' alignItems='center'>
-            <TbCards size='20' />{wordPackDTO.totalWords}
-          </Text>
-        </Flex>
-        <Flex justifyContent='center' alignItems='center' height='125px'>{wordPackDTO.description}</Flex>
-        <Flex justifyContent='center'>
-          {isReviewExists
-            ? (
-              <Flex
-                rounded='lg'
-                width='90px'
-                borderWidth='1px'
-                borderColor='gray.500'
-                display='flex'
-                alignItems='center'
-                justifyContent='center'
-                fontSize='sm'
-                p='1.5'
-                fontWeight='600'
-              >
-                <FaCheck style={{ marginRight: '5px' }} />Added
-              </Flex>
-            )
-            : (
-              <CreateReviewWindow
-                button={createButton}
-                isOpen={isOpenCreateButton}
-                onClose={onCloseCreateButton}
-                wordPackDTO={wordPackDTO}
-                fetchAllWordPacksDTO={fetchAllWordPacksDTO}
-                fetchAllReviewsDTO={fetchAllReviewsDTO}
-              />
-            )}
-        </Flex>
-      </Stat>
-    </Box>
+      </Flex>
+      <Flex className='wordPackName_container'>
+        <Heading level={3} text={wordPackDTO.name} />
+      </Flex>
+      <Flex className='wordsCount_container'>
+        <TbCards /><Text size={TextSize.MEDIUM} text={wordPackDTO.totalWords} />
+      </Flex>
+      <Flex className='description_container'>
+        <Text size={TextSize.MEDIUM} text={wordPackDTO.description} />
+      </Flex>
+      <Flex className='buttons_container'>
+        {isReviewExists
+          ? <Flex className='wordPackCard__addedSign'><FaCheck />&nbsp;&nbsp;Added</Flex>
+          : (
+            <CreateReviewWindow
+              button={createButton}
+              isOpen={isOpenCreateButton}
+              onClose={onCloseCreateButton}
+              wordPackDTO={wordPackDTO}
+              fetchAllWordPacksDTO={fetchAllWordPacksDTO}
+              fetchAllReviewsDTO={fetchAllReviewsDTO}
+            />
+          )}
+      </Flex>
+    </Flex>
   );
 }
+
+export default WordPackCard;

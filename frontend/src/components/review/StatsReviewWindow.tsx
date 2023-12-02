@@ -1,112 +1,82 @@
-import React from 'react';
-import {
-  Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Flex, StatNumber, StatLabel,
-  Progress, CircularProgress, CircularProgressLabel, Box, useDisclosure, useColorModeValue,
-} from '@chakra-ui/react';
+import { Flex, useDisclosure } from '@chakra-ui/react';
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
 import ReviewWordPackWindow from '../word-pack/ReviewWordPackWindow';
 import { ReviewDTO, ReviewStatisticsDTO, WordPackDTO } from '../../types/types';
+import { TextSize } from '../../utils/constants';
+import Modal from '../common/complex/Modal';
+import Heading from '../common/basic/Heading';
+import Text from '../common/basic/Text';
+import ProgressBar from '../common/basic/ProgressBar';
+import ProgressCircular from '../common/basic/ProgressCircular';
 
-function StatsReviewWindow({ isOpen, onClose, reviewDTO, reviewStatisticsDTO, wordPackDTO }: {
+interface StatsReviewWindowProps {
   isOpen: boolean;
   onClose: any;
   reviewDTO: ReviewDTO;
   reviewStatisticsDTO: ReviewStatisticsDTO;
   wordPackDTO: WordPackDTO;
-}) {
+}
+
+function StatsReviewWindow(props: StatsReviewWindowProps) {
+  const { isOpen, onClose, reviewDTO, reviewStatisticsDTO, wordPackDTO } = props;
+
   const { isOpen: isOpenDrawer, onOpen: onOpenDrawer, onClose: onCloseDrawer } = useDisclosure();
 
-  const wordsKnownPercentage = Math.round(reviewStatisticsDTO && (reviewStatisticsDTO.wordsKnown / reviewStatisticsDTO.wordsTotal) * 100);
-  const wordsInReviewPercentage = Math.round(reviewStatisticsDTO && (reviewStatisticsDTO.wordsInReview / reviewStatisticsDTO.wordsTotal) * 100);
+  const wordsKnownPercentage = Math.round(reviewStatisticsDTO
+    && (reviewStatisticsDTO.wordsKnown / reviewStatisticsDTO.wordsTotal) * 100);
+  const wordsInReviewPercentage = Math.round(reviewStatisticsDTO
+    && (reviewStatisticsDTO.wordsInReview / reviewStatisticsDTO.wordsTotal) * 100);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size='xl' isCentered>
-      <ModalOverlay />
-      <ModalContent
-        shadow='2xl'
-        rounded='lg'
-        borderColor={useColorModeValue('gray.400', 'rgba(80,80,80)')}
-        bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}
-      >
-        <ModalHeader>{reviewDTO.wordPackName}</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <div
-            style={{
-              border: '1px solid #ccc',
-              borderRadius: '10px',
-              padding: '15px',
-              marginBottom: '15px',
-              paddingTop: '10px',
-            }}
-          >
-            <Flex justifyContent='space-between' alignItems='baseline'>
-              <StatLabel fontSize='2xl'>Pack Progress</StatLabel>
+    <Modal
+      size='xl'
+      isOpen={isOpen}
+      onClose={onClose}
+      header={reviewDTO.wordPackName}
+      body={(
+        <Flex className='StatsReviewWindow_container'>
+          <Flex className='packProgress'>
+            <Flex className='wordPackNameAndInfoButton'>
+              <Heading level={3} text='Pack Progress' />
               <ReviewWordPackWindow
-                button={(
-                  <AiOutlineQuestionCircle size='1em' onClick={onOpenDrawer} cursor='pointer' />
-                )}
+                button={<AiOutlineQuestionCircle className='infoButton' onClick={onOpenDrawer} />}
                 isOpen={isOpenDrawer}
                 onClose={onCloseDrawer}
                 wordPackDTO={wordPackDTO}
               />
             </Flex>
-            <Flex justifyContent='space-between' alignItems='baseline'>
-              <StatNumber fontSize='2xl'>
-                {wordsKnownPercentage}%
-                <StatLabel as='span' fontWeight='medium'> known</StatLabel>
-              </StatNumber>
-              <StatLabel fontWeight='bold'>
-                {reviewStatisticsDTO && `${reviewStatisticsDTO.wordsKnown}/${reviewStatisticsDTO.wordsTotal}`}
-              </StatLabel>
+            <Flex className='stats'>
+              <span>
+                <Text size={TextSize.LARGE} text={`${wordsKnownPercentage}%`} isBold />
+                <Text size={TextSize.SMALL} text=' known' isBold />
+              </span>
+              <Text
+                size={TextSize.SMALL}
+                text={reviewStatisticsDTO && `${reviewStatisticsDTO.wordsKnown}/${reviewStatisticsDTO.wordsTotal}`}
+                isBold
+              />
             </Flex>
-            <Progress
-              value={wordsKnownPercentage}
-              color={useColorModeValue('blue', 'blue')}
-              bgColor={useColorModeValue('gray.200', 'rgba(80,80,80)')}
-              size='md'
-              rounded='md'
-            />
-          </div>
-          <div
-            style={{
-              border: '1px solid #ccc',
-              borderRadius: '10px',
-              padding: '15px',
-              marginBottom: '15px',
-            }}
-          >
-            <Flex justifyContent='space-between' alignItems='baseline'>
-              <StatLabel fontSize='2xl'>Review Status</StatLabel>
+            <ProgressBar value={wordsKnownPercentage} />
+          </Flex>
+          <Flex className='reviewStatus'>
+            <Heading level={3} text='Review Status' />
+            <Flex className='stats'>
+              <ProgressCircular value={wordsInReviewPercentage + wordsKnownPercentage} text='In Review' />
+              <Flex className='text'>
+                <Heading
+                  level={3}
+                  text={reviewStatisticsDTO && (reviewStatisticsDTO.wordsInReview + reviewStatisticsDTO.wordsKnown)}
+                />
+                <Text size={TextSize.SMALL} text='Words In Review' isBold />
+                <br />
+                <Heading level={3} text={reviewStatisticsDTO && reviewStatisticsDTO.wordsNew} />
+                <Text size={TextSize.SMALL} text='Unseen Words' isBold />
+              </Flex>
             </Flex>
-            <Flex>
-              <CircularProgress
-                value={wordsInReviewPercentage + wordsKnownPercentage}
-                color={useColorModeValue('blue.500', 'blue.200')}
-                trackColor={useColorModeValue('gray.200', 'rgba(80,80,80)')}
-                size='175px'
-                thickness='6px'
-              >
-                <CircularProgressLabel>{wordsInReviewPercentage + wordsKnownPercentage}%
-                  <div style={{ fontSize: '14px', fontWeight: 'medium' }}> In Review</div>
-                </CircularProgressLabel>
-              </CircularProgress>
-              <Box pl='5'>
-                <StatNumber fontSize='2xl'>
-                  {reviewStatisticsDTO && (reviewStatisticsDTO.wordsInReview + reviewStatisticsDTO.wordsKnown)}
-                </StatNumber>
-                <StatLabel fontWeight='medium'>Words In Review</StatLabel>
-                <p style={{ margin: '10px' }} />
-                <StatNumber fontSize='2xl'>
-                  {reviewStatisticsDTO && reviewStatisticsDTO.wordsNew}
-                </StatNumber>
-                <StatLabel fontWeight='medium'>Unseen Words</StatLabel>
-              </Box>
-            </Flex>
-          </div>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+          </Flex>
+        </Flex>
+      )}
+    />
   );
 }
 

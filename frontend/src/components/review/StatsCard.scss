@@ -1,0 +1,35 @@
+@import '../../styles/globals';
+
+.StatsCard_container {
+  border: $borderWidth $borderStyle;
+  border-radius: $borderRadius;
+  padding: 15px;
+  width: 220px;
+  height: 100px;
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  align-items: center;
+  gap: 15px;
+
+  &.light {
+    background-color: $lightTheme-bgColor;
+    border-color: $lightTheme-borderColor;
+  }
+
+  &.dark {
+    background-color: $darkTheme-bgColor;
+    border-color: $darkTheme-borderColor;
+  }
+
+  .icon {
+    align-content: center;
+    justify-content: center;
+  }
+
+  .stats {
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+  }
+}

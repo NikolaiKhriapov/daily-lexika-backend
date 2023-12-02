@@ -1,21 +1,25 @@
-import {
-  Badge,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalOverlay,
-  useColorModeValue,
-} from '@chakra-ui/react';
+import { Badge, Flex, useColorMode } from '@chakra-ui/react';
 import { CopyIcon } from '@chakra-ui/icons';
 import { useEffect, useRef, useState } from 'react';
 import { getAllWordsForWordPack } from '../../services/word-packs';
 import { errorNotification } from '../../services/popup-notification';
 import { Status, WordDTO, WordPackDTO } from '../../types/types';
+import Modal from '../common/complex/Modal';
+import StatusBadge from '../common/basic/StatusBadge';
+import Text from '../common/basic/Text';
+import { TextSize } from '../../utils/constants';
 
-function ReviewWordPackWindow({ button, isOpen, onClose, wordPackDTO }: {
-  button: any, isOpen: boolean, onClose: any, wordPackDTO: WordPackDTO
-}) {
+interface ReviewWordPackWindowProps {
+  button: any;
+  isOpen: boolean;
+  onClose: any;
+  wordPackDTO: WordPackDTO;
+}
+
+function ReviewWordPackWindow(props: ReviewWordPackWindowProps) {
+  const { button, isOpen, onClose, wordPackDTO } = props;
+
+  const { colorMode } = useColorMode();
   const [allWordsForWordPackDTO, setAllWordsForWordPackDTO] = useState<[WordDTO]>();
   const [visibleWords, setVisibleWords] = useState(50);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,67 +51,41 @@ function ReviewWordPackWindow({ button, isOpen, onClose, wordPackDTO }: {
   return (
     <>
       {button}
-      <Modal isOpen={isOpen} onClose={onClose} size='3xl' isCentered>
-        <ModalOverlay />
-        <ModalContent
-          shadow='2xl'
-          border='1px solid'
-          rounded='lg'
-          borderColor={useColorModeValue('gray.400', 'rgba(80,80,80)')}
-          bg={useColorModeValue('gray.100', 'rgba(40,40,40)')}
-        >
-          <ModalCloseButton />
-          <ModalBody>
-            <div style={{ margin: '15px 0', fontSize: '20px', fontWeight: 'bold' }}>{wordPackDTO.name}</div>
-            <div style={{ margin: '10px 0' }}><CopyIcon />{wordPackDTO.totalWords}</div>
-            <div style={{ margin: '10px 0 30px 0' }}>{wordPackDTO.description}</div>
-            <div
-              ref={containerRef}
-              style={{ maxHeight: '65vh', overflowY: 'auto', marginBottom: '20px' }}
-              onScroll={handleScroll}
-            >
+      <Modal
+        size='3xl'
+        isOpen={isOpen}
+        onClose={onClose}
+        header={wordPackDTO.name}
+        body={(
+          <div className='ReviewWordCardWindow_container'>
+            <Flex className='totalWords_container'>
+              <CopyIcon /><Text size={TextSize.MEDIUM} text={wordPackDTO.totalWords} />
+            </Flex>
+            <Flex className='description_container'>
+              <Text size={TextSize.MEDIUM} text={wordPackDTO.description} />
+            </Flex>
+            <Flex className='wordInfo_container' ref={containerRef} onScroll={handleScroll}>
               {allWordsForWordPackDTO?.slice(0, visibleWords).map((wordDTO) => (
-                <div
-                  key={wordDTO.id}
-                  style={{
-                    border: '1px solid #ccc',
-                    borderRadius: '10px',
-                    padding: '10px',
-                    marginBottom: '5px',
-                  }}
-                >
-                  <div style={{ display: 'flex' }}>
-                    <div style={{ flex: '1 1 auto', minWidth: 0 }}>
-                      <div>{wordDTO.nameChineseSimplified} {wordDTO.pinyin}</div>
-                      <div>{wordDTO.nameEnglish}</div>
-                    </div>
-                    <div style={{ flex: '0 0 auto', minWidth: 'fit-content' }}>
-                      {wordDTO.status.toString() === Status[Status.IN_REVIEW] ? (
-                        Array.from({ length: wordDTO.totalStreak }).map(() => (
-                          <Badge
-                            key={wordDTO.id}
-                            style={{
-                              width: '10px',
-                              height: '10px',
-                              backgroundColor: 'rgba(0, 128, 0, 0.5)',
-                              borderRadius: '50%',
-                              marginRight: '3px',
-                            }}
-                          />
-                        ))
-                      ) : (
-                        <Badge colorScheme={getStatusColor(wordDTO.status)}>
-                          {wordDTO.status}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                <Flex className={`wordInfo ${colorMode}`} key={wordDTO.id}>
+                  <Flex className='characterAndPinyinAndTranslation'>
+                    <Flex>{wordDTO.nameChineseSimplified}&nbsp;&nbsp;{wordDTO.pinyin}</Flex>
+                    <Flex>{wordDTO.nameEnglish}</Flex>
+                  </Flex>
+                  <Flex className='badgeOrStreakCount'>
+                    {wordDTO.status.toString() === Status[Status.IN_REVIEW] ? (
+                      Array.from({ length: wordDTO.totalStreak }).map(() => (
+                        <Badge className='streakCount' key={wordDTO.id} />
+                      ))
+                    ) : (
+                      <StatusBadge text={wordDTO.status} colorScheme={getStatusColor(wordDTO.status)} />
+                    )}
+                  </Flex>
+                </Flex>
               ))}
-            </div>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+            </Flex>
+          </div>
+        )}
+      />
     </>
   );
 }

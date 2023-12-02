@@ -2,40 +2,41 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ChakraProvider, createStandaloneToast } from '@chakra-ui/react';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
-import WordPack from './WordPack';
-import Review from './Review';
-import Statistics from './Statistics';
-import Login from './components/authorization/Login';
+import WordPack from './pages/word-packs/WordPack';
+import Review from './pages/reviews/Review';
+import Statistics from './pages/statistics/Statistics';
 import AuthProvider from './components/context/AuthContext';
 import ProtectedRoute from './shared/ProtectedRoute';
-import Register from './components/authorization/Register';
+import { Pages } from './utils/constants';
+import AuthPage from './pages/auth/AuthPage';
+import './styles/index.scss';
 
 const { ToastContainer } = createStandaloneToast();
 
 const router = createBrowserRouter([
   {
-    path: '/register',
-    element: <Register />,
+    path: Pages.REGISTER,
+    element: <AuthPage />,
   },
   {
-    path: '/login',
-    element: <Login />,
+    path: Pages.LOGIN,
+    element: <AuthPage />,
   },
   {
-    path: '/word-packs',
-    element: <ProtectedRoute><WordPack /></ProtectedRoute>,
-  },
-  {
-    path: '/reviews',
+    path: Pages.REVIEWS,
     element: <ProtectedRoute><Review /></ProtectedRoute>,
   },
   {
-    path: '/statistics',
+    path: Pages.WORD_PACKS,
+    element: <ProtectedRoute><WordPack /></ProtectedRoute>,
+  },
+  {
+    path: Pages.STATISTICS,
     element: <ProtectedRoute><Statistics /></ProtectedRoute>,
   },
   {
     path: '/',
-    element: <Navigate to='/login' />,
+    element: <Navigate to={Pages.LOGIN} />,
   },
 ]);
 
