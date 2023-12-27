@@ -1,23 +1,23 @@
-import { Flex } from '@chakra-ui/react';
 import { BsFire } from 'react-icons/bs';
 import { ImFire } from 'react-icons/im';
 import { GiYinYang } from 'react-icons/gi';
 import { useEffect, useState } from 'react';
+import styled from 'styled-components/macro';
 import StatsCard from '../../components/review/StatsCard';
 import { errorNotification } from '../../services/popup-notification';
 import { getUserStatistics } from '../../services/user';
 import { getWordStatistics } from '../../services/words';
 import { getAllReviews } from '../../services/reviews';
 import StatsReviewCard from '../../components/review/StatsReviewCard';
-import { ReviewDTO, UserDTO, WordStatisticsDTO } from '../../types/types';
+import { ReviewDTO, UserDTO, WordStatisticsDTO } from '../../utils/types';
 import PageLayout from '../../shared/PageLayout';
 import ErrorComponent from '../../components/common/complex/ErrorComponent';
 import Spinner from '../../components/common/basic/Spinner';
 import Heading from '../../components/common/basic/Heading';
 import Text from '../../components/common/basic/Text';
-import { TextSize } from '../../utils/constants';
+import { Size } from '../../utils/constants';
 
-function Statistics() {
+export default function Statistics() {
   const [userStatisticsDTO, setUserStatisticsDTO] = useState<UserDTO>();
   const [wordStatisticsDTO, setWordStatisticsDTO] = useState<WordStatisticsDTO>();
   const [allReviewsDTO, setAllReviewsDTO] = useState<[ReviewDTO]>();
@@ -76,35 +76,54 @@ function Statistics() {
 
   return (
     <PageLayout>
-      <Flex className='Statistics_container'>
-        <Flex className='section'>
-          <Heading level={2} text='Daily Streak' />
-          <Flex className='cardsContainer'>
-            <StatsCard title='Current Streak' stat={userStatisticsDTO?.currentStreak} icon={<BsFire size='3em' />} />
-            <StatsCard title='Record Streak' stat={userStatisticsDTO?.recordStreak} icon={<ImFire size='3em' />} />
-          </Flex>
-        </Flex>
-        <Flex className='section'>
-          <Heading level={2} text='Vocabulary' />
-          <Flex className='cardsContainer'>
-            <StatsCard title='Words Known' stat={wordStatisticsDTO?.wordsKnown} icon={<GiYinYang size='3em' />} />
-            <StatsCard title='Characters Known' icon={<GiYinYang size='3em' />} />
-            <StatsCard title='Idioms Known' icon={<GiYinYang size='3em' />} />
-          </Flex>
-        </Flex>
-        <Flex className='section'>
-          <Heading level={2} text='Daily Reviews' />
-          <Flex className='cardsContainer'>
+      <StatisticsContainer>
+        <Section>
+          <Heading size={Size.LG}>Daily Streak</Heading>
+          <CardsContainer>
+            <StatsCard title='Current Streak' stat={userStatisticsDTO?.currentStreak} icon={<BsFire size='45px' />} />
+            <StatsCard title='Record Streak' stat={userStatisticsDTO?.recordStreak} icon={<ImFire size='45px' />} />
+          </CardsContainer>
+        </Section>
+        <Section>
+          <Heading size={Size.LG}>Vocabulary</Heading>
+          <CardsContainer>
+            <StatsCard title='Words Known' stat={wordStatisticsDTO?.wordsKnown} icon={<GiYinYang size='45px' />} />
+            <StatsCard title='Characters Known' icon={<GiYinYang size='45px' />} />
+            <StatsCard title='Idioms Known' icon={<GiYinYang size='45px' />} />
+          </CardsContainer>
+        </Section>
+        <Section>
+          <Heading size={Size.LG}>Daily Reviews</Heading>
+          <CardsContainer>
             {allReviewsDTO && allReviewsDTO.length > 0
-              ? (allReviewsDTO!.map((reviewDTO) => (
+              ? (allReviewsDTO.map((reviewDTO) => (
                 <StatsReviewCard key={reviewDTO.id} reviewDTO={reviewDTO} />
               )))
-              : <Text size={TextSize.XL} text='You do not have any daily reviews' />}
-          </Flex>
-        </Flex>
-      </Flex>
+              : <Text size={Size.LG}>You do not have any daily reviews</Text>}
+          </CardsContainer>
+        </Section>
+      </StatisticsContainer>
     </PageLayout>
   );
 }
 
-export default Statistics;
+const StatisticsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+`;
+
+const Section = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+`;
+
+const CardsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 40px;
+`;

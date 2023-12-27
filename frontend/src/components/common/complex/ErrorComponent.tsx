@@ -1,15 +1,13 @@
-import { Flex } from '@chakra-ui/react';
 import PageLayout from '../../../shared/PageLayout';
 import Heading from '../basic/Heading';
+import IndexPageContainer from './IndexPageContainer';
 
-function ErrorComponent() {
+export default function ErrorComponent() {
   return (
     <PageLayout>
-      <Flex className='indexPage_container'>
-        <Heading level={2} text='Oops, there was an error' />
-      </Flex>
+      <IndexPageContainer>
+        <Heading>Oops, there was an error</Heading>
+      </IndexPageContainer>
     </PageLayout>
   );
 }
-
-export default ErrorComponent;

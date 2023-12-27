@@ -1,18 +1,19 @@
 import { AiOutlineCloseCircle } from 'react-icons/ai';
+import styled from 'styled-components/macro';
 
-interface CloseButtonProps {
-  onClick: any;
-}
+type Props = {
+  onClick: () => void;
+};
 
-function CloseButton(props: CloseButtonProps) {
+export default function CloseButton(props: Props) {
   const { onClick } = props;
 
   return (
-    <AiOutlineCloseCircle
-      className='closeButton'
-      onClick={onClick}
-    />
+    <Component onClick={onClick} />
   );
 }
 
-export default CloseButton;
+const Component = styled(AiOutlineCloseCircle)`
+  font-size: 16px;
+  cursor: pointer;
+`;

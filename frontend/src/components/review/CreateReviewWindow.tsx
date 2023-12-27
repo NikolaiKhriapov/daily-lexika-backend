@@ -1,25 +1,25 @@
-import { Flex } from '@chakra-ui/react';
 import * as Yup from 'yup';
 import { TbCards } from 'react-icons/tb';
+import styled from 'styled-components/macro';
 import { createReview } from '../../services/reviews';
 import { errorNotification, successNotification } from '../../services/popup-notification';
-import { ReviewDTO, WordPackDTO } from '../../types/types';
+import { ReviewDTO, WordPackDTO } from '../../utils/types';
 import TextInput from '../common/complex/TextInput';
+import Text from '../common/basic/Text';
 import InputFieldsWithButton from '../common/complex/InputFieldsWithButton';
 import Modal from '../common/complex/Modal';
-import Text from '../common/basic/Text';
-import { TextSize } from '../../utils/constants';
+import { Size } from '../../utils/constants';
 
-interface CreateReviewWindowProps {
+type Props = {
   button: any;
   isOpen: boolean;
   onClose: any;
   wordPackDTO: WordPackDTO;
   fetchAllWordPacksDTO: any;
   fetchAllReviewsDTO: any;
-}
+};
 
-function CreateReviewWindow(props: CreateReviewWindowProps) {
+export default function CreateReviewWindow(props: Props) {
   const { button, isOpen, onClose, wordPackDTO, fetchAllWordPacksDTO, fetchAllReviewsDTO } = props;
 
   const initialValues = {
@@ -55,18 +55,19 @@ function CreateReviewWindow(props: CreateReviewWindowProps) {
     <>
       {button}
       <Modal
-        size='md'
+        size={Size.MD}
         isOpen={isOpen}
         onClose={onClose}
         header={wordPackDTO.name}
         body={(
           <>
-            <Flex className='totalWords_container'>
-              <TbCards /><Text size={TextSize.MEDIUM} text={wordPackDTO.totalWords} />
-            </Flex>
-            <Flex className='description_container'>
-              <Text size={TextSize.MEDIUM} text={wordPackDTO.description} />
-            </Flex>
+            <TotalWords>
+              <TbCards />
+              <Text>{wordPackDTO.totalWords}</Text>
+            </TotalWords>
+            <Description>
+              <Text>{wordPackDTO.description}</Text>
+            </Description>
             <InputFieldsWithButton
               validateOnMount
               initialValues={initialValues}
@@ -97,4 +98,12 @@ function CreateReviewWindow(props: CreateReviewWindowProps) {
   );
 }
 
-export default CreateReviewWindow;
+const TotalWords = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
+`;
+
+const Description = styled.div`
+`;

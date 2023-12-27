@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { AuthenticationRequest, RegistrationRequest } from '../types/types';
+import { AuthenticationRequest, RegistrationRequest } from '../utils/types';
 import { ApiEndpointsAuthorization } from '../API/apiMethods';
 
 export const register = async (registrationRequest: RegistrationRequest) => {

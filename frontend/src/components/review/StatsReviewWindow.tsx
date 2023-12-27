@@ -1,25 +1,28 @@
-import { Flex, useDisclosure } from '@chakra-ui/react';
-import { AiOutlineQuestionCircle } from 'react-icons/ai';
+import { ColorMode, useColorMode, useDisclosure } from '@chakra-ui/react';
+import styled from 'styled-components/macro';
 import ReviewWordPackWindow from '../word-pack/ReviewWordPackWindow';
-import { ReviewDTO, ReviewStatisticsDTO, WordPackDTO } from '../../types/types';
-import { TextSize } from '../../utils/constants';
+import { ReviewDTO, ReviewStatisticsDTO, WordPackDTO } from '../../utils/types';
 import Modal from '../common/complex/Modal';
-import Heading from '../common/basic/Heading';
 import Text from '../common/basic/Text';
 import ProgressBar from '../common/basic/ProgressBar';
 import ProgressCircular from '../common/basic/ProgressCircular';
+import { theme } from '../../utils/theme';
+import InfoButton from '../common/basic/InfoButton';
+import { borderStyles, mediaBreakpointUp } from '../../utils/functions';
+import { Breakpoint, FontWeight, Size } from '../../utils/constants';
 
-interface StatsReviewWindowProps {
+type Props = {
   isOpen: boolean;
   onClose: any;
   reviewDTO: ReviewDTO;
   reviewStatisticsDTO: ReviewStatisticsDTO;
   wordPackDTO: WordPackDTO;
-}
+};
 
-function StatsReviewWindow(props: StatsReviewWindowProps) {
+export default function StatsReviewWindow(props: Props) {
   const { isOpen, onClose, reviewDTO, reviewStatisticsDTO, wordPackDTO } = props;
 
+  const { colorMode } = useColorMode();
   const { isOpen: isOpenDrawer, onOpen: onOpenDrawer, onClose: onCloseDrawer } = useDisclosure();
 
   const wordsKnownPercentage = Math.round(reviewStatisticsDTO
@@ -29,55 +32,121 @@ function StatsReviewWindow(props: StatsReviewWindowProps) {
 
   return (
     <Modal
-      size='xl'
+      size={Size.XL}
       isOpen={isOpen}
       onClose={onClose}
       header={reviewDTO.wordPackName}
       body={(
-        <Flex className='StatsReviewWindow_container'>
-          <Flex className='packProgress'>
-            <Flex className='wordPackNameAndInfoButton'>
-              <Heading level={3} text='Pack Progress' />
+        <>
+          <PackProgress colorMode={colorMode}>
+            <WordPackNameAndInfoButton>
+              <Text size={Size.XL} fontWeight={FontWeight.SEMIBOLD}>Pack Progress</Text>
               <ReviewWordPackWindow
-                button={<AiOutlineQuestionCircle className='infoButton' onClick={onOpenDrawer} />}
+                button={<InfoButton onClick={onOpenDrawer} />}
                 isOpen={isOpenDrawer}
                 onClose={onCloseDrawer}
                 wordPackDTO={wordPackDTO}
               />
-            </Flex>
-            <Flex className='stats'>
-              <span>
-                <Text size={TextSize.LARGE} text={`${wordsKnownPercentage}%`} isBold />
-                <Text size={TextSize.SMALL} text=' known' isBold />
-              </span>
-              <Text
-                size={TextSize.SMALL}
-                text={reviewStatisticsDTO && `${reviewStatisticsDTO.wordsKnown}/${reviewStatisticsDTO.wordsTotal}`}
-                isBold
-              />
-            </Flex>
+            </WordPackNameAndInfoButton>
+            <StatsRow>
+              <Percentage>
+                <Text size={{ base: Size.MD, md: Size.XL, xl: Size.XL }} fontWeight={FontWeight.SEMIBOLD}>
+                  {`${wordsKnownPercentage}%`}
+                </Text>
+                <Text size={{ base: Size.XS, md: Size.SM, xl: Size.SM }} fontWeight={FontWeight.SEMIBOLD}>
+                  {' known'}
+                </Text>
+              </Percentage>
+              <Text size={{ base: Size.SM, md: Size.MD, xl: Size.MD }} fontWeight={FontWeight.SEMIBOLD}>
+                {reviewStatisticsDTO && `${reviewStatisticsDTO.wordsKnown}/${reviewStatisticsDTO.wordsTotal}`}
+              </Text>
+            </StatsRow>
             <ProgressBar value={wordsKnownPercentage} />
-          </Flex>
-          <Flex className='reviewStatus'>
-            <Heading level={3} text='Review Status' />
-            <Flex className='stats'>
+          </PackProgress>
+          <ReviewStatus colorMode={colorMode}>
+            <Text size={Size.XL} fontWeight={FontWeight.SEMIBOLD}>Review Status</Text>
+            <StatsContainer>
               <ProgressCircular value={wordsInReviewPercentage + wordsKnownPercentage} text='In Review' />
-              <Flex className='text'>
-                <Heading
-                  level={3}
-                  text={reviewStatisticsDTO && (reviewStatisticsDTO.wordsInReview + reviewStatisticsDTO.wordsKnown)}
-                />
-                <Text size={TextSize.SMALL} text='Words In Review' isBold />
-                <br />
-                <Heading level={3} text={reviewStatisticsDTO && reviewStatisticsDTO.wordsNew} />
-                <Text size={TextSize.SMALL} text='Unseen Words' isBold />
-              </Flex>
-            </Flex>
-          </Flex>
-        </Flex>
+              <StatsColumn>
+                <Stat>
+                  <Text size={{ base: Size.XL, md: Size.XXXL, xl: Size.XXXL }}>
+                    {reviewStatisticsDTO && (reviewStatisticsDTO.wordsInReview + reviewStatisticsDTO.wordsKnown)}
+                  </Text>
+                  <Text size={{ base: Size.XS, md: Size.MD, xl: Size.MD }} fontWeight={FontWeight.SEMIBOLD}>
+                    Words In Review
+                  </Text>
+                </Stat>
+                <Stat>
+                  <Text size={{ base: Size.XL, md: Size.XXXL, xl: Size.XXXL }}>
+                    {reviewStatisticsDTO && reviewStatisticsDTO.wordsNew}
+                  </Text>
+                  <Text size={{ base: Size.XS, md: Size.MD, xl: Size.MD }} fontWeight={FontWeight.SEMIBOLD}>
+                    Unseen Words
+                  </Text>
+                </Stat>
+              </StatsColumn>
+            </StatsContainer>
+          </ReviewStatus>
+        </>
       )}
     />
   );
 }
 
-export default StatsReviewWindow;
+const PackProgress = styled.div<{ colorMode: ColorMode }>`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 15px 15px;
+  border: ${({ colorMode }) => borderStyles(colorMode)};
+  border-radius: ${theme.stylesToDelete.borderRadius};
+`;
+
+const WordPackNameAndInfoButton = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+`;
+
+const StatsRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+`;
+
+const Percentage = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 4px;
+`;
+
+const ReviewStatus = styled.div<{ colorMode: ColorMode }>`
+  display: flex;
+  flex-direction: column;
+  padding: 10px 15px 15px;
+  border: ${({ colorMode }) => borderStyles(colorMode)};
+  border-radius: ${theme.stylesToDelete.borderRadius};
+`;
+
+const StatsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+`;
+
+const StatsColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  
+  ${mediaBreakpointUp(Breakpoint.TABLET)} {
+    gap: 10px;
+  }
+`;
+
+const Stat = styled.div`
+  display: flex;
+  flex-direction: column;
+`;

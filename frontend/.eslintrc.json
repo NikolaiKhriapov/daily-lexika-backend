@@ -43,6 +43,10 @@
     "react/jsx-indent": "error",
     "no-multiple-empty-lines": "error",
     "@typescript-eslint/indent": "error",
-    "unused-imports/no-unused-imports": "error"
+    "unused-imports/no-unused-imports": "error",
+    "@typescript-eslint/no-duplicate-enum-values": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "import/no-extraneous-dependencies": "off",
+    "react/jsx-props-no-spreading": "off"
   }
 }

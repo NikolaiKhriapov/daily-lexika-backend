@@ -1,9 +1,10 @@
 import { BsCheck2Circle } from 'react-icons/bs';
 
-function CompletedIcon() {
+export default function CompletedIcon() {
   return (
-    <BsCheck2Circle className='completedIcon' />
+    <BsCheck2Circle
+      color='green'
+      size='30px'
+    />
   );
 }
-
-export default CompletedIcon;

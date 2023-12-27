@@ -1,25 +1,26 @@
 import { useEffect, useState } from 'react';
-import { Flex } from '@chakra-ui/react';
+import styled from 'styled-components/macro';
 import { processReviewAction } from '../../services/reviews';
 import { updateUserStreak } from '../../services/user';
 import { errorNotification, successNotification } from '../../services/popup-notification';
 import ReviewWordCard from './ReviewWordCard';
-import { Status, WordDTO } from '../../types/types';
-import { ButtonSize, ButtonType } from '../../utils/constants';
+import { Status, WordDTO } from '../../utils/types';
+import { Breakpoint, ButtonType, Size } from '../../utils/constants';
 import Modal from '../common/complex/Modal';
-import Button from '../common/basic/Button';
+import ButtonsContainer from '../common/complex/ButtonsContainer';
 import ProgressBar from '../common/basic/ProgressBar';
+import Button from '../common/basic/Button';
+import { mediaBreakpointUp } from '../../utils/functions';
 
-interface StartReviewWindowProps {
+type Props = {
   reviewId: number;
   isOpen: boolean;
   onClose: any;
-  button: any;
   totalReviewWords: number;
-}
+};
 
-function StartReviewWindow(props: StartReviewWindowProps) {
-  const { reviewId, isOpen, onClose, button, totalReviewWords } = props;
+export default function StartReviewWindow(props: Props) {
+  const { reviewId, isOpen, onClose, totalReviewWords } = props;
 
   const [reviewWordDTO, setReviewWordDTO] = useState<WordDTO | null>(null);
   const [reviewUpdatedSize, setReviewUpdatedSize] = useState<number>(0);
@@ -73,47 +74,75 @@ function StartReviewWindow(props: StartReviewWindowProps) {
   const reviewProgress = ((totalReviewWords - reviewUpdatedSize) / totalReviewWords) * 100;
 
   return (
-    <>
-      {button}
-      <Modal
-        size='6xl'
-        isOpen={isOpen}
-        onClose={onClose}
-        header={null}
-        body={(
-          <div>
-            {!isFormVisible && isReviewComplete ? null : (
-              <>
-                <ProgressBar value={reviewProgress} margin='20px 50px' />
-                <Flex className='ReviewWordCard_container'>
-                  <ReviewWordCard
-                    reviewWordDTO={reviewWordDTO!}
-                    isFlipped={isFlipped}
-                    setIsFlipped={setIsFlipped}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      header={null}
+      body={(
+        <Container>
+          {isFormVisible && !isReviewComplete && reviewWordDTO && (
+            <>
+              <ProgressBarContainer>
+                <ProgressBar value={reviewProgress} />
+              </ProgressBarContainer>
+              <CardContainer>
+                <ReviewWordCard
+                  reviewWordDTO={reviewWordDTO!}
+                  isFlipped={isFlipped}
+                  setIsFlipped={setIsFlipped}
+                />
+                <ButtonsContainer>
+                  <Button
+                    buttonText='Forgot'
+                    buttonType={ButtonType.BUTTON_RED}
+                    size={{ base: Size.SM, md: Size.MD }}
+                    onClick={() => pressButton('no')}
                   />
-                  <Flex className='buttons_container'>
-                    <Button
-                      content='Forgot'
-                      size={ButtonSize.MEDIUM}
-                      type={ButtonType.BUTTON_RED}
-                      onClick={() => pressButton('no')}
-                    />
-                    <Button
-                      content='Remembered'
-                      size={ButtonSize.MEDIUM}
-                      type={ButtonType.BUTTON}
-                      onClick={() => pressButton('yes')}
-                      isDisabled={!reviewWordDTO}
-                    />
-                  </Flex>
-                </Flex>
-              </>
-            )}
-          </div>
-        )}
-      />
-    </>
+                  <Button
+                    buttonText='Remembered'
+                    buttonType={ButtonType.BUTTON}
+                    size={{ base: Size.SM, md: Size.MD }}
+                    onClick={() => pressButton('yes')}
+                    isDisabled={!reviewWordDTO}
+                  />
+                </ButtonsContainer>
+              </CardContainer>
+            </>
+          )}
+        </Container>
+      )}
+    />
   );
 }
 
-export default StartReviewWindow;
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  width: 80vw;
+  
+  ${mediaBreakpointUp(Breakpoint.TABLET)} {
+    gap: 100px;
+    margin: 0 0 50px 0;
+  }
+
+  ${mediaBreakpointUp(Breakpoint.DESKTOP)} {
+    width: 1000px;
+  }
+`;
+
+const ProgressBarContainer = styled.div`
+  margin: 20px 10px;
+  
+  ${mediaBreakpointUp('450px')} {
+    margin: 20px 50px;
+  }
+`;
+
+const CardContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+`;

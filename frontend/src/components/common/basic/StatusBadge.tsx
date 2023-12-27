@@ -1,18 +1,26 @@
-import { Badge, Flex } from '@chakra-ui/react';
+import { Badge } from '@chakra-ui/react';
+import styled, { css } from 'styled-components/macro';
+import Text from './Text';
+import { Size } from '../../../utils/constants';
 
-interface StatusBadgeProps {
+type Props = {
   colorScheme: string;
   text: string;
   isInTopRight?: boolean;
-}
+};
 
-function StatusBadge(props: StatusBadgeProps) {
+export default function StatusBadge(props: Props) {
   const { colorScheme, text, isInTopRight } = props;
 
   return (
-    <Flex className='statusBadge'>
-      <Badge className={`${isInTopRight && 'isInTopRight'}`} colorScheme={colorScheme}>{text}</Badge>
-    </Flex>
+    <Component>
+      <StyledBadge
+        isInTopRight={isInTopRight || false}
+        colorScheme={colorScheme}
+      >
+        <Text size={{ base: Size.XXS, md: Size.SM, xl: Size.SM }}>{text}</Text>
+      </StyledBadge>
+    </Component>
   );
 }
 
@@ -20,4 +28,16 @@ StatusBadge.defaultProps = {
   isInTopRight: false,
 };
 
-export default StatusBadge;
+const Component = styled.div`
+  flex-direction: column;
+`;
+
+const StyledBadge = styled(Badge)<{
+  isInTopRight: boolean
+}>`
+  ${(props) => props.isInTopRight && css`
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  `};
+`;

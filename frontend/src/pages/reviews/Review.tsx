@@ -1,15 +1,18 @@
-import { useEffect, useState } from 'react';
-import { Flex } from '@chakra-ui/react';
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components/macro';
 import PageLayout from '../../shared/PageLayout';
 import { errorNotification } from '../../services/popup-notification';
 import { getAllReviews } from '../../services/reviews';
-import { ReviewDTO } from '../../types/types';
+import { ReviewDTO } from '../../utils/types';
 import ErrorComponent from '../../components/common/complex/ErrorComponent';
 import Spinner from '../../components/common/basic/Spinner';
 import Heading from '../../components/common/basic/Heading';
 import ReviewCard from '../../components/review/ReviewCard';
+import IndexPageContainer from '../../components/common/complex/IndexPageContainer';
+import Text from '../../components/common/basic/Text';
+import { Size } from '../../utils/constants';
 
-function Review() {
+export default function Review() {
   const [allReviewsDTO, setAllReviewsDTO] = useState<ReviewDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -43,28 +46,36 @@ function Review() {
   if (allReviewsDTO.length <= 0) {
     return (
       <PageLayout>
-        <Flex className='indexPage_container'>
-          <Heading level={2} text='You do not have any daily reviews' />
-          <Flex className='textLarge'>Add a word pack to create a daily review and start growing your vocabulary</Flex>
-        </Flex>
+        <IndexPageContainer>
+          <Heading size={Size.LG} isCentered>You do not have any daily reviews</Heading>
+          <Text size={Size.LG} isCentered>
+            Add a word pack to create a daily review and start growing your vocabulary
+          </Text>
+        </IndexPageContainer>
       </PageLayout>
     );
   }
 
   return (
     <PageLayout>
-      <Flex className='Review_container'>
+      <ReviewContainer>
         {allReviewsDTO.map((reviewDTO) => (
-          <Flex key={reviewDTO.id}>
-            <ReviewCard
-              reviewDTO={reviewDTO}
-              fetchAllReviewsDTO={fetchAllReviewsDTO}
-            />
-          </Flex>
+          <ReviewCard
+            key={reviewDTO.id}
+            reviewDTO={reviewDTO}
+            fetchAllReviewsDTO={fetchAllReviewsDTO}
+          />
         ))}
-      </Flex>
+      </ReviewContainer>
     </PageLayout>
   );
 }
 
-export default Review;
+const ReviewContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+`;

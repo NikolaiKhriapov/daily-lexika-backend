@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { UserDTO } from '../types/types';
+import { UserDTO } from '../utils/types';
 import { ApiEndpointsUsers } from '../API/apiMethods';
 import { LocalStorage } from '../utils/constants';
 

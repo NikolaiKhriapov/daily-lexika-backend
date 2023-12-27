@@ -1,15 +1,36 @@
-import { Flex } from '@chakra-ui/react';
+import React from 'react';
+import styled from 'styled-components/macro';
+import { mediaBreakpointUp } from '../../utils/functions';
+import { Breakpoint } from '../../utils/constants';
 
-interface ContentProps {
-  body: any;
-}
+type Props = {
+  children: React.ReactNode;
+};
 
-function Content(props: ContentProps) {
-  const { body } = props;
+export default function Content(props: Props) {
+  const { children } = props;
 
   return (
-    <Flex className='Content_container'>{body}</Flex>
+    <Container>
+      {children}
+    </Container>
   );
 }
 
-export default Content;
+const Container = styled.div`
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
+  margin-bottom: 50px;
+
+  ${mediaBreakpointUp(Breakpoint.TABLET)} {
+    padding: 50px;
+    margin-top: 70px;
+    margin-bottom: 70px;
+  }
+  
+  ${mediaBreakpointUp(Breakpoint.DESKTOP)} {
+    margin-left: 210px;
+  }
+`;

@@ -1,43 +1,58 @@
 import { Form, Formik } from 'formik';
-import { Box, Flex } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
+import styled from 'styled-components/macro';
+import React from 'react';
+import { ButtonType } from '../../../utils/constants';
 import Button from '../basic/Button';
-import { ButtonSize, ButtonType } from '../../../utils/constants';
 
-interface InputFieldWithButtonProps {
+type Props = {
   validateOnMount: boolean;
   initialValues: any;
   validationSchema: any;
   onSubmit: any;
-  inputElements: any;
-}
+  inputElements: React.ReactNode;
+  buttonText: string;
+};
 
-function InputFieldWithButton(props: InputFieldWithButtonProps) {
-  const { validateOnMount, initialValues, validationSchema, onSubmit, inputElements } = props;
+export default function InputFieldWithButton(props: Props) {
+  const { validateOnMount, initialValues, validationSchema, onSubmit, inputElements, buttonText } = props;
 
   return (
-    <Formik
+    <FormikStyled
       validateOnMount={validateOnMount}
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={onSubmit}
     >
       {({ isValid, isSubmitting, dirty }) => (
-        <Flex className='InputFieldWithButton'>
-          <Form>
-            <Flex className='InputFieldWithButton_container'>
-              <Box className='InputFieldWithButton__inputElements'>{inputElements}</Box>
-              <Button
-                content='Change'
-                size={ButtonSize.MEDIUM}
-                type={ButtonType.SUBMIT}
-                isDisabled={!(isValid && dirty) || isSubmitting}
-              />
-            </Flex>
-          </Form>
-        </Flex>
+        <FormStyled>
+          <InputElementsContainer>
+            {inputElements}
+          </InputElementsContainer>
+          <Button
+            buttonText={buttonText}
+            buttonType={ButtonType.SUBMIT}
+            isDisabled={!(isValid && dirty) || isSubmitting}
+          />
+        </FormStyled>
       )}
-    </Formik>
+    </FormikStyled>
   );
 }
 
-export default InputFieldWithButton;
+const FormikStyled = styled(Formik)`
+  display: flex;
+  flex-direction: column;
+`;
+
+const FormStyled = styled(Form)`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+`;
+
+const InputElementsContainer = styled(Box)`
+  flex: 1;
+  margin-right: 10px;
+`;

@@ -1,31 +1,82 @@
 import {
-  Modal as ChakraModal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useColorMode,
+  ColorMode,
+  Modal as ChakraModal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay, ModalProps,
+  useColorMode,
 } from '@chakra-ui/react';
+import styled from 'styled-components/macro';
+import React from 'react';
+import { theme } from '../../../utils/theme';
+import { borderStyles, hiddenScrollbar, mediaBreakpointUp } from '../../../utils/functions';
+import { Breakpoint, Size } from '../../../utils/constants';
 
-interface ModalProps {
-  size: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl';
-  isOpen: boolean;
-  onClose: any;
-  header: any;
-  body: any;
+interface Props extends Omit<ModalProps, 'children'> {
+  header: React.ReactNode;
+  body: React.ReactNode;
 }
 
-function Modal(props: ModalProps) {
-  const { isOpen, onClose, size, header, body } = props;
-
+export default function Modal({ header, body, ...rest }: Props) {
   const { colorMode } = useColorMode();
 
   return (
-    <ChakraModal isOpen={isOpen} onClose={onClose} size={size} isCentered>
+    <ChakraModal isCentered {...rest} size={Size.XXXL}>
       <ModalOverlay />
-      <ModalContent className={`Modal__ModalContent ${colorMode}`}>
+      <ModalContentStyled colorMode={colorMode}>
         <ModalCloseButton />
-        <ModalHeader className='Modal__ModalHeader'>{header}</ModalHeader>
-        <ModalBody className='Modal__ModalBody'>{body}</ModalBody>
-        <ModalFooter />
-      </ModalContent>
+        <ModalHeaderStyled fontSize={Size.XL}>{header}</ModalHeaderStyled>
+        <ModalBodyStyled>{body}</ModalBodyStyled>
+        <ModalFooterStyled />
+      </ModalContentStyled>
     </ChakraModal>
   );
 }
 
-export default Modal;
+const ModalContentStyled = styled(ModalContent)<{
+  colorMode: ColorMode;
+}>`
+  padding: 6px;
+  background-color: ${({ colorMode }) => theme.colors[colorMode].bgColor} !important;
+  border: ${({ colorMode }) => borderStyles(colorMode)};
+  border-radius: ${theme.stylesToDelete.borderRadius};
+  max-width: 90% !important;
+  max-height: 90vh;
+  width: fit-content !important;
+  overflow-y: auto;
+  ${hiddenScrollbar};
+`;
+
+const ModalHeaderStyled = styled(ModalHeader)`
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-right: 30px;
+  padding: 8px 12px !important;
+
+  ${mediaBreakpointUp(Breakpoint.TABLET)} {
+    padding: 16px 24px !important;
+  }
+`;
+
+const ModalBodyStyled = styled(ModalBody)`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px 12px !important;
+
+  ${mediaBreakpointUp(Breakpoint.TABLET)} {
+    padding: 8px 24px !important;
+  }
+`;
+
+const ModalFooterStyled = styled(ModalFooter)`
+  padding: 4px 12px !important;
+
+  ${mediaBreakpointUp(Breakpoint.TABLET)} {
+    padding: 8px 24px !important;
+  }
+`;

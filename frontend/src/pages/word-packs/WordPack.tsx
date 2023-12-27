@@ -1,15 +1,17 @@
-import { Flex } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
+import styled from 'styled-components/macro';
 import PageLayout from '../../shared/PageLayout';
 import { errorNotification } from '../../services/popup-notification';
 import WordPackCard from '../../components/word-pack/WordPackCard';
 import { getAllWordPacks } from '../../services/word-packs';
-import { WordPackDTO } from '../../types/types';
+import { WordPackDTO } from '../../utils/types';
 import ErrorComponent from '../../components/common/complex/ErrorComponent';
 import Heading from '../../components/common/basic/Heading';
 import Spinner from '../../components/common/basic/Spinner';
+import IndexPageContainer from '../../components/common/complex/IndexPageContainer';
+import { Size } from '../../utils/constants';
 
-function WordPack() {
+export default function WordPack() {
   const [allWordPacksDTO, setAllWordPacksDTO] = useState<WordPackDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -40,27 +42,33 @@ function WordPack() {
   if (allWordPacksDTO.length <= 0) {
     return (
       <PageLayout>
-        <Flex className='WordPack_container'>
-          <Heading level={2} text='No Word Packs available' />
-        </Flex>
+        <IndexPageContainer>
+          <Heading size={Size.LG} isCentered>No Word Packs available</Heading>
+        </IndexPageContainer>
       </PageLayout>
     );
   }
 
   return (
     <PageLayout>
-      <Flex className='WordPack_container'>
+      <WordPackContainer>
         {allWordPacksDTO.map((wordPackDTO) => (
-          <Flex key={wordPackDTO.name}>
-            <WordPackCard
-              wordPackDTO={wordPackDTO}
-              fetchAllWordPacksDTO={fetchAllWordPacksDTO}
-            />
-          </Flex>
+          <WordPackCard
+            key={wordPackDTO.name}
+            wordPackDTO={wordPackDTO}
+            fetchAllWordPacksDTO={fetchAllWordPacksDTO}
+          />
         ))}
-      </Flex>
+      </WordPackContainer>
     </PageLayout>
   );
 }
 
-export default WordPack;
+const WordPackContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+`;

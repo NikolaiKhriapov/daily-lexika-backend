@@ -1,22 +1,26 @@
-import { Badge, Flex, useColorMode } from '@chakra-ui/react';
+import { ColorMode, useColorMode } from '@chakra-ui/react';
 import { CopyIcon } from '@chakra-ui/icons';
 import { useEffect, useRef, useState } from 'react';
+import styled from 'styled-components/macro';
 import { getAllWordsForWordPack } from '../../services/word-packs';
 import { errorNotification } from '../../services/popup-notification';
-import { Status, WordDTO, WordPackDTO } from '../../types/types';
+import { Status, WordDTO, WordPackDTO } from '../../utils/types';
 import Modal from '../common/complex/Modal';
 import StatusBadge from '../common/basic/StatusBadge';
 import Text from '../common/basic/Text';
-import { TextSize } from '../../utils/constants';
+import BadgeStreakCount from '../common/complex/BadgeStreakCount';
+import { theme } from '../../utils/theme';
+import { borderStyles } from '../../utils/functions';
+import { Size } from '../../utils/constants';
 
-interface ReviewWordPackWindowProps {
+type Props = {
   button: any;
   isOpen: boolean;
   onClose: any;
   wordPackDTO: WordPackDTO;
-}
+};
 
-function ReviewWordPackWindow(props: ReviewWordPackWindowProps) {
+export default function ReviewWordPackWindow(props: Props) {
   const { button, isOpen, onClose, wordPackDTO } = props;
 
   const { colorMode } = useColorMode();
@@ -52,42 +56,87 @@ function ReviewWordPackWindow(props: ReviewWordPackWindowProps) {
     <>
       {button}
       <Modal
-        size='3xl'
+        size={Size.XXXL}
         isOpen={isOpen}
         onClose={onClose}
         header={wordPackDTO.name}
         body={(
-          <div className='ReviewWordCardWindow_container'>
-            <Flex className='totalWords_container'>
-              <CopyIcon /><Text size={TextSize.MEDIUM} text={wordPackDTO.totalWords} />
-            </Flex>
-            <Flex className='description_container'>
-              <Text size={TextSize.MEDIUM} text={wordPackDTO.description} />
-            </Flex>
-            <Flex className='wordInfo_container' ref={containerRef} onScroll={handleScroll}>
+          <Container>
+            <TotalWords>
+              <CopyIcon />
+              <Text>{wordPackDTO.totalWords}</Text>
+            </TotalWords>
+            <Description>
+              <Text size={{ base: Size.SM, md: Size.MD, xl: Size.MD }}>{wordPackDTO.description}</Text>
+            </Description>
+            <WordInfoContainer ref={containerRef} onScroll={handleScroll}>
               {allWordsForWordPackDTO?.slice(0, visibleWords).map((wordDTO) => (
-                <Flex className={`wordInfo ${colorMode}`} key={wordDTO.id}>
-                  <Flex className='characterAndPinyinAndTranslation'>
-                    <Flex>{wordDTO.nameChineseSimplified}&nbsp;&nbsp;{wordDTO.pinyin}</Flex>
-                    <Flex>{wordDTO.nameEnglish}</Flex>
-                  </Flex>
-                  <Flex className='badgeOrStreakCount'>
+                <WordInfo colorMode={colorMode} key={wordDTO.id}>
+                  <CharacterAndPinyinAndTranslation>
+                    <Text>{wordDTO.nameChineseSimplified}&nbsp;&nbsp;{wordDTO.pinyin}</Text>
+                    <Text size={{ base: Size.SM, md: Size.MD, xl: Size.MD }}>{wordDTO.nameEnglish}</Text>
+                  </CharacterAndPinyinAndTranslation>
+                  <BadgeOrStreakCount>
                     {wordDTO.status.toString() === Status[Status.IN_REVIEW] ? (
                       Array.from({ length: wordDTO.totalStreak }).map(() => (
-                        <Badge className='streakCount' key={wordDTO.id} />
+                        <BadgeStreakCount key={wordDTO.id} />
                       ))
                     ) : (
                       <StatusBadge text={wordDTO.status} colorScheme={getStatusColor(wordDTO.status)} />
                     )}
-                  </Flex>
-                </Flex>
+                  </BadgeOrStreakCount>
+                </WordInfo>
               ))}
-            </Flex>
-          </div>
+            </WordInfoContainer>
+          </Container>
         )}
       />
     </>
   );
 }
 
-export default ReviewWordPackWindow;
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const WordInfoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  max-height: 65vh;
+  overflow-y: auto;
+`;
+
+const WordInfo = styled.div<{ colorMode: ColorMode }>`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px;
+  border: ${({ colorMode }) => borderStyles(colorMode)};
+  border-radius: ${theme.stylesToDelete.borderRadius};
+  max-width: 800px;
+`;
+
+const CharacterAndPinyinAndTranslation = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
+
+const TotalWords = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
+`;
+
+const Description = styled.div`
+`;
+
+const BadgeOrStreakCount = styled.div`
+  display: flex;
+  flex-direction: row;
+`;

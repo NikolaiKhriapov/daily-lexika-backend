@@ -1,21 +1,15 @@
+import React from 'react';
+import { LinkProps } from '@chakra-ui/layout/dist/link';
 import { Link as ChakraLink } from '@chakra-ui/react';
+import { theme } from '../../../utils/theme';
 
-interface LinkProps {
-  href: string;
-  text: string;
-}
-
-function Link(props: LinkProps) {
-  const { href, text } = props;
-
+export default function Link({ children, ...rest }: LinkProps) {
   return (
     <ChakraLink
-      href={href}
-      color='blue.500'
+      color={theme.stylesToDelete.link}
+      {...rest}
     >
-      {text}
+      {children}
     </ChakraLink>
   );
 }
-
-export default Link;

@@ -1,18 +1,19 @@
 import { AiOutlineQuestionCircle } from 'react-icons/ai';
+import styled from 'styled-components/macro';
 
-interface InfoButtonProps {
-  onOpen: any;
-}
+type Props = {
+  onClick: () => void;
+};
 
-function InfoButton(props: InfoButtonProps) {
-  const { onOpen } = props;
+export default function InfoButton(props: Props) {
+  const { onClick } = props;
 
   return (
-    <AiOutlineQuestionCircle
-      className='infoButton'
-      onClick={onOpen}
-    />
+    <Component onClick={onClick} />
   );
 }
 
-export default InfoButton;
+const Component = styled(AiOutlineQuestionCircle)`
+  font-size: 16px;
+  cursor: pointer;
+`;

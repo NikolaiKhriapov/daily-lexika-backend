@@ -1,32 +1,33 @@
-import { CircularProgress, CircularProgressLabel, Flex, useColorMode } from '@chakra-ui/react';
-import { TextSize } from '../../../utils/constants';
+import {
+  CircularProgress,
+  CircularProgressLabel,
+  CircularProgressProps,
+  useBreakpointValue,
+  useColorMode,
+} from '@chakra-ui/react';
+import { theme } from '../../../utils/theme';
 import Text from './Text';
+import { FontWeight, Size } from '../../../utils/constants';
 
-interface ProgressCircularProps {
-  value: any;
+interface Props extends CircularProgressProps {
   text: string;
 }
 
-function ProgressCircular(props: ProgressCircularProps) {
-  const { value, text } = props;
-
+export default function ProgressCircular({ text, value, ...rest }: Props) {
   const { colorMode } = useColorMode();
 
   return (
     <CircularProgress
       value={value}
-      color={colorMode === 'light' ? '#8088A0' : '#E4E8EE'}
-      trackColor={colorMode === 'light' ? '#E4E8EE' : '#505050'}
-      size='175px'
+      size={useBreakpointValue({ base: '105px', md: '175px', xl: '175px' })}
       thickness='6px'
+      color={theme.colors[colorMode].progressCircularColor}
+      trackColor={theme.colors[colorMode].progressBarBgColor}
+      {...rest}
     >
       <CircularProgressLabel>{value}%
-        <Flex className='text_container'>
-          <Text size={TextSize.SMALL} text={text} isBold />
-        </Flex>
+        <Text size={{ base: Size.XS, md: Size.MD, xl: Size.MD }} fontWeight={FontWeight.SEMIBOLD}>{text}</Text>
       </CircularProgressLabel>
     </CircularProgress>
   );
 }
-
-export default ProgressCircular;

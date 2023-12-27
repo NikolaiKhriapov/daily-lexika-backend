@@ -1,16 +1,16 @@
-import { Flex } from '@chakra-ui/react';
+import styled from 'styled-components/macro';
 
-interface RedDotProps {
-  top: string;
-  right: string;
-}
-
-function RedDot(props: RedDotProps) {
-  const { top, right } = props;
-
+export default function RedDot() {
   return (
-    <Flex className='redDot' top={top} right={right} />
+    <Component />
   );
 }
 
-export default RedDot;
+const Component = styled.div`
+  top: -10px;
+  position: relative;
+  width: 6px;
+  height: 6px;
+  background-color: red;
+  border-radius: 100%;
+`;

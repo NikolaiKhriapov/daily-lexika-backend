@@ -1,18 +1,18 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { login as performLogin } from '../../services/authorization';
-import { AuthenticatedUser, AuthenticationRequest } from '../../types/types';
+import { AuthenticatedUser, AuthenticationRequest } from '../../utils/types';
 import { LocalStorage } from '../../utils/constants';
 
-interface AuthContextProps {
+type Props = {
   user: AuthenticatedUser | null;
   login: (authenticationRequest: AuthenticationRequest) => Promise<void>;
   logout: () => void;
   isUserAuthenticated: () => boolean;
   setUserFromToken: () => void;
-}
+};
 
-const AuthContext = createContext<AuthContextProps>({
+const AuthContext = createContext<Props>({
   user: null,
   login: async () => {
   },
@@ -40,19 +40,20 @@ function AuthProvider({ children }: {
     setUserFromToken();
   }, []);
 
-  const login = async (authenticationRequest: AuthenticationRequest): Promise<void> => new Promise((resolve, reject) => {
-    performLogin(authenticationRequest)
-      .then((response) => {
-        let jwtToken = response.data.data.authenticationResponse.token;
-        localStorage.setItem(LocalStorage.ACCESS_TOKEN, jwtToken);
+  const login = async (authenticationRequest: AuthenticationRequest): Promise<void> =>
+    new Promise((resolve, reject) => {
+      performLogin(authenticationRequest)
+        .then((response) => {
+          let jwtToken = response.data.data.authenticationResponse.token;
+          localStorage.setItem(LocalStorage.ACCESS_TOKEN, jwtToken);
 
-        jwtToken = jwtDecode(jwtToken);
+          jwtToken = jwtDecode(jwtToken);
 
-        setUser({ username: jwtToken.sub });
-        resolve();
-      })
-      .catch((error) => reject(error));
-  });
+          setUser({ username: jwtToken.sub });
+          resolve();
+        })
+        .catch((error) => reject(error));
+    });
 
   const logout = () => {
     localStorage.removeItem(LocalStorage.ACCESS_TOKEN);

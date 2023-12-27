@@ -1,29 +1,22 @@
-import { Progress, useColorMode } from '@chakra-ui/react';
+import { ColorMode, Progress, ProgressProps, useColorMode } from '@chakra-ui/react';
+import styled from 'styled-components/macro';
+import { theme } from '../../../utils/theme';
+import { Size } from '../../../utils/constants';
 
-interface ProgressBarProps {
-  value: number;
-  margin?: any;
-}
-
-function ProgressBar(props: ProgressBarProps) {
-  const { value, margin } = props;
-
+export default function ProgressBar({ ...rest }: ProgressProps) {
   const { colorMode } = useColorMode();
 
   return (
-    <Progress
-      className={`progressBar ${colorMode}`}
-      value={value}
+    <ProgressStyled
+      colorMode={colorMode}
       colorScheme='gray'
-      size='sm'
-      rounded='md'
-      margin={margin}
+      size={Size.SM}
+      rounded={Size.MD}
+      {...rest}
     />
   );
 }
 
-ProgressBar.defaultProps = {
-  margin: '0',
-};
-
-export default ProgressBar;
+const ProgressStyled = styled(Progress)<{ colorMode: ColorMode }>`
+  background-color: ${({ colorMode }) => theme.colors[colorMode].progressBarBgColor};
+`;

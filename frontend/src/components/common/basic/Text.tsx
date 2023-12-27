@@ -1,21 +1,26 @@
-import { TextSize } from '../../../utils/constants';
+import React from 'react';
+import { Text as ChakraText, TextProps } from '@chakra-ui/react';
+import styled from 'styled-components/macro';
+import { Size } from '../../../utils/constants';
 
-interface TextProps {
-  size: TextSize;
-  text: any;
-  isBold?: boolean;
+interface Props extends TextProps {
+  size?: Size | { base: Size, md: Size, xl: Size };
+  isCentered?: boolean;
 }
 
-function Text(props: TextProps) {
-  const { text, size, isBold } = props;
-
+export default function Text({ children, size, isCentered, ...rest }: Props) {
   return (
-    <span className={`text${size} ${isBold && 'isBold'}`}>{text}</span>
+    <ChakraTextStyled fontSize={size} isCentered={isCentered} {...rest}>
+      {children}
+    </ChakraTextStyled>
   );
 }
 
 Text.defaultProps = {
-  isBold: false,
+  size: Size.MD,
+  isCentered: false,
 };
 
-export default Text;
+const ChakraTextStyled = styled(ChakraText)<{ isCentered: boolean }>`
+  text-align: ${({ isCentered }) => isCentered && 'center'};
+`;

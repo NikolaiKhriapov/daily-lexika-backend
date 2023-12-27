@@ -1,49 +1,49 @@
-import { Button as ChakraButton, useColorMode } from '@chakra-ui/react';
-import { ButtonSize, ButtonType } from '../../../utils/constants';
+import React from 'react';
+import { Button as ChakraButton, ButtonProps, ColorMode, useColorMode } from '@chakra-ui/react';
+import styled from 'styled-components/macro';
+import { theme } from '../../../utils/theme';
+import { ButtonType } from '../../../utils/constants';
 
-interface ButtonProps {
-  content: any;
-  type: ButtonType;
-  onClick?: any;
-  isDisabled?: boolean;
-  size?: ButtonSize;
-  ref?: any;
+interface Props extends ButtonProps {
+  buttonType: ButtonType;
+  buttonText: React.ReactNode;
 }
 
-function Button(props: ButtonProps) {
-  const { type, onClick, content, isDisabled, size, ref } = props;
-
+export default function Button({ buttonType, buttonText, ...rest }: Props) {
   const { colorMode } = useColorMode();
 
   const getButtonType = () => {
-    switch (type) {
+    switch (buttonType) {
       case ButtonType.SUBMIT:
         return 'submit';
       case ButtonType.RESET:
         return 'reset';
-      default: return 'button';
+      default:
+        return 'button';
     }
   };
 
   return (
-    <ChakraButton
-      className={`button ${type} ${colorMode}`}
-      size={size}
-      onClick={onClick}
-      isDisabled={isDisabled}
-      ref={ref}
+    <ChakraButtonStyled
+      className={`${buttonType}`}
       type={getButtonType()}
+      colorMode={colorMode}
+      {...rest}
     >
-      {content}
-    </ChakraButton>
+      {buttonText}
+    </ChakraButtonStyled>
   );
 }
 
-Button.defaultProps = {
-  onClick: null,
-  isDisabled: false,
-  size: ButtonSize.SMALL,
-  ref: null,
-};
+const ChakraButtonStyled = styled(ChakraButton)<{ colorMode: ColorMode }>`
+  color: ${({ colorMode }) => theme.colors[colorMode].buttonColor};
+  background-color: ${({ colorMode }) => theme.colors[colorMode].buttonBgColor};
+  
+  &.standard:hover {
+    background-color: ${({ colorMode }) => theme.colors[colorMode].buttonHoverBgColor};
+  }
 
-export default Button;
+  &.redOnHover:hover {
+    background-color: ${({ colorMode }) => theme.colors[colorMode].buttonRemoveHoverBgColor};
+  }
+`;

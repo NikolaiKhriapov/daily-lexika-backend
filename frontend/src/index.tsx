@@ -7,36 +7,36 @@ import Review from './pages/reviews/Review';
 import Statistics from './pages/statistics/Statistics';
 import AuthProvider from './components/context/AuthContext';
 import ProtectedRoute from './shared/ProtectedRoute';
-import { Pages } from './utils/constants';
+import { Page } from './utils/constants';
 import AuthPage from './pages/auth/AuthPage';
-import './styles/index.scss';
+import { theme } from './utils/theme';
 
 const { ToastContainer } = createStandaloneToast();
 
 const router = createBrowserRouter([
   {
-    path: Pages.REGISTER,
+    path: Page.REGISTER,
     element: <AuthPage />,
   },
   {
-    path: Pages.LOGIN,
+    path: Page.LOGIN,
     element: <AuthPage />,
   },
   {
-    path: Pages.REVIEWS,
+    path: Page.REVIEWS,
     element: <ProtectedRoute><Review /></ProtectedRoute>,
   },
   {
-    path: Pages.WORD_PACKS,
+    path: Page.WORD_PACKS,
     element: <ProtectedRoute><WordPack /></ProtectedRoute>,
   },
   {
-    path: Pages.STATISTICS,
+    path: Page.STATISTICS,
     element: <ProtectedRoute><Statistics /></ProtectedRoute>,
   },
   {
     path: '/',
-    element: <Navigate to={Pages.LOGIN} />,
+    element: <Navigate to={Page.LOGIN} />,
   },
 ]);
 
@@ -47,7 +47,7 @@ if (rootElement) {
     .createRoot(rootElement)
     .render(
       <React.StrictMode>
-        <ChakraProvider>
+        <ChakraProvider theme={theme}>
           <AuthProvider>
             <RouterProvider router={router} />
           </AuthProvider>

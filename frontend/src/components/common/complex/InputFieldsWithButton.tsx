@@ -1,18 +1,20 @@
 import { Form, Formik } from 'formik';
-import { Stack } from '@chakra-ui/react';
-import { ButtonSize, ButtonType } from '../../../utils/constants';
+import styled from 'styled-components/macro';
+import React from 'react';
+import { Breakpoint, ButtonType } from '../../../utils/constants';
 import Button from '../basic/Button';
+import { mediaBreakpointUp } from '../../../utils/functions';
 
-interface InputFieldsWithButtonProps {
+type Props = {
   validateOnMount: boolean;
   initialValues: any;
   validationSchema: any;
   onSubmit: any;
-  inputElements: any;
+  inputElements: React.ReactNode;
   buttonText: string;
-}
+};
 
-function InputFieldsWithButton(props: InputFieldsWithButtonProps) {
+export default function InputFieldsWithButton(props: Props) {
   const { validateOnMount, initialValues, validationSchema, onSubmit, inputElements, buttonText } = props;
 
   return (
@@ -23,20 +25,30 @@ function InputFieldsWithButton(props: InputFieldsWithButtonProps) {
       onSubmit={onSubmit}
     >
       {({ isValid, isSubmitting }) => (
-        <Form>
-          <Stack spacing='24px'>
-            {inputElements}
-            <Button
-              content={buttonText}
-              size={ButtonSize.MEDIUM}
-              type={ButtonType.SUBMIT}
-              isDisabled={!(isValid) || isSubmitting}
-            />
-          </Stack>
-        </Form>
+        <FormStyled>
+          {inputElements}
+          <Button
+            buttonText={buttonText}
+            buttonType={ButtonType.SUBMIT}
+            isDisabled={!(isValid) || isSubmitting}
+          />
+        </FormStyled>
       )}
     </Formik>
   );
 }
 
-export default InputFieldsWithButton;
+const FormStyled = styled(Form)`
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+
+  ${mediaBreakpointUp(Breakpoint.TABLET)} {
+    gap: 25px;
+  }
+
+  ${mediaBreakpointUp(Breakpoint.DESKTOP)} {
+    gap: 30px;
+  }
+`;

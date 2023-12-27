@@ -1,26 +1,27 @@
-import { Avatar, Flex, Stack, useDisclosure } from '@chakra-ui/react';
+import { Avatar, Stack, useDisclosure } from '@chakra-ui/react';
 import * as Yup from 'yup';
 import { RefObject, useRef } from 'react';
+import styled from 'styled-components/macro';
 import { errorNotification, successNotification } from '../../services/popup-notification';
 import { deleteAccount, updateUserInfo } from '../../services/user';
-import { UserDTO } from '../../types/types';
-import { ButtonSize, ButtonType, LocalStorage } from '../../utils/constants';
+import { UserDTO } from '../../utils/types';
+import { ButtonType, LocalStorage, Size } from '../../utils/constants';
 import TextInput from '../common/complex/TextInput';
 import AlertDialog from '../common/complex/AlertDialog';
 import InputFieldWithButton from '../common/complex/InputFieldWithButton';
 import Modal from '../common/complex/Modal';
+import ButtonsContainer from '../common/complex/ButtonsContainer';
 import Button from '../common/basic/Button';
 
-interface UserAccountWindowProps {
-  button: any;
+type Props = {
   isOpen: boolean;
   onClose: any;
   userDTO: UserDTO;
   updateUserAndName: any;
-}
+};
 
-function UserAccountWindow(props: UserAccountWindowProps) {
-  const { button, isOpen, onClose, userDTO, updateUserAndName } = props;
+export default function UserAccountWindow(props: Props) {
+  const { isOpen, onClose, userDTO, updateUserAndName } = props;
 
   const cancelRef: RefObject<HTMLButtonElement> = useRef(null);
   const {
@@ -101,61 +102,65 @@ function UserAccountWindow(props: UserAccountWindowProps) {
   };
 
   return (
-    <>
-      {button}
-      <Modal
-        size='md'
-        isOpen={isOpen}
-        onClose={onClose}
-        header='Account'
-        body={(
-          <>
-            <Flex className='UserAccountWindow__avatar'><Avatar size='2xl' /></Flex>
-            <InputFieldWithButton
-              validateOnMount
-              initialValues={userAccountWindowData.name.initialValues}
-              validationSchema={userAccountWindowData.name.validationSchema}
-              onSubmit={userAccountWindowData.name.onSubmit}
-              inputElements={userAccountWindowData.name.inputElement}
-            />
-            <InputFieldWithButton
-              validateOnMount={false}
-              initialValues={userAccountWindowData.email.initialValues}
-              validationSchema={userAccountWindowData.email.validationSchema}
-              onSubmit={userAccountWindowData.email.onSubmit}
-              inputElements={userAccountWindowData.email.inputElement}
-            />
-            <InputFieldWithButton
-              validateOnMount={false}
-              initialValues={userAccountWindowData.password.initialValues}
-              validationSchema={userAccountWindowData.password.validationSchema}
-              onSubmit={userAccountWindowData.password.onSubmit}
-              inputElements={userAccountWindowData.password.inputElement}
-            />
-            <Flex className='buttons_container'>
-              <Stack>
-                <Button
-                  content='Delete Account'
-                  size={ButtonSize.MEDIUM}
-                  type={ButtonType.BUTTON_RED}
-                  onClick={onOpenDeleteAccountButton}
-                />
-                <AlertDialog
-                  isOpenDeleteButton={isOpenDeleteAccountButton}
-                  onCloseDeleteButton={onCloseDeleteAccountButton}
-                  cancelRef={cancelRef}
-                  handleDelete={handleDeleteAccount}
-                  header='Delete Account'
-                  body={`Are you sure you want to delete account? You can't undo this action.`}
-                  deleteButtonText='Delete'
-                />
-              </Stack>
-            </Flex>
-          </>
-        )}
-      />
-    </>
+    <Modal
+      size={Size.MD}
+      isOpen={isOpen}
+      onClose={onClose}
+      header='Account'
+      body={(
+        <>
+          <ProfileImageContainer>
+            <Avatar size='2xl' />
+          </ProfileImageContainer>
+          <InputFieldWithButton
+            buttonText='Change'
+            validateOnMount
+            initialValues={userAccountWindowData.name.initialValues}
+            validationSchema={userAccountWindowData.name.validationSchema}
+            onSubmit={userAccountWindowData.name.onSubmit}
+            inputElements={userAccountWindowData.name.inputElement}
+          />
+          <InputFieldWithButton
+            buttonText='Change'
+            validateOnMount={false}
+            initialValues={userAccountWindowData.email.initialValues}
+            validationSchema={userAccountWindowData.email.validationSchema}
+            onSubmit={userAccountWindowData.email.onSubmit}
+            inputElements={userAccountWindowData.email.inputElement}
+          />
+          <InputFieldWithButton
+            buttonText='Change'
+            validateOnMount={false}
+            initialValues={userAccountWindowData.password.initialValues}
+            validationSchema={userAccountWindowData.password.validationSchema}
+            onSubmit={userAccountWindowData.password.onSubmit}
+            inputElements={userAccountWindowData.password.inputElement}
+          />
+          <ButtonsContainer>
+            <Stack>
+              <Button
+                buttonText='Delete Account'
+                buttonType={ButtonType.BUTTON_RED}
+                onClick={onOpenDeleteAccountButton}
+              />
+              <AlertDialog
+                isOpenDeleteButton={isOpenDeleteAccountButton}
+                onCloseDeleteButton={onCloseDeleteAccountButton}
+                cancelRef={cancelRef}
+                handleDelete={handleDeleteAccount}
+                header='Delete Account'
+                body={`Are you sure you want to delete account? You can't undo this action.`}
+                deleteButtonText='Delete'
+              />
+            </Stack>
+          </ButtonsContainer>
+        </>
+      )}
+    />
   );
 }
 
-export default UserAccountWindow;
+const ProfileImageContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;

@@ -1,26 +1,29 @@
 import { useEffect, useState } from 'react';
-import { Box, Flex, Stat, useColorMode, useDisclosure } from '@chakra-ui/react';
+import { ColorMode, Stat, useColorMode, useDisclosure } from '@chakra-ui/react';
+import styled from 'styled-components/macro';
 import { errorNotification } from '../../services/popup-notification';
 import { getReviewStatistics } from '../../services/reviews';
 import StatsReviewWindow from './StatsReviewWindow';
 import { getWordPack } from '../../services/word-packs';
-import { ReviewDTO, ReviewStatisticsDTO, WordPackDTO } from '../../types/types';
-import { TextSize } from '../../utils/constants';
+import { ReviewDTO, ReviewStatisticsDTO, WordPackDTO } from '../../utils/types';
 import Text from '../common/basic/Text';
 import ProgressBar from '../common/basic/ProgressBar';
 import InfoButton from '../common/basic/InfoButton';
+import { theme } from '../../utils/theme';
+import { borderStyles } from '../../utils/functions';
+import { FontWeight, Size } from '../../utils/constants';
 
-interface StatsReviewCardProps {
+type Props = {
   reviewDTO: ReviewDTO;
-}
+};
 
-function StatsReviewCard(props: StatsReviewCardProps) {
+export default function StatsReviewCard(props: Props) {
   const { reviewDTO } = props;
 
   const { colorMode } = useColorMode();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [reviewStatisticsDTO, setReviewStatisticsDTO] = useState<ReviewStatisticsDTO>();
   const [wordPackDTO, setWordPackDTO] = useState<WordPackDTO>();
-  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const fetchWordPackDTO = (wordPackName: string) => {
     getWordPack(wordPackName)
@@ -43,11 +46,11 @@ function StatsReviewCard(props: StatsReviewCardProps) {
     && Math.round((reviewStatisticsDTO.wordsKnown / reviewStatisticsDTO.wordsTotal) * 100);
 
   return (
-    <Box>
-      <Stat className={`StatsReviewCard_container ${colorMode}`} shadow='2xl'>
-        <Flex className='wordPackNameAndInfoButton'>
-          <Text size={TextSize.LARGE} text={reviewDTO.wordPackName} isBold />
-          <InfoButton onOpen={onOpen} />
+    <Container colorMode={colorMode} shadow='2xl'>
+      <WordPackNameAndInfoButton>
+        <Text size={Size.XL} fontWeight={FontWeight.SEMIBOLD}>{reviewDTO.wordPackName}</Text>
+        <InfoButton onClick={onOpen} />
+        {isOpen && (
           <StatsReviewWindow
             isOpen={isOpen}
             onClose={onClose}
@@ -55,22 +58,47 @@ function StatsReviewCard(props: StatsReviewCardProps) {
             reviewStatisticsDTO={reviewStatisticsDTO!}
             wordPackDTO={wordPackDTO!}
           />
-        </Flex>
-        <Flex className='stats'>
-          <span>
-            <Text size={TextSize.LARGE} text={`${wordsKnownPercentage}%`} isBold />
-            <Text size={TextSize.SMALL} text=' known' isBold />
-          </span>
-          <Text
-            size={TextSize.SMALL}
-            text={reviewStatisticsDTO && `${reviewStatisticsDTO.wordsKnown}/${reviewStatisticsDTO.wordsTotal}`}
-            isBold
-          />
-        </Flex>
-        <ProgressBar value={wordsKnownPercentage || 0} />
-      </Stat>
-    </Box>
+        )}
+      </WordPackNameAndInfoButton>
+      <Stats>
+        <Percentage>
+          <Text size={Size.XL} fontWeight={FontWeight.SEMIBOLD}>{`${wordsKnownPercentage}%`}</Text>
+          <Text size={Size.SM} fontWeight={FontWeight.SEMIBOLD}>&nbsp;known</Text>
+        </Percentage>
+        <Text fontWeight={FontWeight.SEMIBOLD}>
+          {reviewStatisticsDTO && `${reviewStatisticsDTO.wordsKnown}/${reviewStatisticsDTO.wordsTotal}`}
+        </Text>
+      </Stats>
+      <ProgressBar value={wordsKnownPercentage || 0} />
+    </Container>
   );
 }
 
-export default StatsReviewCard;
+const Container = styled(Stat)<{ colorMode: ColorMode }>`
+  min-width: 220px;
+  max-width: 220px;
+  height: 100px;
+  padding: 15px;
+  background-color: ${({ colorMode }) => theme.colors[colorMode].bgColor};
+  border: ${({ colorMode }) => borderStyles(colorMode)};
+  border-radius: ${theme.stylesToDelete.borderRadius};
+  box-shadow: ${theme.stylesToDelete.boxShadow};
+`;
+
+const WordPackNameAndInfoButton = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+`;
+
+const Stats = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+`;
+
+const Percentage = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+`;

@@ -1,20 +1,23 @@
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import { Box, useColorMode } from '@chakra-ui/react';
+import { Box, ColorMode, useColorMode } from '@chakra-ui/react';
+import styled from 'styled-components/macro';
 import { useAuth } from '../context/AuthContext';
 import { register } from '../../services/authorization';
 import { errorNotification, successNotification } from '../../services/popup-notification';
 import TextInput from '../common/complex/TextInput';
-import { AuthFormType, Pages } from '../../utils/constants';
-import { AuthenticationRequest, RegistrationRequest } from '../../types/types';
+import { AuthFormType, Breakpoint, Page } from '../../utils/constants';
+import { AuthenticationRequest, RegistrationRequest } from '../../utils/types';
 import InputFieldsWithButton from '../common/complex/InputFieldsWithButton';
+import { borderStyles, mediaBreakpointUp } from '../../utils/functions';
+import { theme } from '../../utils/theme';
 
-interface AuthFormProps {
+type Props = {
   formType: AuthFormType;
   onSuccess: any;
-}
+};
 
-function AuthForm(props: AuthFormProps) {
+export default function AuthForm(props: Props) {
   const { formType, onSuccess } = props;
 
   const { colorMode } = useColorMode();
@@ -37,7 +40,7 @@ function AuthForm(props: AuthFormProps) {
       handleOnSubmit: (values: RegistrationRequest | AuthenticationRequest, { setSubmitting }: any) => {
         setSubmitting(true);
         login(values)
-          .then(() => navigate(Pages.REVIEWS))
+          .then(() => navigate(Page.REVIEWS))
           .catch((error: any) => errorNotification(error.code, error.response.data.message))
           .finally(() => setSubmitting(false));
       },
@@ -71,28 +74,60 @@ function AuthForm(props: AuthFormProps) {
       },
     },
   };
+
   const authFormData = authFormMapping[formType];
 
   return (
-    <Box className={`authFormContainer ${colorMode}`} boxShadow='2xl'>
+    <BoxStyled boxShadow='2xl' colorMode={colorMode}>
       <InputFieldsWithButton
         validateOnMount
         initialValues={authFormData.initialValues}
         validationSchema={authFormData.validationSchema}
         onSubmit={authFormData.handleOnSubmit}
         inputElements={(
-          <>
+          <InputElements>
             {formType === AuthFormType.REGISTER && (
               <TextInput label='Name' name='name' type='text' placeholder='Name' />
             )}
             <TextInput label='Email' name='email' type='email' placeholder='Email address' />
             <TextInput label='Password' name='password' type='password' placeholder='Password' />
-          </>
+          </InputElements>
         )}
         buttonText='Submit'
       />
-    </Box>
+    </BoxStyled>
   );
 }
 
-export default AuthForm;
+const BoxStyled = styled(Box)<{ colorMode: ColorMode }>`
+  width: 250px;
+  max-width: 80%;
+  padding: 20px;
+  background-color: ${({ colorMode }) => theme.colors[colorMode].bgColor};
+  border: ${({ colorMode }) => borderStyles(colorMode)};
+  border-radius: ${theme.stylesToDelete.borderRadius};
+
+  ${mediaBreakpointUp(Breakpoint.TABLET)} {
+    width: 310px;
+    padding: 30px;
+  }
+
+  ${mediaBreakpointUp(Breakpoint.DESKTOP)} {
+    width: 370px;
+    padding: 30px;
+  }
+`;
+
+const InputElements = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  ${mediaBreakpointUp(Breakpoint.TABLET)} {
+    gap: 20px;
+  }
+
+  ${mediaBreakpointUp(Breakpoint.DESKTOP)} {
+    gap: 25px;
+  }
+`;

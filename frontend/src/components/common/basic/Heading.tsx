@@ -1,16 +1,23 @@
-import { Flex } from '@chakra-ui/react';
+import React from 'react';
+import { Heading as ChakraHeading, HeadingProps } from '@chakra-ui/react';
+import styled from 'styled-components/macro';
 
-interface HeadingProps {
-  text: any;
-  level: 1 | 2 | 3 | 4;
+interface Props extends HeadingProps {
+  isCentered?: boolean;
 }
 
-function Heading(props: HeadingProps) {
-  const { text, level } = props;
-
+export default function Heading({ children, isCentered, ...rest }: Props) {
   return (
-    <Flex className={`heading${level}`}>{text}</Flex>
+    <ChakraHeadingStyled isCentered={isCentered} {...rest}>
+      {children}
+    </ChakraHeadingStyled>
   );
 }
 
-export default Heading;
+Heading.defaultProps = {
+  isCentered: false,
+};
+
+const ChakraHeadingStyled = styled(ChakraHeading)<{ isCentered: boolean }>`
+  text-align: ${({ isCentered }) => isCentered && 'center'};
+`;
