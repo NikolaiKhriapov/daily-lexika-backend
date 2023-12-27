@@ -3,9 +3,6 @@ package my.project.models.entity.chineseflashcards;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -13,8 +10,8 @@ import java.util.List;
 public class ChineseCharacter {
 
     @Id
-    @SequenceGenerator(name = "sequence", sequenceName = "sequence", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence")
+    @SequenceGenerator(name = "chinese_character_id_sequence", sequenceName = "chinese_character_id_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chinese_character_id_sequence")
     private Long id;
 
     private String nameChineseSimplified;
@@ -31,22 +28,4 @@ public class ChineseCharacter {
     private Status status;
 
     private Integer correctStreak;
-
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @ToString.Exclude
-    private List<WordData> listOfWordData;
-
-//    public ChineseCharacter(String nameChineseSimplified,
-//                            String nameChineseTraditional,
-//                            String pinyin,
-//                            String nameEnglish,
-//                            String nameRussian) {
-//        this.nameChineseSimplified = nameChineseSimplified;
-//        this.nameChineseTraditional = nameChineseTraditional;
-//        this.pinyin = pinyin;
-//        this.nameEnglish = nameEnglish;
-//        this.nameRussian = nameRussian;
-//        this.status = Status.NEW;
-//        this.correctStreak = 0;
-//    }
 }

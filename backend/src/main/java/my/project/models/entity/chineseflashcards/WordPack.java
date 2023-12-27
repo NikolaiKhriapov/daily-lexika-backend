@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -21,11 +18,4 @@ public class WordPack {
 
     @Enumerated(EnumType.STRING)
     private Category category;
-
-    @ManyToMany(mappedBy = "listOfWordPacks", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @ToString.Exclude
-    private List<WordData> listOfWordData;
-
-    @OneToOne
-    private Review review;
 }

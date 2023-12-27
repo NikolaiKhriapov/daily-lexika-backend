@@ -3,6 +3,7 @@ package my.project.models.mapper.chineseflashcards;
 import lombok.AllArgsConstructor;
 import my.project.models.dto.chineseflashcards.WordDTO;
 import my.project.models.entity.chineseflashcards.*;
+import my.project.repositories.chineseflashcards.ReviewRepository;
 import my.project.services.chineseflashcards.WordDataService;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +15,13 @@ import java.util.stream.Collectors;
 public class WordMapper implements Mapper<Word, WordDTO> {
 
     private final WordDataService wordDataService;
+    private final ReviewRepository reviewRepository;
 
     @Override
     public WordDTO toDTO(Word entity) {
-        WordData wordData = wordDataService.getWordData(entity.getWordId());
+        WordData wordData = wordDataService.getWordData(entity.getWordDataId());
+        List<Long> listOfReviewIds = reviewRepository.findAllReviewIdsByWord(entity);
+
         return new WordDTO(
                 entity.getId(),
                 wordData.getNameChineseSimplified(),
@@ -30,9 +34,7 @@ public class WordMapper implements Mapper<Word, WordDTO> {
                 entity.getTotalStreak(),
                 entity.getOccurrence(),
                 entity.getDateOfLastOccurrence(),
-                entity.getListOfReviews().stream()
-                        .map(Review::getId)
-                        .collect(Collectors.toList()),
+                listOfReviewIds,
                 wordData.getListOfChineseCharacters().stream()
                         .map(ChineseCharacter::getId)
                         .collect(Collectors.toList()),
@@ -43,7 +45,8 @@ public class WordMapper implements Mapper<Word, WordDTO> {
     }
 
     public WordDTO toDTOShort(Word entity) {
-        WordData wordData = wordDataService.getWordData(entity.getWordId());
+        WordData wordData = wordDataService.getWordData(entity.getWordDataId());
+
         return new WordDTO(
                 entity.getId(),
                 wordData.getNameChineseSimplified(),

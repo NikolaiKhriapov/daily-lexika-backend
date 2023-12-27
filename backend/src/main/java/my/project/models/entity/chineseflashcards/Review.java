@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,8 +15,8 @@ import java.util.List;
 public class Review {
 
     @Id
-    @SequenceGenerator(name = "sequence", sequenceName = "sequence", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence")
+    @SequenceGenerator(name = "review_id_sequence", sequenceName = "review_id_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "review_id_sequence")
     private Long id;
 
     private Long userId;
@@ -30,7 +29,6 @@ public class Review {
     private WordPack wordPack;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @ToString.Exclude
     @OrderColumn
     private List<Word> listOfWords;
 

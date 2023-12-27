@@ -6,7 +6,6 @@ import my.project.exception.UserAlreadyExistsException;
 import my.project.models.dto.user.UserDTO;
 import my.project.models.entity.notification.Notification;
 import my.project.models.mapper.user.UserMapper;
-import my.project.services.fraudcheck.FraudCheckHistoryService;
 import my.project.services.notification.NotificationService;
 import my.project.models.dto.user.AuthenticationRequest;
 import my.project.models.dto.user.AuthenticationResponse;
@@ -33,7 +32,6 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final FraudCheckHistoryService fraudCheckHistoryService;
     private final NotificationService notificationService;
     private final PasswordEncoder passwordEncoder;
 
@@ -53,7 +51,6 @@ public class AuthenticationService {
                 .build();
         userRepository.save(user);
 
-        checkWhetherIsFraudster(user);
         sendWelcomeNotificationToUser(user);
 
         String jwtToken = jwtService.generateToken(user);
@@ -85,13 +82,6 @@ public class AuthenticationService {
         Optional<User> userOptional = userRepository.findUserByEmail(email.toLowerCase());
         if (userOptional.isPresent()) {
             throw new UserAlreadyExistsException("User '" + userOptional.get().getEmail() + "' already exists");
-        }
-    }
-
-    private void checkWhetherIsFraudster(User user) {
-        boolean isFraudster = fraudCheckHistoryService.isFraudster(user.getId());
-        if (isFraudster) {
-            throw new IllegalStateException("Fraudster");
         }
     }
 

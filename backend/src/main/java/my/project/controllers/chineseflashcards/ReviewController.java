@@ -1,7 +1,7 @@
 package my.project.controllers.chineseflashcards;
 
 import lombok.RequiredArgsConstructor;
-import my.project.models.dto.chineseflashcards.ResponseDTO;
+import my.project.models.dto.ResponseDTO;
 import my.project.models.dto.chineseflashcards.ReviewDTO;
 import my.project.services.chineseflashcards.ReviewService;
 import org.springframework.context.MessageSource;

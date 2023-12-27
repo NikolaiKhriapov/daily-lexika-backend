@@ -3,7 +3,6 @@ package my.project.models.entity.chineseflashcards;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.util.List;
 
@@ -26,11 +25,9 @@ public class WordData {
     private String nameRussian;
 
     @ManyToMany
-    @ToString.Exclude
     private List<ChineseCharacter> listOfChineseCharacters;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinTable
-    @ToString.Exclude
     private List<WordPack> listOfWordPacks;
 }

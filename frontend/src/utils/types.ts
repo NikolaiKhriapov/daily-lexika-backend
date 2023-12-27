@@ -40,7 +40,6 @@ export interface ReviewStatisticsDTO {
   wordsInReview: number;
   wordsKnown: number;
   wordsTotal: number;
-
 }
 
 export interface WordDTO {
@@ -60,16 +59,17 @@ export interface WordDTO {
   listOfWordPackNames: string[];
 }
 
-export interface WordStatisticsDTO {
-  wordsKnown: number;
-}
-
 export interface WordPackDTO {
   name: string;
   description: string;
   category: Category;
   totalWords: number;
-  review: ReviewDTO;
+}
+
+export interface WordStatisticsDTO {
+  wordsKnown: number;
+  // charactersKnown: number;
+  // idiomsKnown: number;
 }
 
 export interface NotificationDTO {

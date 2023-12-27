@@ -3,6 +3,7 @@ package my.project.services.chineseflashcards;
 import lombok.RequiredArgsConstructor;
 import my.project.exception.ResourceNotFoundException;
 import my.project.models.entity.chineseflashcards.WordData;
+import my.project.models.entity.chineseflashcards.WordPack;
 import my.project.repositories.chineseflashcards.WordDataRepository;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -20,5 +21,9 @@ public class WordDataService {
         return wordDataRepository.findById(wordDataId)
                 .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
                         "exception.wordData.notFound", null, Locale.getDefault())));
+    }
+
+    public List<Long> getListOfAllWordDataIdsByWordPack(WordPack wordPack) {
+        return wordDataRepository.findAllWordDataIdsByWordPack(wordPack);
     }
 }

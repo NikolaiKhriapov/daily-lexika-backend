@@ -1,7 +1,7 @@
 package my.project.controllers.user;
 
 import lombok.RequiredArgsConstructor;
-import my.project.models.dto.user.ResponseDTO;
+import my.project.models.dto.ResponseDTO;
 import my.project.models.dto.user.UserDTO;
 import my.project.services.user.AuthenticationService;
 import my.project.services.user.UserAccountService;

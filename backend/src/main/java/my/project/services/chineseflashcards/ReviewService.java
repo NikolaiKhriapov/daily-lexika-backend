@@ -10,18 +10,16 @@ import my.project.models.dto.chineseflashcards.WordDTO;
 import my.project.models.mapper.chineseflashcards.WordMapper;
 import my.project.models.entity.chineseflashcards.*;
 import my.project.repositories.chineseflashcards.ReviewRepository;
-import my.project.repositories.chineseflashcards.WordRepository;
 import my.project.services.user.AuthenticationService;
-import my.project.services.user.UserAccountService;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static java.time.temporal.ChronoUnit.DAYS;
 import static my.project.models.entity.chineseflashcards.Status.*;
 
 @Service
@@ -31,11 +29,11 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewMapper reviewMapper;
     private final WordMapper wordMapper;
+    private final WordService wordService;
+    private final WordDataService wordDataService;
     private final WordPackService wordPackService;
-    private final WordRepository wordRepository;
     private final AuthenticationService authenticationService;
     private final MessageSource messageSource;
-
 
     @Transactional
     public List<ReviewDTO> getAllReviews() {
@@ -61,10 +59,8 @@ public class ReviewService {
     public void createReview(ReviewDTO newReviewDTO) {
         Long userId = authenticationService.getAuthenticatedUser().id();
 
-        List<Review> existingReviews = reviewRepository.findAllByUserId(userId);
-        if (existingReviews
-                .stream().map(review -> review.getWordPack().getName()).toList()
-                .contains(newReviewDTO.wordPackName())) {
+        List<String> wordPackNamesOfExistingReviews = reviewRepository.findAllReviewNamesByUserId(userId);
+        if (wordPackNamesOfExistingReviews.contains(newReviewDTO.wordPackName())) {
             throw new ReviewAlreadyExistsException("Review '" + newReviewDTO.wordPackName() + "' already exists");
         }
 
@@ -127,26 +123,18 @@ public class ReviewService {
 
     public ReviewStatisticsDTO getReviewStatistics(Long reviewId) {
         Long userId = authenticationService.getAuthenticatedUser().id();
-        List<WordData> listOfWordData = getReview(reviewId).getWordPack().getListOfWordData();
 
-        List<Long> wordDataIds = listOfWordData.stream()
-                .map(WordData::getId)
-                .toList();
-        long newWords = wordRepository.findByUserIdAndWordIdIn(userId, wordDataIds).stream()
-                .filter(word -> word.getStatus().equals(NEW))
-                .count();
-        long reviewWords = wordRepository.findByUserIdAndWordIdIn(userId, wordDataIds).stream()
-                .filter(word -> word.getStatus().equals(IN_REVIEW))
-                .count();
-        long knownWords = wordRepository.findByUserIdAndWordIdIn(userId, wordDataIds).stream()
-                .filter(word -> word.getStatus().equals(KNOWN))
-                .count();
+        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPack(getReview(reviewId).getWordPack());
+
+        Integer newWords = wordService.countByUserIdAndWordDataIdInAndStatusEquals(userId, wordDataIds, NEW);
+        Integer reviewWords = wordService.countByUserIdAndWordDataIdInAndStatusEquals(userId, wordDataIds, IN_REVIEW);
+        Integer knownWords = wordService.countByUserIdAndWordDataIdInAndStatusEquals(userId, wordDataIds, KNOWN);
 
         return new ReviewStatisticsDTO(
-                (int) newWords,
-                (int) reviewWords,
-                (int) knownWords,
-                listOfWordData.size()
+                newWords,
+                reviewWords,
+                knownWords,
+                wordDataIds.size()
         );
     }
 
@@ -169,22 +157,23 @@ public class ReviewService {
      * KNOWN -> if dateOfLastOccurrence >= totalStreak
      **/
     public List<Word> generateListOfWordsForReview(Long userId, WordPack wordPack, ReviewDTO reviewDTO) {
-        List<Long> wordDataIds = wordPack.getListOfWordData().stream()
-                .map(WordData::getId)
-                .collect(Collectors.toList());
-        List<Word> tempListOfWords = wordRepository.findByUserIdAndWordIdIn(userId, wordDataIds);
+        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPack(wordPack);
 
-        List<Word> newWords = tempListOfWords.stream()
-                .filter(word -> word.getStatus().equals(Status.NEW))
-                .limit(reviewDTO.maxNewWordsPerDay())
-                .toList();
-        List<Word> reviewAndKnownWords = tempListOfWords.stream()
-                .filter(word -> word.getStatus().equals(Status.IN_REVIEW) || word.getStatus().equals(KNOWN))
-                .filter(word -> DAYS.between(word.getDateOfLastOccurrence(), LocalDate.now())
-                        >= (int) Math.pow(2, word.getTotalStreak()))
-                .sorted(Comparator.comparing(Word::getDateOfLastOccurrence).reversed())
-                .limit(reviewDTO.maxReviewWordsPerDay())
-                .toList();
+        Pageable pageableNew = PageRequest.of(0, reviewDTO.maxNewWordsPerDay());
+        List<Word> newWords = wordService.findByUserIdAndWordDataIdInAndStatusIn(
+                userId,
+                wordDataIds,
+                new ArrayList<>(List.of(NEW)),
+                pageableNew
+        );
+
+        Pageable pageableReviewAndKnown = PageRequest.of(0, reviewDTO.maxReviewWordsPerDay());
+        List<Word> reviewAndKnownWords = wordService.findByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrdered(
+                userId,
+                wordDataIds,
+                new ArrayList<>(List.of(IN_REVIEW, KNOWN)),
+                pageableReviewAndKnown
+        );
 
         List<Word> listOfWords = new ArrayList<>();
         listOfWords.addAll(newWords);

@@ -5,17 +5,19 @@ spring:
   application:
     name: chinese-learning-app
   datasource:
-    url: jdbc:postgresql://localhost:5432/chinese_learning_app
+    url: jdbc:postgresql://localhost:5432/dev_chinese_learning_app
     username: 'postgres'
     password: '1478236950'
   jpa:
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: 'true'
         show-sql: 'true'
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
+  flyway:
+    locations: "classpath:db/migration"
+#    enabled: false
   servlet:
     multipart:
       max-file-size: 10MB
@@ -31,6 +33,10 @@ cors:
 
 file-location:
   data-excel: "src/main/resources/static/data/Data.xlsx"
+
+#logging:
+#  level:
+#    root: debug
 
 #file-storage:
 #  profile-photo-directory: "backend/file-storage/src/main/resources/static/images/user-%s/profile-photo/"

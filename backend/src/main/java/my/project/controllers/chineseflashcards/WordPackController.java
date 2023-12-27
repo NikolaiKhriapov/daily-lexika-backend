@@ -1,7 +1,7 @@
 package my.project.controllers.chineseflashcards;
 
 import lombok.RequiredArgsConstructor;
-import my.project.models.dto.chineseflashcards.ResponseDTO;
+import my.project.models.dto.ResponseDTO;
 import my.project.services.chineseflashcards.WordPackService;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
