@@ -6,9 +6,9 @@
     "root": true
   },
   "scripts": {
-    "dev": "react-scripts dev",
-    "build": "react-scripts build",
-    "start": "react-scripts start"
+    "dev": "react-scripts dev -p 3000",
+    "build": "react-scripts build -p 3000",
+    "start": "react-scripts start -p 3000"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
