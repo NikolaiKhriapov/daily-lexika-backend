@@ -1,6 +1,0 @@
-server:
-  port: 8000
-
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/chinese_learning_app
