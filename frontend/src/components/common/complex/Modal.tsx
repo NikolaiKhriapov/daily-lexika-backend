@@ -26,7 +26,7 @@ export default function Modal({ header, body, ...rest }: Props) {
   return (
     <ChakraModal isCentered {...rest} size={Size.XXXL}>
       <ModalOverlay />
-      <ModalContentStyled colorMode={colorMode}>
+      <ModalContentStyled $colorMode={colorMode}>
         <ModalCloseButton />
         <ModalHeaderStyled fontSize={Size.XL}>{header}</ModalHeaderStyled>
         <ModalBodyStyled>{body}</ModalBodyStyled>
@@ -36,12 +36,10 @@ export default function Modal({ header, body, ...rest }: Props) {
   );
 }
 
-const ModalContentStyled = styled(ModalContent)<{
-  colorMode: ColorMode;
-}>`
+const ModalContentStyled = styled(ModalContent)<{ $colorMode: ColorMode }>`
   padding: 6px;
-  background-color: ${({ colorMode }) => theme.colors[colorMode].bgColor} !important;
-  border: ${({ colorMode }) => borderStyles(colorMode)};
+  background-color: ${({ $colorMode }) => theme.colors[$colorMode].bgColor} !important;
+  border: ${({ $colorMode }) => borderStyles($colorMode)};
   border-radius: ${theme.stylesToDelete.borderRadius};
   max-width: 90% !important;
   max-height: 90vh;

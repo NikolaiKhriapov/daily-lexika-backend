@@ -13,18 +13,14 @@ type Props = {
   isOpen: boolean;
   onClose: () => void;
   formattedDate: (dateString: string) => string;
-  formattedDateTime: (dateTimeString: string) => string;
   allNotificationsDTO: NotificationDTO[];
   handleNotificationClick: (notificationDTO: NotificationDTO) => void;
-  handleCloseNotificationModal: () => void;
-  selectedNotification: NotificationDTO;
 };
 
 export default function NotificationsWindow(props: Props) {
-  const { isOpen, onClose, formattedDate, formattedDateTime, allNotificationsDTO, handleNotificationClick, handleCloseNotificationModal, selectedNotification } = props;
+  const { isOpen, onClose, formattedDate, allNotificationsDTO, handleNotificationClick } = props;
 
   const { colorMode } = useColorMode();
-  console.log(`${formattedDateTime} ${handleCloseNotificationModal} ${selectedNotification}`);
 
   return (
     <Modal
@@ -36,7 +32,7 @@ export default function NotificationsWindow(props: Props) {
         <Container>
           {allNotificationsDTO.map((notificationDTO, index) => (
             <ButtonContainer key={index}>
-              <NotificationButton colorMode={colorMode} onClick={() => handleNotificationClick(notificationDTO)}>
+              <NotificationButton $colorMode={colorMode} onClick={() => handleNotificationClick(notificationDTO)}>
                 <SubjectAndDateContainer>
                   <Text
                     size={{ base: Size.SM, md: Size.MD, xl: Size.MD }}
@@ -86,13 +82,13 @@ const ButtonContainer = styled.div`
   max-width: 100%;
 `;
 
-const NotificationButton = styled(ChakraButton)<{ colorMode: ColorMode }>`
+const NotificationButton = styled(ChakraButton)<{ $colorMode: ColorMode }>`
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between !important;
   padding: 0 5px 0 0 !important;
-  background-color: ${({ colorMode }) => theme.colors[colorMode].bgColor} !important;
+  background-color: ${({ $colorMode }) => theme.colors[$colorMode].bgColor} !important;
   height: 30px !important;
   width: 250px;
 
@@ -107,7 +103,7 @@ const NotificationButton = styled(ChakraButton)<{ colorMode: ColorMode }>`
   }
 
   &:hover {
-    background-color: ${({ colorMode }) => theme.colors[colorMode].hoverBgColor} !important;
+    background-color: ${({ $colorMode }) => theme.colors[$colorMode].hoverBgColor} !important;
   }
 `;
 

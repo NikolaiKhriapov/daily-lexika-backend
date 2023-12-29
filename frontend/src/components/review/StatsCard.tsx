@@ -17,7 +17,7 @@ export default function StatsCard(props: Props) {
   const { colorMode } = useColorMode();
 
   return (
-    <Container colorMode={colorMode}>
+    <Container $colorMode={colorMode}>
       <Icon>{icon}</Icon>
       <Stats>
         <Text size={Size.XXXL}>{stat}</Text>
@@ -31,7 +31,7 @@ StatsCard.defaultProps = {
   stat: '–––',
 };
 
-const Container = styled.div<{ colorMode: ColorMode }>`
+const Container = styled.div<{ $colorMode: ColorMode }>`
   width: 220px;
   height: 100px;
   padding: 15px;
@@ -40,8 +40,8 @@ const Container = styled.div<{ colorMode: ColorMode }>`
   align-items: center;
   justify-content: left;
   gap: 15px;
-  background-color: ${({ colorMode }) => theme.colors[colorMode].bgColor};
-  border: ${({ colorMode }) => borderStyles(colorMode)};
+  background-color: ${({ $colorMode }) => theme.colors[$colorMode].bgColor};
+  border: ${({ $colorMode }) => borderStyles($colorMode)};
   border-radius: ${theme.stylesToDelete.borderRadius};
   box-shadow: ${theme.stylesToDelete.boxShadow};
 `;

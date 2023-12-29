@@ -1,6 +1,6 @@
 import { Spinner as ChakraSpinner } from '@chakra-ui/react';
 
-function Spinner() {
+export default function Spinner() {
   return (
     <ChakraSpinner
       thickness='4px'
@@ -11,5 +11,3 @@ function Spinner() {
     />
   );
 }
-
-export default Spinner;

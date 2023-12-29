@@ -20,8 +20,8 @@ type Props = {
 export default function AuthForm(props: Props) {
   const { formType, onSuccess } = props;
 
-  const { colorMode } = useColorMode();
   const { login } = useAuth();
+  const { colorMode } = useColorMode();
   const navigate = useNavigate();
 
   const authFormMapping = {
@@ -78,7 +78,7 @@ export default function AuthForm(props: Props) {
   const authFormData = authFormMapping[formType];
 
   return (
-    <BoxStyled boxShadow='2xl' colorMode={colorMode}>
+    <BoxStyled boxShadow='2xl' $colorMode={colorMode}>
       <InputFieldsWithButton
         validateOnMount
         initialValues={authFormData.initialValues}
@@ -99,12 +99,12 @@ export default function AuthForm(props: Props) {
   );
 }
 
-const BoxStyled = styled(Box)<{ colorMode: ColorMode }>`
+const BoxStyled = styled(Box)<{ $colorMode: ColorMode }>`
   width: 250px;
   max-width: 80%;
   padding: 20px;
-  background-color: ${({ colorMode }) => theme.colors[colorMode].bgColor};
-  border: ${({ colorMode }) => borderStyles(colorMode)};
+  background-color: ${({ $colorMode }) => theme.colors[$colorMode].bgColor};
+  border: ${({ $colorMode }) => borderStyles($colorMode)};
   border-radius: ${theme.stylesToDelete.borderRadius};
 
   ${mediaBreakpointUp(Breakpoint.TABLET)} {

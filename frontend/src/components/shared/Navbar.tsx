@@ -12,7 +12,7 @@ export default function Navbar() {
   const { colorMode } = useColorMode();
 
   return (
-    <Container colorMode={colorMode}>
+    <Container $colorMode={colorMode}>
       <NotificationsComponent />
       <ColorModeSwitchComponent />
       <ProfileComponent />
@@ -20,7 +20,7 @@ export default function Navbar() {
   );
 }
 
-const Container = styled.div<{ colorMode: ColorMode }>`
+const Container = styled.div<{ $colorMode: ColorMode }>`
   position: fixed;
   display: flex;
   flex-direction: row;
@@ -30,7 +30,7 @@ const Container = styled.div<{ colorMode: ColorMode }>`
   height: 50px;
   gap: 5px;
   padding-right: 10px;
-  background-color: ${({ colorMode }) => theme.colors[colorMode].bgColor};
+  background-color: ${({ $colorMode }) => theme.colors[$colorMode].bgColor};
 
   ${mediaBreakpointUp(Breakpoint.TABLET)} {
     height: 70px;

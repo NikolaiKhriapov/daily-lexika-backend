@@ -27,7 +27,7 @@ export default function Button({ buttonType, buttonText, ...rest }: Props) {
     <ChakraButtonStyled
       className={`${buttonType}`}
       type={getButtonType()}
-      colorMode={colorMode}
+      $colorMode={colorMode}
       {...rest}
     >
       {buttonText}
@@ -35,15 +35,15 @@ export default function Button({ buttonType, buttonText, ...rest }: Props) {
   );
 }
 
-const ChakraButtonStyled = styled(ChakraButton)<{ colorMode: ColorMode }>`
-  color: ${({ colorMode }) => theme.colors[colorMode].buttonColor};
-  background-color: ${({ colorMode }) => theme.colors[colorMode].buttonBgColor};
+const ChakraButtonStyled = styled(ChakraButton)<{ $colorMode: ColorMode }>`
+  color: ${({ $colorMode }) => theme.colors[$colorMode].buttonColor};
+  background-color: ${({ $colorMode }) => theme.colors[$colorMode].buttonBgColor};
   
   &.standard:hover {
-    background-color: ${({ colorMode }) => theme.colors[colorMode].buttonHoverBgColor};
+    background-color: ${({ $colorMode }) => theme.colors[$colorMode].buttonHoverBgColor};
   }
 
   &.redOnHover:hover {
-    background-color: ${({ colorMode }) => theme.colors[colorMode].buttonRemoveHoverBgColor};
+    background-color: ${({ $colorMode }) => theme.colors[$colorMode].buttonRemoveHoverBgColor};
   }
 `;

@@ -38,9 +38,9 @@ export default function ReviewWordCard(props: Props) {
 
   return (
     <Container
-      colorMode={colorMode}
-      isNewStatus={isNewStatus}
-      isFlipped={isFlipped}
+      $colorMode={colorMode}
+      $isNewStatus={isNewStatus}
+      $isFlipped={isFlipped}
       onClick={handleFlip}
     >
       {isNewStatus && <StatusBadge text={reviewWordDTO.status} colorScheme='red' isInTopRight />}
@@ -59,9 +59,9 @@ export default function ReviewWordCard(props: Props) {
 }
 
 const Container = styled.div<{
-  colorMode: ColorMode;
-  isNewStatus: boolean;
-  isFlipped: boolean;
+  $colorMode: ColorMode;
+  $isNewStatus: boolean;
+  $isFlipped: boolean;
 }>`
   display: flex;
   justify-content: center;
@@ -70,15 +70,15 @@ const Container = styled.div<{
   height: calc(240px * 1.3);
   padding: 10px;
 
-  background-color: ${({ colorMode }) => theme.colors[colorMode].reviewWordCardBgColor};
-  border: ${({ colorMode }) => borderStyles(colorMode)};
+  background-color: ${({ $colorMode }) => theme.colors[$colorMode].reviewWordCardBgColor};
+  border: ${({ $colorMode }) => borderStyles($colorMode)};
   border-radius: ${theme.stylesToDelete.borderRadius};
-  border-color: ${({ colorMode, isNewStatus }) => (isNewStatus
-          && theme.colors[colorMode].reviewWordCardBadgeRedColor
+  border-color: ${({ $colorMode, $isNewStatus }) => ($isNewStatus
+          && theme.colors[$colorMode].reviewWordCardBadgeRedColor
   )};
 
   transition: transform 0.3s;
-  transform: ${({ isFlipped }) => (isFlipped
+  transform: ${({ $isFlipped }) => ($isFlipped
     ? css`rotateY(180deg) scaleX(-1);`
     : css`rotateY(0deg)`
   )};

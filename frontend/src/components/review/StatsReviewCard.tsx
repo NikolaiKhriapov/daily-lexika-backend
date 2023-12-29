@@ -46,7 +46,7 @@ export default function StatsReviewCard(props: Props) {
     && Math.round((reviewStatisticsDTO.wordsKnown / reviewStatisticsDTO.wordsTotal) * 100);
 
   return (
-    <Container colorMode={colorMode} shadow='2xl'>
+    <Container $colorMode={colorMode} shadow='2xl'>
       <WordPackNameAndInfoButton>
         <Text size={Size.XL} fontWeight={FontWeight.SEMIBOLD}>{reviewDTO.wordPackName}</Text>
         <InfoButton onClick={onOpen} />
@@ -74,13 +74,13 @@ export default function StatsReviewCard(props: Props) {
   );
 }
 
-const Container = styled(Stat)<{ colorMode: ColorMode }>`
+const Container = styled(Stat)<{ $colorMode: ColorMode }>`
   min-width: 220px;
   max-width: 220px;
   height: 100px;
   padding: 15px;
-  background-color: ${({ colorMode }) => theme.colors[colorMode].bgColor};
-  border: ${({ colorMode }) => borderStyles(colorMode)};
+  background-color: ${({ $colorMode }) => theme.colors[$colorMode].bgColor};
+  border: ${({ $colorMode }) => borderStyles($colorMode)};
   border-radius: ${theme.stylesToDelete.borderRadius};
   box-shadow: ${theme.stylesToDelete.boxShadow};
 `;

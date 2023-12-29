@@ -8,7 +8,7 @@ export default function ProgressBar({ ...rest }: ProgressProps) {
 
   return (
     <ProgressStyled
-      colorMode={colorMode}
+      $colorMode={colorMode}
       colorScheme='gray'
       size={Size.SM}
       rounded={Size.MD}
@@ -17,6 +17,6 @@ export default function ProgressBar({ ...rest }: ProgressProps) {
   );
 }
 
-const ProgressStyled = styled(Progress)<{ colorMode: ColorMode }>`
-  background-color: ${({ colorMode }) => theme.colors[colorMode].progressBarBgColor};
+const ProgressStyled = styled(Progress)<{ $colorMode: ColorMode }>`
+  background-color: ${({ $colorMode }) => theme.colors[$colorMode].progressBarBgColor};
 `;

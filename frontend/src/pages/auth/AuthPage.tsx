@@ -43,7 +43,7 @@ export default function AuthPage() {
   const authPageData = authPageMapping[window.location.pathname as keyof typeof authPageMapping];
 
   return (
-    <Container colorMode={colorMode}>
+    <Container $colorMode={colorMode}>
       <Heading size={Size.LG}>{authPageData.heading}</Heading>
       <AuthForm formType={authPageData.authForm.formType} onSuccess={authPageData.authForm.onSuccess} />
       <Link href={authPageData.link.href}>{authPageData.link.text}</Link>
@@ -51,13 +51,13 @@ export default function AuthPage() {
   );
 }
 
-const Container = styled.div<{ colorMode: ColorMode }>`
+const Container = styled.div<{ $colorMode: ColorMode }>`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: ${({ colorMode }) => theme.colors[colorMode].background};
+  background-color: ${({ $colorMode }) => theme.colors[$colorMode].background};
   gap: 30px;
 
   ${mediaBreakpointUp(Breakpoint.TABLET)} {

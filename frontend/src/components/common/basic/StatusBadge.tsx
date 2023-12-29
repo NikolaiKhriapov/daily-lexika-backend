@@ -1,5 +1,5 @@
 import { Badge } from '@chakra-ui/react';
-import styled, { css } from 'styled-components/macro';
+import styled from 'styled-components/macro';
 import Text from './Text';
 import { Size } from '../../../utils/constants';
 
@@ -15,7 +15,7 @@ export default function StatusBadge(props: Props) {
   return (
     <Component>
       <StyledBadge
-        isInTopRight={isInTopRight || false}
+        $isInTopRight={isInTopRight || false}
         colorScheme={colorScheme}
       >
         <Text size={{ base: Size.XXS, md: Size.SM, xl: Size.SM }}>{text}</Text>
@@ -32,12 +32,8 @@ const Component = styled.div`
   flex-direction: column;
 `;
 
-const StyledBadge = styled(Badge)<{
-  isInTopRight: boolean
-}>`
-  ${(props) => props.isInTopRight && css`
-    position: absolute;
-    top: 10px;
-    right: 10px;
-  `};
+const StyledBadge = styled(Badge)<{ $isInTopRight: boolean }>`
+  position: ${({ $isInTopRight }) => $isInTopRight && 'absolute'};
+  top: ${({ $isInTopRight }) => $isInTopRight && '10px'};
+  right: ${({ $isInTopRight }) => $isInTopRight && '10px'};
 `;

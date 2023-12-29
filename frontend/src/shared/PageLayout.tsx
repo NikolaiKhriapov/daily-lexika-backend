@@ -16,7 +16,7 @@ export default function PageLayout(props: Props) {
   const { colorMode } = useColorMode();
 
   return (
-    <Container colorMode={colorMode}>
+    <Container $colorMode={colorMode}>
       <Navbar />
       <Content>{children}</Content>
       <Sidebar />
@@ -24,10 +24,10 @@ export default function PageLayout(props: Props) {
   );
 }
 
-const Container = styled.div<{ colorMode: ColorMode }>`
+const Container = styled.div<{ $colorMode: ColorMode }>`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
-  background-color: ${({ colorMode }) => theme.colors[colorMode].background};
+  background-color: ${({ $colorMode }) => theme.colors[$colorMode].background};
 `;

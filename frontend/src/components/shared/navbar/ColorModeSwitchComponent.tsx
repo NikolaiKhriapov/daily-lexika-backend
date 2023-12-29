@@ -14,15 +14,15 @@ export default function ColorModeSwitchComponent() {
       buttonText={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
       buttonType={ButtonType.BUTTON}
       onClick={toggleColorMode}
-      colorMode={colorMode}
+      $colorMode={colorMode}
     />
   );
 }
 
-const ButtonStyled = styled(Button)<{ colorMode: ColorMode }>`
-  background-color: ${({ colorMode }) => theme.colors[colorMode].bgColor} !important;
+const ButtonStyled = styled(Button)<{ $colorMode: ColorMode }>`
+  background-color: ${({ $colorMode }) => theme.colors[$colorMode].bgColor} !important;
 
   &:hover {
-    background-color: ${({ colorMode }) => theme.colors[colorMode].hoverBgColor} !important;
+    background-color: ${({ $colorMode }) => theme.colors[$colorMode].hoverBgColor} !important;
   }
 `;

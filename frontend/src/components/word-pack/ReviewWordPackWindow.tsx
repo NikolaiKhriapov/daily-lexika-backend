@@ -71,7 +71,7 @@ export default function ReviewWordPackWindow(props: Props) {
             </Description>
             <WordInfoContainer ref={containerRef} onScroll={handleScroll}>
               {allWordsForWordPackDTO?.slice(0, visibleWords).map((wordDTO) => (
-                <WordInfo colorMode={colorMode} key={wordDTO.id}>
+                <WordInfo $colorMode={colorMode} key={wordDTO.id}>
                   <CharacterAndPinyinAndTranslation>
                     <Text>{wordDTO.nameChineseSimplified}&nbsp;&nbsp;{wordDTO.pinyin}</Text>
                     <Text size={{ base: Size.SM, md: Size.MD, xl: Size.MD }}>{wordDTO.nameEnglish}</Text>
@@ -110,12 +110,12 @@ const WordInfoContainer = styled.div`
   overflow-y: auto;
 `;
 
-const WordInfo = styled.div<{ colorMode: ColorMode }>`
+const WordInfo = styled.div<{ $colorMode: ColorMode }>`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   padding: 10px;
-  border: ${({ colorMode }) => borderStyles(colorMode)};
+  border: ${({ $colorMode }) => borderStyles($colorMode)};
   border-radius: ${theme.stylesToDelete.borderRadius};
   max-width: 800px;
 `;

@@ -38,7 +38,7 @@ export default function StatsReviewWindow(props: Props) {
       header={reviewDTO.wordPackName}
       body={(
         <>
-          <PackProgress colorMode={colorMode}>
+          <PackProgress $colorMode={colorMode}>
             <WordPackNameAndInfoButton>
               <Text size={Size.XL} fontWeight={FontWeight.SEMIBOLD}>Pack Progress</Text>
               <ReviewWordPackWindow
@@ -63,7 +63,7 @@ export default function StatsReviewWindow(props: Props) {
             </StatsRow>
             <ProgressBar value={wordsKnownPercentage} />
           </PackProgress>
-          <ReviewStatus colorMode={colorMode}>
+          <ReviewStatus $colorMode={colorMode}>
             <Text size={Size.XL} fontWeight={FontWeight.SEMIBOLD}>Review Status</Text>
             <StatsContainer>
               <ProgressCircular value={wordsInReviewPercentage + wordsKnownPercentage} text='In Review' />
@@ -93,12 +93,12 @@ export default function StatsReviewWindow(props: Props) {
   );
 }
 
-const PackProgress = styled.div<{ colorMode: ColorMode }>`
+const PackProgress = styled.div<{ $colorMode: ColorMode }>`
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 10px 15px 15px;
-  border: ${({ colorMode }) => borderStyles(colorMode)};
+  border: ${({ $colorMode }) => borderStyles($colorMode)};
   border-radius: ${theme.stylesToDelete.borderRadius};
 `;
 
@@ -121,11 +121,11 @@ const Percentage = styled.div`
   gap: 4px;
 `;
 
-const ReviewStatus = styled.div<{ colorMode: ColorMode }>`
+const ReviewStatus = styled.div<{ $colorMode: ColorMode }>`
   display: flex;
   flex-direction: column;
   padding: 10px 15px 15px;
-  border: ${({ colorMode }) => borderStyles(colorMode)};
+  border: ${({ $colorMode }) => borderStyles($colorMode)};
   border-radius: ${theme.stylesToDelete.borderRadius};
 `;
 

@@ -69,10 +69,10 @@ export default function NotificationsComponent() {
     .filter((notificationDTO) => !notificationDTO.isRead);
 
   return (
-    <Notifications colorMode={colorMode}>
+    <Notifications $colorMode={colorMode}>
       <Menu>
         <MenuButton>
-          <ButtonContainer colorMode={colorMode}>
+          <ButtonContainer>
             <FiBell />{unreadNotifications.length > 0 && <RedDot />}
           </ButtonContainer>
         </MenuButton>
@@ -116,11 +116,8 @@ export default function NotificationsComponent() {
                 isOpen={isOpen}
                 onClose={onClose}
                 formattedDate={formattedDate}
-                formattedDateTime={formattedDateTime}
                 allNotificationsDTO={allNotificationsDTO}
                 handleNotificationClick={handleNotificationClick}
-                handleCloseNotificationModal={handleCloseNotificationModal}
-                selectedNotification={selectedNotification!}
               />
             )}
             {selectedNotification && (
@@ -137,18 +134,18 @@ export default function NotificationsComponent() {
   );
 }
 
-const Notifications = styled.div<{ colorMode: ColorMode }>`
+const Notifications = styled.div<{ $colorMode: ColorMode }>`
   border-radius: 6px;
   display: flex;
   justify-content: center;
   align-items: center;
 
   &:hover {
-    background-color: ${({ colorMode }) => theme.colors[colorMode].hoverBgColor} !important;
+    background-color: ${({ $colorMode }) => theme.colors[$colorMode].hoverBgColor} !important;
   }
 `;
 
-const ButtonContainer = styled.div<{ colorMode: ColorMode }>`
+const ButtonContainer = styled.div`
   width: 48px;
   height: 40px;
   display: flex;

@@ -18,9 +18,9 @@ export default function Sidebar() {
   ];
 
   return (
-    <Container colorMode={colorMode}>
+    <Container $colorMode={colorMode}>
       {sidebarItems.map((item) => (
-        <Item key={item.name} href={item.route} colorMode={colorMode}>
+        <Item key={item.name} href={item.route} $colorMode={colorMode}>
           <Icon as={item.icon} />
           <Text size={Size.MD} display={{ base: 'none', md: 'unset' }}>{item.name}</Text>
         </Item>
@@ -29,7 +29,7 @@ export default function Sidebar() {
   );
 }
 
-const Container = styled.div<{ colorMode: ColorMode }>`
+const Container = styled.div<{ $colorMode: ColorMode }>`
   position: fixed;
   bottom: 0;
   width: 100%;
@@ -37,7 +37,7 @@ const Container = styled.div<{ colorMode: ColorMode }>`
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-  background-color: ${({ colorMode }) => theme.colors[colorMode].bgColor};
+  background-color: ${({ $colorMode }) => theme.colors[$colorMode].bgColor};
 
   ${mediaBreakpointUp(Breakpoint.TABLET)} {
     height: 70px;
@@ -50,11 +50,11 @@ const Container = styled.div<{ colorMode: ColorMode }>`
     flex-direction: column;
     align-items: normal;
     justify-content: normal;
-    background-color: ${({ colorMode }) => theme.colors[colorMode].background};
+    background-color: ${({ $colorMode }) => theme.colors[$colorMode].background};
   }
 `;
 
-const Item = styled.a<{ colorMode: ColorMode }>`
+const Item = styled.a<{ $colorMode: ColorMode }>`
   display: flex;
   flex-direction: row;
   gap: 20px;
@@ -72,8 +72,8 @@ const Item = styled.a<{ colorMode: ColorMode }>`
     border-radius: ${theme.stylesToDelete.borderRadius};
 
     &:hover {
-      background-color: ${({ colorMode }) => theme.colors[colorMode].bgColor};
-      border: ${({ colorMode }) => borderStyles(colorMode)};
+      background-color: ${({ $colorMode }) => theme.colors[$colorMode].bgColor};
+      border: ${({ $colorMode }) => borderStyles($colorMode)};
     }
   }
 `;

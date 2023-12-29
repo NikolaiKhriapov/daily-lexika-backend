@@ -11,20 +11,20 @@ export default function SignAdded() {
   const { colorMode } = useColorMode();
 
   return (
-    <Component colorMode={colorMode}>
+    <Component $colorMode={colorMode}>
       <FaCheck />
       <Text size={Size.SM}>&nbsp;&nbsp;Added</Text>
     </Component>
   );
 }
 
-const Component = styled.div<{ colorMode: ColorMode }>`
+const Component = styled.div<{ $colorMode: ColorMode }>`
   width: 90px;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   padding: 6px;
-  border: ${({ colorMode }) => borderStyles(colorMode)};
+  border: ${({ $colorMode }) => borderStyles($colorMode)};
   border-radius: ${theme.stylesToDelete.borderRadius};
 `;

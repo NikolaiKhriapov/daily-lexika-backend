@@ -79,7 +79,7 @@ export default function ReviewCard(props: Props) {
   const totalReviewWords = wordsForReviewDTO.filter((wordDTO) => wordDTO.status.toString() === Status[Status.IN_REVIEW] || wordDTO.status.toString() === Status[Status.KNOWN]).length;
 
   return (
-    <Container colorMode={colorMode}>
+    <Container $colorMode={colorMode}>
       <CompletedIconAndCloseButtonContainer>
         <CompletedIconContainer>
           {isDateLastCompletedToday() && <CompletedIcon />}
@@ -130,16 +130,16 @@ export default function ReviewCard(props: Props) {
   );
 }
 
-const Container = styled.div<{ colorMode: ColorMode }>`
+const Container = styled.div<{ $colorMode: ColorMode }>`
   height: 280px;
   width: calc(280px / 1.3);
   padding: 0 25px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border: ${({ colorMode }) => borderStyles(colorMode)};
+  border: ${({ $colorMode }) => borderStyles($colorMode)};
   border-radius: ${theme.stylesToDelete.borderRadius};
-  background-color: ${({ colorMode }) => theme.colors[colorMode].bgColor};
+  background-color: ${({ $colorMode }) => theme.colors[$colorMode].bgColor};
 `;
 
 const CompletedIconAndCloseButtonContainer = styled.div`

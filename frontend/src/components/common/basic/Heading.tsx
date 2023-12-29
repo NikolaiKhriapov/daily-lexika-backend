@@ -8,7 +8,7 @@ interface Props extends HeadingProps {
 
 export default function Heading({ children, isCentered, ...rest }: Props) {
   return (
-    <ChakraHeadingStyled isCentered={isCentered} {...rest}>
+    <ChakraHeadingStyled $isCentered={isCentered} {...rest}>
       {children}
     </ChakraHeadingStyled>
   );
@@ -18,6 +18,6 @@ Heading.defaultProps = {
   isCentered: false,
 };
 
-const ChakraHeadingStyled = styled(ChakraHeading)<{ isCentered: boolean }>`
-  text-align: ${({ isCentered }) => isCentered && 'center'};
+const ChakraHeadingStyled = styled(ChakraHeading)<{ $isCentered: boolean }>`
+  text-align: ${({ $isCentered }) => $isCentered && 'center'};
 `;

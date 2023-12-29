@@ -42,7 +42,7 @@ export default function WordPackCard(props: Props) {
   }, []);
 
   return (
-    <Container colorMode={colorMode}>
+    <Container $colorMode={colorMode}>
       <InfoButtonContainer>
         <InfoButton onClick={onOpenPreviewButton} />
         <ReviewWordPackWindow
@@ -87,16 +87,16 @@ export default function WordPackCard(props: Props) {
   );
 }
 
-const Container = styled.div<{ colorMode: ColorMode }>`
+const Container = styled.div<{ $colorMode: ColorMode }>`
   height: 280px;
   width: calc(280px / 1.3);
   padding: 0 25px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border: ${({ colorMode }) => borderStyles(colorMode)};
+  border: ${({ $colorMode }) => borderStyles($colorMode)};
   border-radius: ${theme.stylesToDelete.borderRadius};
-  background-color: ${({ colorMode }) => theme.colors[colorMode].bgColor};
+  background-color: ${({ $colorMode }) => theme.colors[$colorMode].bgColor};
 `;
 
 const InfoButtonContainer = styled.div`

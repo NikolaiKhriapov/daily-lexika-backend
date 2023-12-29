@@ -32,7 +32,7 @@ export default function AlertDialog(props: Props) {
       isCentered
     >
       <AlertDialogOverlay>
-        <AlertDialogContentStyled colorMode={colorMode}>
+        <AlertDialogContentStyled $colorMode={colorMode}>
           <AlertDialogHeader>{header}</AlertDialogHeader>
           <AlertDialogBody>{body}</AlertDialogBody>
           <AlertDialogFooterStyled>
@@ -59,10 +59,10 @@ const AlertDialogFooterStyled = styled(AlertDialogFooter)`
   gap: 20px;
 `;
 
-const AlertDialogContentStyled = styled(AlertDialogContent)<{ colorMode: ColorMode }>`
-  border: ${({ colorMode }) => borderStyles(colorMode)};
+const AlertDialogContentStyled = styled(AlertDialogContent)<{ $colorMode: ColorMode }>`
+  border: ${({ $colorMode }) => borderStyles($colorMode)};
   border-radius: ${theme.stylesToDelete.borderRadius};
-  background-color: ${({ colorMode }) => theme.colors[colorMode].bgColor} !important;
+  background-color: ${({ $colorMode }) => theme.colors[$colorMode].bgColor} !important;
   width: fit-content !important;
   max-width: 90% !important;
 `;
