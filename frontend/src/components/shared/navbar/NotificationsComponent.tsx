@@ -95,13 +95,6 @@ export default function NotificationsComponent() {
                     {formattedDate(notificationDTO.sentAt)}
                   </Text>
                 </MenuItemStyled>
-                {selectedNotification && (
-                  <NotificationWindow
-                    formattedDateTime={formattedDateTime}
-                    handleCloseNotificationModal={handleCloseNotificationModal}
-                    selectedNotification={selectedNotification}
-                  />
-                )}
                 {index < allNotificationsDTO.length - 1 && <MenuDivider />}
               </NotificationContainer>
             )))
@@ -128,6 +121,13 @@ export default function NotificationsComponent() {
                 handleNotificationClick={handleNotificationClick}
                 handleCloseNotificationModal={handleCloseNotificationModal}
                 selectedNotification={selectedNotification!}
+              />
+            )}
+            {selectedNotification && (
+              <NotificationWindow
+                formattedDateTime={formattedDateTime}
+                handleCloseNotificationModal={handleCloseNotificationModal}
+                selectedNotification={selectedNotification}
               />
             )}
           </ButtonsContainer>
