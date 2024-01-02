@@ -26,22 +26,8 @@ public class DefaultExceptionHandler {
         return new ResponseEntity<>(apiErrorDTO, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<ApiErrorDTO> handleException(UserAlreadyExistsException e, HttpServletRequest request) {
-        ApiErrorDTO apiErrorDTO = new ApiErrorDTO(
-                request.getRequestURI(),
-                HttpStatus.CONFLICT.value(),
-                HttpStatus.CONFLICT,
-                LocalDateTime.now(),
-                e.getMessage(),
-                Arrays.toString(e.getStackTrace())
-        );
-
-        return new ResponseEntity<>(apiErrorDTO, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(ReviewAlreadyExistsException.class)
-    public ResponseEntity<ApiErrorDTO> handleException(ReviewAlreadyExistsException e, HttpServletRequest request) {
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorDTO> handleException(ResourceAlreadyExistsException e, HttpServletRequest request) {
         ApiErrorDTO apiErrorDTO = new ApiErrorDTO(
                 request.getRequestURI(),
                 HttpStatus.CONFLICT.value(),

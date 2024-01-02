@@ -1,10 +1,8 @@
-package my.project.controllers.user;
+package my.project.controllers.flashcards;
 
 import lombok.RequiredArgsConstructor;
 import my.project.models.dto.ResponseDTO;
-import my.project.models.dto.user.UserDTO;
-import my.project.services.user.AuthenticationService;
-import my.project.services.user.UserAccountService;
+import my.project.services.flashcards.WordPackService;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,50 +13,49 @@ import java.util.Locale;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/v1/user/account")
 @RequiredArgsConstructor
-public class UserAccountController {
+@RequestMapping("/api/v1/flashcards/word-packs")
+public class WordPackController {
 
-    private final UserAccountService userAccountService;
-    private final AuthenticationService authenticationService;
+    private final WordPackService wordPackService;
     private final MessageSource messageSource;
 
     @GetMapping
-    public ResponseEntity<ResponseDTO> showUserAccount() {
+    public ResponseEntity<ResponseDTO> getAllWordPacks() {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResponseDTO.builder()
                         .timeStamp(LocalDateTime.now())
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage(
-                                "response.userAccount.showAccount", null, Locale.getDefault()))
-                        .data(Map.of("userDTO", authenticationService.getAuthenticatedUserDTO()))
+                                "response.wordPack.getAllWordPacks", null, Locale.getDefault()))
+                        .data(Map.of("allWordPacksDTO", wordPackService.getAllWordPacks()))
                         .build());
     }
 
-    @PatchMapping("/info")
-    public ResponseEntity<ResponseDTO> updateUserInfo(@RequestBody UserDTO userDTO) {
-        userAccountService.updateUserInfo(userDTO);
+    @GetMapping("/{wordPackName}")
+    public ResponseEntity<ResponseDTO> getWordPack(@PathVariable("wordPackName") String wordPackName) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResponseDTO.builder()
                         .timeStamp(LocalDateTime.now())
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage(
-                                "response.userAccount.updateUserInfo", null, Locale.getDefault()))
+                                "response.wordPack.getAllWordPacks", null, Locale.getDefault()))
+                        .data(Map.of("wordPackDTO", wordPackService.getWordPackDTOByName(wordPackName)))
                         .build());
     }
 
-    @DeleteMapping
-    public ResponseEntity<ResponseDTO> deleteAccount() {
-        userAccountService.deleteAccount();
+    @GetMapping("/{wordPackName}/words")
+    public ResponseEntity<ResponseDTO> getAllWordsForWordPack(@PathVariable("wordPackName") String wordPackName) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResponseDTO.builder()
                         .timeStamp(LocalDateTime.now())
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage(
-                                "response.userAccount.deleteAccount", null, Locale.getDefault()))
+                                "response.wordPack.getAllWordsForWordPacks", null, Locale.getDefault()))
+                        .data(Map.of("allWordsForWordPackDTO", wordPackService.getAllWordsForWordPack(wordPackName)))
                         .build());
     }
 }
