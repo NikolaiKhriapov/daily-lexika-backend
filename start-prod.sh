@@ -20,7 +20,7 @@ then
     exit 1
 fi
 
-nohup ./mvnw spring-boot:run -D spring-boot.run.profiles=env -D server.port="$APPLICATION_PORT" >> "$OUTPUT_PATH" 2>&1 &
+nohup ./mvnw spring-boot:run -D spring-boot.run.profiles=prod -D server.port="$APPLICATION_PORT" >> "$OUTPUT_PATH" 2>&1 &
 
 if [ "$?" -eq 0 ];
 then
