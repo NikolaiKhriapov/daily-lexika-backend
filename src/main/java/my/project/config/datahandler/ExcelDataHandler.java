@@ -1,11 +1,12 @@
 package my.project.config.datahandler;
 
 import lombok.RequiredArgsConstructor;
-import my.project.models.entity.chineseflashcards.WordData;
-import my.project.repositories.chineseflashcards.WordDataRepository;
-import my.project.models.entity.chineseflashcards.Category;
-import my.project.models.entity.chineseflashcards.WordPack;
-import my.project.repositories.chineseflashcards.WordPackRepository;
+import my.project.models.entity.flashcards.WordData;
+import my.project.models.entity.enumeration.Platform;
+import my.project.repositories.flashcards.WordDataRepository;
+import my.project.models.entity.enumeration.Category;
+import my.project.models.entity.flashcards.WordPack;
+import my.project.repositories.flashcards.WordPackRepository;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -26,21 +27,21 @@ public class ExcelDataHandler {
     private final WordPackRepository wordPackRepository;
     private final WordDataRepository wordDataRepository;
 
-    public void importWordPacks(String file, String fileSheet) {
-        List<WordPack> listOfWordPacks = getWordPacksFromExcel(file, fileSheet);
+    public void importWordPacks(String file, String fileSheet, Platform platform) {
+        List<WordPack> listOfWordPacks = getWordPacksFromExcel(file, fileSheet, platform);
         saveWordPacksToDatabase(listOfWordPacks);
         System.out.println("ExcelDataHandler Report: " + fileSheet + " updated!");
     }
 
-    public void importWords(String file, String[] fileSheets) {
+    public void importWords(String file, String[] fileSheets, Platform platform) {
         for (String fileSheet : fileSheets) {
-            List<WordData> listOfWordData = getWordsFromExcel(file, fileSheet);
+            List<WordData> listOfWordData = getWordsFromExcel(file, fileSheet, platform);
             saveWordsToDatabase(listOfWordData);
             System.out.println("ExcelDataHandler Report: " + fileSheet + " updated!");
         }
     }
 
-    public List<WordPack> getWordPacksFromExcel(String file, String fileSheet) {
+    private List<WordPack> getWordPacksFromExcel(String file, String fileSheet, Platform platform) {
         try (FileInputStream is = new FileInputStream(file)) {
             Workbook workbook = new XSSFWorkbook(is);
             Sheet sheet = workbook.getSheet(fileSheet);
@@ -71,6 +72,7 @@ public class ExcelDataHandler {
                     }
                     cellIdx++;
                 }
+                wordPack.setPlatform(platform);
 
                 listOfWordPacks.add(wordPack);
             }
@@ -81,7 +83,7 @@ public class ExcelDataHandler {
         }
     }
 
-    public List<WordData> getWordsFromExcel(String file, String fileSheet) {
+    private List<WordData> getWordsFromExcel(String file, String fileSheet, Platform platform) {
         try (FileInputStream is = new FileInputStream(file)) {
             Workbook workbook = new XSSFWorkbook(is);
             Sheet sheet = workbook.getSheet(fileSheet);
@@ -105,29 +107,50 @@ public class ExcelDataHandler {
                 int cellIdx = 0;
                 while (cellsInRow.hasNext()) {
                     Cell currentCell = cellsInRow.next();
-                    switch (cellIdx) {
-                        case 0 -> wordData.setId((long) currentCell.getNumericCellValue());
-                        case 1 -> wordData.setNameChineseSimplified(currentCell.getStringCellValue());
-                        case 2 -> wordData.setNameChineseTraditional(currentCell.getStringCellValue());
-                        case 3 -> wordData.setPinyin(currentCell.getStringCellValue());
-                        case 4 -> wordData.setNameEnglish(currentCell.getStringCellValue());
-                        case 5 -> wordData.setNameRussian(currentCell.getStringCellValue());
-                        case 6 -> {
-                            List<WordPack> listOfWordPacks = new ArrayList<>();
-                            WordPack wordPack = wordPackRepository.findById(currentCell.getStringCellValue())
-                                    .orElseThrow(() -> new IllegalStateException("NOT FOUND"));
-                            listOfWordPacks.add(wordPack);
-                            wordData.setListOfWordPacks(listOfWordPacks);
-                        }
-                        default -> {
+
+                    if (platform == Platform.CHINESE) {
+                        switch (cellIdx) {
+                            case 0 -> wordData.setId((long) currentCell.getNumericCellValue());
+                            case 1 -> wordData.setNameChineseSimplified(currentCell.getStringCellValue());
+                            case 2 -> wordData.setNameChineseTraditional(currentCell.getStringCellValue());
+                            case 3 -> wordData.setPinyin(currentCell.getStringCellValue());
+                            case 4 -> wordData.setNameEnglish(currentCell.getStringCellValue());
+                            case 5 -> wordData.setNameRussian(currentCell.getStringCellValue());
+                            case 6 -> {
+                                List<WordPack> listOfWordPacks = new ArrayList<>();
+                                WordPack wordPack = wordPackRepository.findById(currentCell.getStringCellValue())
+                                        .orElseThrow(() -> new IllegalStateException("NOT FOUND"));
+                                listOfWordPacks.add(wordPack);
+                                wordData.setListOfWordPacks(listOfWordPacks);
+                            }
+                            default -> {
+                            }
                         }
                     }
+                    if (platform == Platform.ENGLISH) {
+                        switch (cellIdx) {
+                            case 0 -> wordData.setId((long) currentCell.getNumericCellValue());
+                            case 1 -> wordData.setNameEnglish(currentCell.getStringCellValue());
+                            case 2 -> wordData.setNameRussian(currentCell.getStringCellValue());
+                            case 3 -> {
+                                List<WordPack> listOfWordPacks = new ArrayList<>();
+                                WordPack wordPack = wordPackRepository.findById(currentCell.getStringCellValue())
+                                        .orElseThrow(() -> new IllegalStateException("NOT FOUND"));
+                                listOfWordPacks.add(wordPack);
+                                wordData.setListOfWordPacks(listOfWordPacks);
+                            }
+                            default -> {
+                            }
+                        }
+                    }
+
                     cellIdx++;
                 }
 
                 if (wordData.getNameEnglish().length() > 250) {
                     wordData.setNameEnglish(wordData.getNameEnglish().substring(0, 250) + "...");
                 }
+                wordData.setPlatform(platform);
 
                 listOfWordData.add(wordData);
             }
@@ -138,7 +161,7 @@ public class ExcelDataHandler {
         }
     }
 
-    public void saveWordPacksToDatabase(List<WordPack> listOfWordPacks) {
+    private void saveWordPacksToDatabase(List<WordPack> listOfWordPacks) {
         List<WordPack> allWordPacks = wordPackRepository.findAll();
         List<String> allWordPackNames = allWordPacks.stream()
                 .map(WordPack::getName)
@@ -153,13 +176,14 @@ public class ExcelDataHandler {
                         .orElseThrow(() -> new IllegalStateException("NOT FOUND"));
                 wordPackToBeUpdated.setDescription(wordPack.getDescription());
                 wordPackToBeUpdated.setCategory(wordPack.getCategory());
+                wordPackToBeUpdated.setPlatform(wordPack.getPlatform());
                 wordsPacksToBeSavedOrUpdated.add(wordPackToBeUpdated);
             }
         }
         wordPackRepository.saveAll(wordsPacksToBeSavedOrUpdated);
     }
 
-    public void saveWordsToDatabase(List<WordData> listOfWordData) {
+    private void saveWordsToDatabase(List<WordData> listOfWordData) {
         List<WordData> allWordData = wordDataRepository.findAll();
         List<Long> allWordsId = allWordData.stream().map(WordData::getId).toList();
 
@@ -177,62 +201,12 @@ public class ExcelDataHandler {
                 wordDataToBeUpdated.setNameEnglish(wordData.getNameEnglish());
                 wordDataToBeUpdated.setNameRussian(wordData.getNameRussian());
                 wordDataToBeUpdated.setListOfWordPacks(wordData.getListOfWordPacks());
+                wordDataToBeUpdated.setListOfWordPacks(wordData.getListOfWordPacks());
+                wordDataToBeUpdated.setPlatform(wordData.getPlatform());
                 wordsToBeUpdated.add(wordDataToBeUpdated);
             }
         }
         wordDataRepository.saveAll(wordsToBeSaved);
         wordDataRepository.saveAll(wordsToBeUpdated);
     }
-
-//    public void importWordsFromDict(String file, String fileSheet) {
-//        List<WordData> listOfWords = getWordsFromDict(file, fileSheet);
-//        saveWordsToDatabase(listOfWords);
-//        System.out.println("ExcelDataHandler Report: " + fileSheet + " updated!");
-//    }
-//
-//    public List<WordData> getWordsFromDict(String file, String fileSheet) {
-//        try (FileInputStream is = new FileInputStream(file)) {
-//            Workbook workbook = new XSSFWorkbook(is);
-//            Sheet sheet = workbook.getSheet(fileSheet);
-//            Iterator<Row> rows = sheet.iterator();
-//
-//            List<WordData> listOfWords = new ArrayList<>();
-//
-//            int rowNumber = 0;
-//            while (rows.hasNext()) {
-//                Row currentRow = rows.next();
-//
-//                Iterator<Cell> cellsInRow = currentRow.iterator();
-//
-//                WordData word = new WordData();
-//
-//                int cellIdx = 0;
-//                while (cellsInRow.hasNext()) {
-//                    Cell currentCell = cellsInRow.next();
-//                    word.setId(50000000L + currentRow.getRowNum());
-//                    word.setNameRussian(" ");
-//                    switch (cellIdx) {
-//                        case 0 -> word.setNameChineseTraditional(currentCell.getStringCellValue());
-//                        case 1 -> word.setNameChineseSimplified(currentCell.getStringCellValue());
-//                        case 2 -> word.setPinyin(currentCell.getStringCellValue());
-//                        case 3 -> word.setNameEnglish(currentCell.getStringCellValue());
-//                    }
-//                    cellIdx++;
-//                }
-//
-//                if (word.getNameChineseSimplified().length() == 1) {
-//
-//                    if (word.getNameEnglish().length() > 250) {
-//                        word.setNameEnglish(word.getNameEnglish().substring(0, 250) + "...");
-//                    }
-//
-//                    listOfWords.add(word);
-//                }
-//            }
-//            workbook.close();
-//            return listOfWords;
-//        } catch (IOException e) {
-//            throw new RuntimeException("Failed to parse Excel file: " + e.getMessage());
-//        }
-//    }
 }
