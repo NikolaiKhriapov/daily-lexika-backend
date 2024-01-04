@@ -1,11 +1,10 @@
 package my.project.services.flashcards;
 
 import lombok.RequiredArgsConstructor;
-import my.project.models.dto.flashcards.WordStatisticsDTO;
 import my.project.models.entity.enumeration.Status;
 import my.project.models.entity.flashcards.Word;
 import my.project.repositories.flashcards.WordRepository;
-import my.project.services.user.AuthenticationService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -16,19 +15,9 @@ import java.util.List;
 public class WordService {
 
     private final WordRepository wordRepository;
-    private final AuthenticationService authenticationService;
 
-    public WordStatisticsDTO getWordStatistics() {
-        Long userId = authenticationService.getAuthenticatedUser().getId();
-        return new WordStatisticsDTO(wordRepository.countByUserIdAndStatusEquals(userId, Status.KNOWN));
-    }
-
-    public List<Word> saveAll(List<Word> words) {
-        return wordRepository.saveAll(words);
-    }
-
-    public List<Word> findByUserIdAndWordDataIdIn(Long userId, List<Long> wordDataIds) {
-        return wordRepository.findByUserIdAndWordDataIdIn(userId, wordDataIds);
+    public Page<Word> findByUserIdAndWordDataIdIn(Long userId, List<Long> wordDataIds, Pageable pageable) {
+        return wordRepository.findByUserIdAndWordDataIdIn(userId, wordDataIds, pageable);
     }
 
     public List<Word> findByUserIdAndWordDataIdInAndStatusIn(Long userId, List<Long> wordDataIds, List<Status> status, Pageable pageable) {

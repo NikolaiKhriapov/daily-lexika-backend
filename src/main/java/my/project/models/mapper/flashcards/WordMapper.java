@@ -3,7 +3,6 @@ package my.project.models.mapper.flashcards;
 import lombok.AllArgsConstructor;
 import my.project.models.dto.flashcards.WordDTO;
 import my.project.models.entity.flashcards.*;
-import my.project.repositories.flashcards.ReviewRepository;
 import my.project.services.flashcards.WordDataService;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +14,10 @@ import java.util.stream.Collectors;
 public class WordMapper implements Mapper<Word, WordDTO> {
 
     private final WordDataService wordDataService;
-    private final ReviewRepository reviewRepository;
 
     @Override
     public WordDTO toDTO(Word entity) {
         WordData wordData = wordDataService.getWordData(entity.getWordDataId());
-        List<Long> listOfReviewIds = reviewRepository.findAllReviewIdsByWord(entity);
 
         return new WordDTO(
                 entity.getId(),
@@ -34,7 +31,6 @@ public class WordMapper implements Mapper<Word, WordDTO> {
                 entity.getTotalStreak(),
                 entity.getOccurrence(),
                 entity.getDateOfLastOccurrence(),
-                listOfReviewIds,
                 wordData.getListOfChineseCharacters().stream()
                         .map(ChineseCharacter::getId)
                         .collect(Collectors.toList()),
@@ -57,7 +53,6 @@ public class WordMapper implements Mapper<Word, WordDTO> {
                 entity.getStatus(),
                 null,
                 entity.getTotalStreak(),
-                null,
                 null,
                 null,
                 null,

@@ -12,17 +12,20 @@ import my.project.models.dto.flashcards.WordDTO;
 import my.project.models.mapper.flashcards.WordMapper;
 import my.project.models.entity.flashcards.*;
 import my.project.repositories.flashcards.ReviewRepository;
+import my.project.repositories.user.UserRepository;
 import my.project.services.user.AuthenticationService;
 import my.project.services.user.RoleService;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
 
+import static java.time.temporal.ChronoUnit.DAYS;
 import static my.project.models.entity.enumeration.Status.*;
 
 @Service
@@ -30,6 +33,7 @@ import static my.project.models.entity.enumeration.Status.*;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
     private final ReviewMapper reviewMapper;
     private final WordMapper wordMapper;
     private final WordService wordService;
@@ -94,19 +98,19 @@ public class ReviewService {
     }
 
     @Transactional
-    public Map<String, Object> processReviewAction(Long reviewId, String answer) {
+    public Map<String, Object> processReviewAction(Long reviewId, Boolean isCorrect) {
         Review review = getReview(reviewId);
-        if (answer != null) {
+        if (isCorrect != null) {
             List<Word> listOfWords = new ArrayList<>(review.getListOfWords());
 
             Word thisWord = listOfWords.get(0);
             thisWord.setOccurrence(thisWord.getOccurrence() + 1);
 
-            if (answer.equals("yes")) {
-                updateWordForYesAnswer(thisWord, listOfWords);
+            if (isCorrect) {
+                updateWordForCorrectAnswer(thisWord, listOfWords);
             }
-            if (answer.equals("no")) {
-                updateWordForNoAnswer(thisWord, listOfWords);
+            if (!isCorrect) {
+                updateWordForIncorrectAnswer(thisWord, listOfWords);
             }
 
             review.setListOfWords(listOfWords);
@@ -116,7 +120,9 @@ public class ReviewService {
         WordDTO reviewWordDTO = showOneReviewWord(review);
 
         Map<String, Object> map = null;
-        if (reviewWordDTO != null) {
+        if (reviewWordDTO == null) {
+            updateUserStreak();
+        } else {
             map = new HashMap<>();
             map.put("reviewWordDTO", reviewWordDTO);
             map.put("reviewUpdatedSize", review.getListOfWords().size());
@@ -125,21 +131,19 @@ public class ReviewService {
         return map;
     }
 
-    public List<WordDTO> getAllWordsForReview(Long reviewId) {
-        Review review = getReview(reviewId);
-        return wordMapper.toDTOShortList(review.getListOfWords());
-    }
-
     public ReviewStatisticsDTO getReviewStatistics(Long reviewId) {
         Long userId = authenticationService.getAuthenticatedUser().getId();
 
-        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPack(getReview(reviewId).getWordPack());
+        Review review = getReview(reviewId);
+        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPack(review.getWordPack());
 
         Integer newWords = wordService.countByUserIdAndWordDataIdInAndStatusEquals(userId, wordDataIds, NEW);
         Integer reviewWords = wordService.countByUserIdAndWordDataIdInAndStatusEquals(userId, wordDataIds, IN_REVIEW);
         Integer knownWords = wordService.countByUserIdAndWordDataIdInAndStatusEquals(userId, wordDataIds, KNOWN);
 
         return new ReviewStatisticsDTO(
+                review.getId(),
+                review.getWordPack().getName(),
                 newWords,
                 reviewWords,
                 knownWords,
@@ -209,7 +213,7 @@ public class ReviewService {
     private WordDTO showOneReviewWord(Review review) {
         if (!review.getListOfWords().isEmpty()) {
             Word word = review.getListOfWords().get(0);
-            return wordMapper.toDTO(word);
+            return wordMapper.toDTOShort(word);
         }
         review.setDateLastCompleted(LocalDate.now());
         return null;
@@ -228,7 +232,7 @@ public class ReviewService {
         );
     }
 
-    private void updateWordForYesAnswer(Word thisWord, List<Word> listOfWords) {
+    private void updateWordForCorrectAnswer(Word thisWord, List<Word> listOfWords) {
         if (thisWord.getStatus().equals(NEW) || thisWord.getStatus().equals(KNOWN)) {
             if (thisWord.getStatus().equals(NEW)) {
                 thisWord.setTotalStreak(5);
@@ -268,12 +272,45 @@ public class ReviewService {
         }
     }
 
-    private void updateWordForNoAnswer(Word thisWord, List<Word> listOfWords) {
+    private void updateWordForIncorrectAnswer(Word thisWord, List<Word> listOfWords) {
         thisWord.setStatus(IN_REVIEW);
         thisWord.setTotalStreak(0);
         thisWord.setCurrentStreak(0);
 
         listOfWords.remove(0);
         listOfWords.add(Math.min(listOfWords.size(), 3), thisWord);
+    }
+
+    @Transactional
+    public void updateUserStreak() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long daysFromLastStreak = DAYS.between(user.getDateOfLastStreak(), LocalDate.now());
+        Long differenceBetweenRecordStreakAndCurrentStreak = user.getRecordStreak() - user.getCurrentStreak();
+
+        updateCurrentStreak(user, daysFromLastStreak);
+        updateRecordStreak(user, differenceBetweenRecordStreakAndCurrentStreak, daysFromLastStreak);
+        user.setDateOfLastStreak(LocalDate.now());
+
+        userRepository.save(user);
+    }
+
+    private void updateCurrentStreak(User user, Long daysFromLastStreak) {
+        if (daysFromLastStreak == 1) {
+            user.setCurrentStreak(user.getCurrentStreak() + 1);
+        } else if (daysFromLastStreak > 1) {
+            user.setCurrentStreak(1L);
+        } else if (daysFromLastStreak < 0) {
+            throw new RuntimeException(messageSource.getMessage(
+                    "exception.statistics.updateUserStreak.erroneousCurrentStreak", null, Locale.getDefault()));
+        }
+    }
+
+    private void updateRecordStreak(User user, Long differenceBetweenRecordStreakAndCurrentStreak, Long daysFromLastStreak) {
+        if (differenceBetweenRecordStreakAndCurrentStreak == 0 && daysFromLastStreak > 0) {
+            user.setRecordStreak(user.getRecordStreak() + 1);
+        } else if (differenceBetweenRecordStreakAndCurrentStreak < 0) {
+            throw new RuntimeException(messageSource.getMessage(
+                    "exception.statistics.updateUserStreak.erroneousCurrentStreak", null, Locale.getDefault()));
+        }
     }
 }

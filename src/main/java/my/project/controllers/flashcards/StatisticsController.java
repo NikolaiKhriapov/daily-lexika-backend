@@ -2,7 +2,7 @@ package my.project.controllers.flashcards;
 
 import lombok.RequiredArgsConstructor;
 import my.project.models.dto.ResponseDTO;
-import my.project.services.flashcards.WordService;
+import my.project.services.flashcards.StatisticsService;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,22 +14,22 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/flashcards/words")
-public class WordController {
+@RequestMapping("api/v1/statistics")
+public class StatisticsController {
 
-    private final WordService wordService;
+    private final StatisticsService statisticsService;
     private final MessageSource messageSource;
 
-    @GetMapping("/statistics")
-    public ResponseEntity<ResponseDTO> getWordStatistics() {
+    @GetMapping
+    public ResponseEntity<ResponseDTO> getStatistics() {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResponseDTO.builder()
                         .timeStamp(LocalDateTime.now())
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage(
-                                "response.word.getWordStatistics", null, Locale.getDefault()))
-                        .data(Map.of("wordStatisticsDTO", wordService.getWordStatistics()))
+                                "response.statistics.getStatistics", null, Locale.getDefault()))
+                        .data(Map.of("statisticsDTO", statisticsService.getStatistics()))
                         .build());
     }
 }
