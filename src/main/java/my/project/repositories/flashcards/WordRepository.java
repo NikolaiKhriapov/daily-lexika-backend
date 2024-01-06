@@ -14,7 +14,7 @@ import java.util.List;
 @Repository
 public interface WordRepository extends JpaRepository<Word, Long> {
 
-    List<Word> findByUserIdAndWordDataIdInAndStatusIn(Long userId, List<Long> wordDataIds, List<Status> status, Pageable pageable);
+    List<Word> findByUserIdAndWordDataIdIn(Long userId, List<Long> wordDataIds);
 
     @Query("SELECT w FROM words w WHERE w.userId = :userId AND w.wordDataId IN :wordDataIds " +
             "ORDER BY CASE w.status " +
@@ -23,6 +23,8 @@ public interface WordRepository extends JpaRepository<Word, Long> {
             "WHEN my.project.models.entity.enumeration.Status.NEW THEN 3 " +
             "ELSE 4 END ASC")
     Page<Word> findByUserIdAndWordDataIdIn(Long userId, List<Long> wordDataIds, Pageable pageable);
+
+    List<Word> findByUserIdAndWordDataIdInAndStatusIn(Long userId, List<Long> wordDataIds, List<Status> status, Pageable pageable);
 
     @Query("SELECT COUNT(w) FROM words w WHERE w.userId = :userId AND w.status = :status")
     Integer countByUserIdAndStatusEquals(@Param("userId") Long userId, @Param("status") Status status);

@@ -172,6 +172,8 @@ public class ReviewService {
     public List<Word> generateListOfWordsForReview(Long userId, WordPack wordPack, ReviewDTO reviewDTO) {
         List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPack(wordPack);
 
+        wordService.createOrUpdateWordsForUser(userId, wordDataIds);
+
         Pageable pageableNew = PageRequest.of(0, reviewDTO.maxNewWordsPerDay());
         List<Word> newWords = wordService.findByUserIdAndWordDataIdInAndStatusIn(
                 userId,
@@ -221,6 +223,7 @@ public class ReviewService {
 
     private Review generateReview(ReviewDTO reviewDTO, Long userId) {
         WordPack wordPack = wordPackService.getWordPackByName(reviewDTO.wordPackName());
+
         List<Word> listOfWords = generateListOfWordsForReview(userId, wordPack, reviewDTO);
 
         return new Review(
