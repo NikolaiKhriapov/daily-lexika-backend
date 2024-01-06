@@ -16,6 +16,18 @@ public class WordService {
 
     private final WordRepository wordRepository;
 
+    public void createOrUpdateWordsForUser(Long userId, List<Long> wordDataIds) {
+        List<Word> existingWords = wordRepository.findByUserIdAndWordDataIdIn(userId, wordDataIds);
+        List<Word> wordsToBeSaved = wordDataIds.stream()
+                .filter(wordDataId -> existingWords.stream()
+                        .noneMatch(word -> word.getWordDataId().equals(wordDataId))
+                )
+                .map(wordDataId -> new Word(userId, wordDataId)) // TODO::: change to mapper
+                .toList();
+
+        wordRepository.saveAll(wordsToBeSaved);
+    }
+
     public Page<Word> findByUserIdAndWordDataIdIn(Long userId, List<Long> wordDataIds, Pageable pageable) {
         return wordRepository.findByUserIdAndWordDataIdIn(userId, wordDataIds, pageable);
     }

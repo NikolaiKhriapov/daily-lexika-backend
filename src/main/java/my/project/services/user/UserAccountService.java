@@ -39,6 +39,7 @@ public class UserAccountService {
         userRepository.save(user);
     }
 
+    @Transactional
     public void deleteAccount() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 

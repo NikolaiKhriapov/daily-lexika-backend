@@ -64,13 +64,10 @@ public class WordPackService {
     @Transactional
     public List<WordDTO> getAllWordsForWordPack(String wordPackName, Pageable pageable) {
         Long userId = authenticationService.getAuthenticatedUser().getId();
-        WordPack wordPack = getWordPackByName(wordPackName);
-
-        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPack(wordPack);
+        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPack(getWordPackByName(wordPackName));
 
         Page<Word> wordsPage = wordService.findByUserIdAndWordDataIdIn(userId, wordDataIds, pageable);
-        List<Word> listOfWords = wordsPage.getContent();
 
-        return new ArrayList<>(wordMapper.toDTOShortList(listOfWords));
+        return new ArrayList<>(wordMapper.toDTOShortList(wordsPage.getContent()));
     }
 }
