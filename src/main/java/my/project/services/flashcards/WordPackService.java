@@ -15,6 +15,8 @@ import my.project.repositories.flashcards.WordPackRepository;
 import my.project.services.user.AuthenticationService;
 import my.project.services.user.RoleService;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -48,38 +50,27 @@ public class WordPackService {
         return allWordPackDTOs;
     }
 
+    public WordPack getWordPackByName(String wordPackName) {
+        return wordPackRepository.findById(wordPackName)
+                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
+                        "exception.wordPack.notFound", null, Locale.getDefault())));
+    }
+
     public WordPackDTO getWordPackDTOByName(String wordPackName) {
         WordPack wordPack = getWordPackByName(wordPackName);
         return wordPackMapper.toDTO(wordPack);
     }
 
     @Transactional
-    public List<WordDTO> getAllWordsForWordPack(String wordPackName) {
+    public List<WordDTO> getAllWordsForWordPack(String wordPackName, Pageable pageable) {
         Long userId = authenticationService.getAuthenticatedUser().getId();
         WordPack wordPack = getWordPackByName(wordPackName);
 
         List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPack(wordPack);
 
-        List<Word> existingWords = wordService.findByUserIdAndWordDataIdIn(userId, wordDataIds);
-        List<Word> wordsToBeSaved = wordDataService.getListOfAllWordDataIdsByWordPack(wordPack).stream()
-                .filter(wordDataId -> existingWords.stream()
-                        .noneMatch(word -> word.getWordDataId().equals(wordDataId))
-                )
-                .map(wordDataId -> new Word(userId, wordDataId)) // TODO::: change to converter
-                .toList();
-
-        List<Word> savedWords = wordService.saveAll(wordsToBeSaved);
-
-        List<Word> listOfWords = new ArrayList<>();
-        listOfWords.addAll(existingWords);
-        listOfWords.addAll(savedWords);
+        Page<Word> wordsPage = wordService.findByUserIdAndWordDataIdIn(userId, wordDataIds, pageable);
+        List<Word> listOfWords = wordsPage.getContent();
 
         return new ArrayList<>(wordMapper.toDTOShortList(listOfWords));
-    }
-
-    public WordPack getWordPackByName(String wordPackName) {
-        return wordPackRepository.findById(wordPackName)
-                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
-                        "exception.wordPack.notFound", null, Locale.getDefault())));
     }
 }

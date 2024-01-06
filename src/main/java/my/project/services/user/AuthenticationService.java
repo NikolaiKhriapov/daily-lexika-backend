@@ -59,8 +59,6 @@ public class AuthenticationService {
                     .dateOfLastStreak(LocalDate.now().minusDays(1))
                     .recordStreak(0L)
                     .build();
-
-            sendWelcomeNotificationToUser(user);
         } else {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -78,6 +76,10 @@ public class AuthenticationService {
         roleService.addRoleToUserRoles(user, roleName);
 
         userRepository.save(user);
+
+        if (!isEmailAlreadyExists) {
+            sendWelcomeNotificationToUser(user);
+        }
 
         String jwtToken = jwtService.generateToken(user);
 

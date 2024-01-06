@@ -5,7 +5,8 @@ import lombok.RequiredArgsConstructor;
 import my.project.models.entity.user.User;
 import my.project.models.dto.user.UserDTO;
 import my.project.repositories.user.UserRepository;
-import my.project.services.flashcards.FlashcardsService;
+import my.project.services.flashcards.ReviewService;
+import my.project.services.flashcards.WordService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,8 @@ public class UserAccountService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final FlashcardsService flashcardsService;
+    private final ReviewService reviewService;
+    private final WordService wordService;
 
     @Transactional
     public void updateUserInfo(UserDTO userDTO) {
@@ -46,7 +48,8 @@ public class UserAccountService {
     }
 
     private void deleteFlashcardsForUser(User user) {
-        flashcardsService.deleteFlashcardsForUser(user.getId());
+        reviewService.deleteAllByUserId(user.getId());
+        wordService.deleteAllByUserId(user.getId());
     }
 }
 

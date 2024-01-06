@@ -84,7 +84,7 @@ public class ReviewController {
     @GetMapping("/{reviewId}/action")
     public ResponseEntity<ResponseDTO> processReviewAction(
             @PathVariable("reviewId") Long reviewId,
-            @RequestParam(value = "answer", required = false) String answer
+            @RequestParam(value = "answer", required = false) Boolean isCorrect
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -92,31 +92,7 @@ public class ReviewController {
                         .timeStamp(LocalDateTime.now())
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage("response.review.startReview", null, Locale.getDefault()))
-                        .data(reviewService.processReviewAction(reviewId, answer))
-                        .build());
-    }
-
-    @GetMapping("/{reviewId}/words")
-    public ResponseEntity<ResponseDTO> getAllWordsForReview(@PathVariable("reviewId") Long reviewId) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(ResponseDTO.builder()
-                        .timeStamp(LocalDateTime.now())
-                        .statusCode(HttpStatus.OK.value())
-                        .message(messageSource.getMessage("response.review.getAllWordsForReview", null, Locale.getDefault()))
-                        .data(Map.of("wordsForReviewDTO", reviewService.getAllWordsForReview(reviewId)))
-                        .build());
-    }
-
-    @GetMapping("/statistics/{reviewId}")
-    public ResponseEntity<ResponseDTO> getReviewStatistics(@PathVariable("reviewId") Long reviewId) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(ResponseDTO.builder()
-                        .timeStamp(LocalDateTime.now())
-                        .statusCode(HttpStatus.OK.value())
-                        .message(messageSource.getMessage("response.review.getReviewStatistics", null, Locale.getDefault()))
-                        .data(Map.of("reviewStatisticsDTO", reviewService.getReviewStatistics(reviewId)))
+                        .data(reviewService.processReviewAction(reviewId, isCorrect))
                         .build());
     }
 }

@@ -23,7 +23,7 @@ public record ReviewDTO(
         String wordPackName,
 
         @Nullable
-        List<Long> listOfWordId,
+        List<WordDTO> listOfWordDTO,
 
         LocalDate dateLastCompleted,
 

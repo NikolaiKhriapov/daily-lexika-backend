@@ -16,6 +16,9 @@ public record WordPackDTO(
         Category category,
 
         @Nullable
-        Long totalWords
+        Long totalWords,
+
+        @Nullable
+        Long reviewId
 ) {
 }

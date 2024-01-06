@@ -2,13 +2,17 @@ package my.project.controllers.flashcards;
 
 import lombok.RequiredArgsConstructor;
 import my.project.models.dto.ResponseDTO;
+import my.project.models.dto.flashcards.WordDTO;
 import my.project.services.flashcards.WordPackService;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -41,13 +45,20 @@ public class WordPackController {
                         .timeStamp(LocalDateTime.now())
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage(
-                                "response.wordPack.getAllWordPacks", null, Locale.getDefault()))
+                                "response.wordPack.getWordPack", null, Locale.getDefault()))
                         .data(Map.of("wordPackDTO", wordPackService.getWordPackDTOByName(wordPackName)))
                         .build());
     }
 
     @GetMapping("/{wordPackName}/words")
-    public ResponseEntity<ResponseDTO> getAllWordsForWordPack(@PathVariable("wordPackName") String wordPackName) {
+    public ResponseEntity<ResponseDTO> getAllWordsForWordPack(
+            @PathVariable("wordPackName") String wordPackName,
+            @RequestParam("page") int page,
+            @RequestParam("size") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<WordDTO> allWordsForWordPack = wordPackService.getAllWordsForWordPack(wordPackName, pageable);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ResponseDTO.builder()
@@ -55,7 +66,7 @@ public class WordPackController {
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage(
                                 "response.wordPack.getAllWordsForWordPacks", null, Locale.getDefault()))
-                        .data(Map.of("allWordsForWordPackDTO", wordPackService.getAllWordsForWordPack(wordPackName)))
+                        .data(Map.of("allWordsForWordPackDTO", allWordsForWordPack))
                         .build());
     }
 }
