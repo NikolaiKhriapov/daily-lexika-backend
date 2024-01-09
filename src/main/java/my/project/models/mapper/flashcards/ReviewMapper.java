@@ -3,6 +3,7 @@ package my.project.models.mapper.flashcards;
 import lombok.AllArgsConstructor;
 import my.project.models.dto.flashcards.ReviewDTO;
 import my.project.models.entity.flashcards.Review;
+import my.project.models.mapper.Mapper;
 import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;

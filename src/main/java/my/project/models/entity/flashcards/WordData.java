@@ -25,9 +25,6 @@ public class WordData {
 
     private String nameRussian;
 
-    @ManyToMany
-    private List<ChineseCharacter> listOfChineseCharacters;
-
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinTable
     private List<WordPack> listOfWordPacks;

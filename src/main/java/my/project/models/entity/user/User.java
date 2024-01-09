@@ -9,7 +9,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -38,14 +37,8 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private RoleName role;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Role> roles;
-
-    private Long currentStreak;
-
-    private LocalDate dateOfLastStreak;
-
-    private Long recordStreak;
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<RoleStatistics> roleStatistics;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
