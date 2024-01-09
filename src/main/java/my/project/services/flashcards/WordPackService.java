@@ -66,6 +66,8 @@ public class WordPackService {
         Long userId = authenticationService.getAuthenticatedUser().getId();
         List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPack(getWordPackByName(wordPackName));
 
+        wordService.createOrUpdateWordsForUser(userId, wordDataIds);
+
         Page<Word> wordsPage = wordService.findByUserIdAndWordDataIdIn(userId, wordDataIds, pageable);
 
         return new ArrayList<>(wordMapper.toDTOShortList(wordsPage.getContent()));
