@@ -4,9 +4,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import my.project.models.entity.user.User;
 import my.project.models.dto.user.UserDTO;
-import my.project.models.mapper.user.UserMapper;
 import my.project.repositories.user.UserRepository;
-import my.project.services.chineseflashcards.ChineseFlashcardsService;
+import my.project.services.flashcards.ReviewService;
+import my.project.services.flashcards.WordService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,8 @@ public class UserAccountService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ChineseFlashcardsService chineseFlashcardsService;
+    private final ReviewService reviewService;
+    private final WordService wordService;
 
     @Transactional
     public void updateUserInfo(UserDTO userDTO) {
@@ -38,16 +39,18 @@ public class UserAccountService {
         userRepository.save(user);
     }
 
+    @Transactional
     public void deleteAccount() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        deleteChineseFlashcardsForUser(user);
+        deleteFlashcardsForUser(user);
 
         userRepository.delete(user);
     }
 
-    private void deleteChineseFlashcardsForUser(User user) {
-        chineseFlashcardsService.deleteChineseFlashcardsForUser(user.getId());
+    private void deleteFlashcardsForUser(User user) {
+        reviewService.deleteAllByUserId(user.getId());
+        wordService.deleteAllByUserId(user.getId());
     }
 }
 

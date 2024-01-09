@@ -32,7 +32,7 @@ public class UserAccountController {
                         .statusCode(HttpStatus.OK.value())
                         .message(messageSource.getMessage(
                                 "response.userAccount.showAccount", null, Locale.getDefault()))
-                        .data(Map.of("userDTO", authenticationService.getAuthenticatedUser()))
+                        .data(Map.of("userDTO", authenticationService.getAuthenticatedUserDTO()))
                         .build());
     }
 
