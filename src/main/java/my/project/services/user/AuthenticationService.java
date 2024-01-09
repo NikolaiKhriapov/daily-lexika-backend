@@ -2,11 +2,8 @@ package my.project.services.user;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import my.project.exception.ResourceAlreadyExistsException;
-import my.project.exception.ResourceNotFoundException;
 import my.project.models.dto.user.UserDTO;
 import my.project.models.entity.notification.Notification;
-import my.project.models.entity.user.Role;
 import my.project.models.mapper.user.UserMapper;
 import my.project.services.notification.NotificationService;
 import my.project.models.dto.user.AuthenticationRequest;
@@ -16,7 +13,6 @@ import my.project.models.entity.user.User;
 import my.project.repositories.user.UserRepository;
 import my.project.models.entity.user.RoleName;
 import my.project.config.security.jwt.JwtService;
-import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,9 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -40,7 +33,6 @@ public class AuthenticationService {
     private final NotificationService notificationService;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
-    private final MessageSource messageSource;
 
     @Transactional
     public AuthenticationResponse register(RegistrationRequest registrationRequest) {
@@ -55,9 +47,6 @@ public class AuthenticationService {
                     .email(registrationRequest.email().toLowerCase())
                     .password(passwordEncoder.encode(registrationRequest.password()))
                     .role(roleName)
-                    .currentStreak(0L)
-                    .dateOfLastStreak(LocalDate.now().minusDays(1))
-                    .recordStreak(0L)
                     .build();
         } else {
             Authentication authentication = authenticationManager.authenticate(
@@ -68,7 +57,7 @@ public class AuthenticationService {
             );
             user = (User) authentication.getPrincipal();
 
-            throwIfUserAlreadyHasRole(user, roleName);
+            roleService.throwIfUserAlreadyHasRole(user, roleName);
 
             user.setRole(roleName);
         }
@@ -98,7 +87,7 @@ public class AuthenticationService {
 
         RoleName roleName = roleService.getRoleNameByPlatform(authenticationRequest.platform());
 
-        throwIfUserNotRegisteredOnPlatform(user, roleName);
+        roleService.throwIfUserNotRegisteredOnPlatform(user, roleName);
 
         user.setRole(roleName);
 
@@ -129,25 +118,5 @@ public class AuthenticationService {
     private boolean checkIfEmailAlreadyExists(String email) {
         Optional<User> userOptional = userRepository.findUserByEmail(email.toLowerCase());
         return userOptional.isPresent();
-    }
-
-    private void throwIfUserAlreadyHasRole(User user, RoleName roleName) {
-        List<RoleName> userRoleNames = user.getRoles().stream().map(Role::getRoleName).toList();
-        if (userRoleNames.contains(roleName)) {
-            throw new ResourceAlreadyExistsException(
-                    messageSource.getMessage("exception.authentication.userAlreadyRegisteredOnPlatform", null, Locale.getDefault())
-                            .formatted(user.getEmail(), roleService.getPlatformByRoleName(roleName))
-            );
-        }
-    }
-
-    private void throwIfUserNotRegisteredOnPlatform(User user, RoleName roleName) {
-        List<RoleName> roleNames = user.getRoles().stream().map(Role::getRoleName).toList();
-        if (!roleNames.contains(roleName)) {
-            throw new ResourceNotFoundException(
-                    messageSource.getMessage("exception.authentication.userNotRegisteredOnPlatform", null, Locale.getDefault())
-                            .formatted(user.getEmail(), roleService.getPlatformByRoleName(roleName))
-            );
-        }
     }
 }

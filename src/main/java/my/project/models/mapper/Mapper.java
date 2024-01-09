@@ -1,9 +1,9 @@
-package my.project.models.mapper.flashcards;
+package my.project.models.mapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-interface Mapper<E, D> {
+public interface Mapper<E, D> {
 
     D toDTO(E entity);
 

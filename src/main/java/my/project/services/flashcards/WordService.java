@@ -15,14 +15,15 @@ import java.util.List;
 public class WordService {
 
     private final WordRepository wordRepository;
+    private final WordDataService wordDataService;
 
     public void createOrUpdateWordsForUser(Long userId, List<Long> wordDataIds) {
         List<Word> existingWords = wordRepository.findByUserIdAndWordDataIdIn(userId, wordDataIds);
         List<Word> wordsToBeSaved = wordDataIds.stream()
                 .filter(wordDataId -> existingWords.stream()
-                        .noneMatch(word -> word.getWordDataId().equals(wordDataId))
+                        .noneMatch(word -> word.getWordData().getId().equals(wordDataId))
                 )
-                .map(wordDataId -> new Word(userId, wordDataId)) // TODO::: change to mapper
+                .map(wordDataId -> new Word(userId, wordDataService.getWordData(wordDataId))) // TODO::: change to mapper
                 .toList();
 
         wordRepository.saveAll(wordsToBeSaved);
