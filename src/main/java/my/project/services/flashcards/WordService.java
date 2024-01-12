@@ -1,6 +1,7 @@
 package my.project.services.flashcards;
 
 import lombok.RequiredArgsConstructor;
+import my.project.models.entity.enumeration.Platform;
 import my.project.models.entity.enumeration.Status;
 import my.project.models.entity.flashcards.Word;
 import my.project.repositories.flashcards.WordRepository;
@@ -45,7 +46,8 @@ public class WordService {
         return wordRepository.findByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrdered(userId, wordDataIds, statuses, pageable);
     }
 
-    public void deleteAllByUserId(Long userId) {
-        wordRepository.deleteAllByUserId(userId);
+    public void deleteAllByUserIdAndPlatform(Long userId, Platform platform) {
+        List<Word> allWordsByUserId = wordRepository.findAllByUserIdAndPlatform(userId, platform);
+        wordRepository.deleteAll(allWordsByUserId);
     }
 }

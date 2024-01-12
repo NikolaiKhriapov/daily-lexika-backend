@@ -203,8 +203,9 @@ public class ReviewService {
         return listOfWords;
     }
 
-    public void deleteAllByUserId(Long userId) {
-        reviewRepository.deleteAllByUserId(userId);
+    public void deleteAllByUserIdAndPlatform(Long userId, Platform platform) {
+        List<Review> allReviewsByUserId = reviewRepository.findAllByUserIdAndPlatform(userId, platform);
+        reviewRepository.deleteAll(allReviewsByUserId);
     }
 
     private Review getReview(Long reviewId) {

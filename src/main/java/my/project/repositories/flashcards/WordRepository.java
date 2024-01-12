@@ -6,6 +6,7 @@ import my.project.models.entity.flashcards.Word;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -60,5 +61,6 @@ public interface WordRepository extends JpaRepository<Word, Long> {
             Pageable pageable
     );
 
-    void deleteAllByUserId(Long userId);
+    @Query("SELECT w FROM words w WHERE w.userId = :userId AND w.wordData.platform = :platform")
+    List<Word> findAllByUserIdAndPlatform(Long userId, Platform platform);
 }
