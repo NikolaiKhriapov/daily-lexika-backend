@@ -2,6 +2,8 @@ package my.project.services.user;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import my.project.models.entity.enumeration.Platform;
+import my.project.models.entity.user.RoleStatistics;
 import my.project.models.entity.user.User;
 import my.project.models.dto.user.UserDTO;
 import my.project.repositories.user.UserRepository;
@@ -21,6 +23,7 @@ public class UserAccountService {
     private final PasswordEncoder passwordEncoder;
     private final ReviewService reviewService;
     private final WordService wordService;
+    private final RoleService roleService;
 
     @Transactional
     public void updateUserInfo(UserDTO userDTO) {
@@ -43,14 +46,22 @@ public class UserAccountService {
     public void deleteAccount() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        deleteFlashcardsForUser(user);
+        RoleStatistics currentRole = roleService.getRoleStatistics();
+        Platform platform = roleService.getPlatformByRoleName(currentRole.getRoleName());
 
-        userRepository.delete(user);
+        deleteFlashcardsForUserByPlatform(user, platform);
+
+        if (user.getRoleStatistics().contains(currentRole) && user.getRoleStatistics().size() == 1) {
+            userRepository.delete(user);
+        } else if (user.getRoleStatistics().contains(currentRole) && user.getRoleStatistics().size() > 1) {
+            user.getRoleStatistics().remove(currentRole);
+            userRepository.save(user);
+        }
     }
 
-    private void deleteFlashcardsForUser(User user) {
-        reviewService.deleteAllByUserId(user.getId());
-        wordService.deleteAllByUserId(user.getId());
+    private void deleteFlashcardsForUserByPlatform(User user, Platform platform) {
+        reviewService.deleteAllByUserIdAndPlatform(user.getId(), platform);
+        wordService.deleteAllByUserIdAndPlatform(user.getId(), platform);
     }
 }
 

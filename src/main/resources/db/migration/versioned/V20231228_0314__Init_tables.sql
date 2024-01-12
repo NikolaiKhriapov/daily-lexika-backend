@@ -35,7 +35,7 @@ create table words
     total_streak            integer,
     id                      bigint not null primary key,
     user_id                 bigint,
-    word_data_id            bigint unique
+    word_data_id            bigint
         references word_data,
     status                  varchar(20)
 );
@@ -97,7 +97,7 @@ create sequence role_statistics_id_sequence;
 
 create table users_role_statistics
 (
-    role_statistics_id bigint not null unique
+    role_statistics_id bigint not null
         references role_statistics,
     users_id           bigint not null
         references users,
