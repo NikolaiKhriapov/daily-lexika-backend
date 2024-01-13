@@ -109,8 +109,20 @@ public class AuthenticationService {
                 new Notification(
                         user.getId(),
                         user.getEmail(),
-                        "Welcome to Chinese Learning App!",
-                        "Hi, %s, welcome to Chinese Learning App!".formatted(user.getName())
+                        "Welcome to Daily Lexika!",
+                        "Hello %s,\n\n".formatted(user.getName())
+                                + "Congratulations on joining our vibrant community of language learners! We're thrilled to have you on board. Get ready for an exciting journey of daily vocabulary learning using the powerful spaced repetition approach.\n\n"
+                                + "📚 What to Expect:\n"
+                                + "Personalized Learning: Our app tailors the experience just for you, ensuring that your learning journey is effective and enjoyable.\n"
+                                + "Spaced Repetition Magic: Say goodbye to cramming! Our spaced repetition technique will help you master new words and solidify your vocabulary in the most efficient way.\n\n"
+                                + "🚀 How to Get Started:\n"
+                                + "Explore the Dashboard: Take a tour of your personalized dashboard, where you'll find your daily reviews, word packs, and statistics.\n"
+                                + "Set Your Goals: Define your language learning goals. Whether it's acing exams, improving communication, or just having fun, we're here to support you.\n"
+                                + "Daily Check-ins: Make it a habit to check in daily. Consistency is key to language mastery.\n\n"
+                                + "Remember, the journey of a thousand words begins with a single step. We're here to make each step enjoyable and impactful.\n\n"
+                                + "Happy learning!\n\n"
+                                + "Best,\n"
+                                + "The Daily Lexika Team"
                 )
         );
     }
