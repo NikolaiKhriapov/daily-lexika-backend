@@ -50,11 +50,11 @@ public class UserAccountService {
         Platform platform = roleService.getPlatformByRoleName(currentRole.getRoleName());
 
         deleteFlashcardsForUserByPlatform(user, platform);
+        user.getRoleStatistics().remove(currentRole);
 
-        if (user.getRoleStatistics().contains(currentRole) && user.getRoleStatistics().size() == 1) {
+        if (user.getRoleStatistics().isEmpty()) {
             userRepository.delete(user);
-        } else if (user.getRoleStatistics().contains(currentRole) && user.getRoleStatistics().size() > 1) {
-            user.getRoleStatistics().remove(currentRole);
+        } else {
             userRepository.save(user);
         }
     }
