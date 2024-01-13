@@ -47,7 +47,7 @@ create table notifications
     notification_id bigint not null primary key,
     sent_at         timestamp(6),
     to_user_id      bigint,
-    message         varchar(255),
+    message         text,
     sender          varchar(100),
     subject         varchar(100),
     to_user_email   varchar(100)

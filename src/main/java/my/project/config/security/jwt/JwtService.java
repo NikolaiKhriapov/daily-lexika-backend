@@ -21,7 +21,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 public class JwtService {
 
     private static final String SECRET_KEY = "foobar_123456789_foobar_123456789_foobar_123456789_foobar_123456789";
-    private static final String ISSUER = "chinese-learning-app";
+    private static final String ISSUER = "daily-lexika";
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts
