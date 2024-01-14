@@ -52,6 +52,10 @@ public class NotificationService {
         notificationRepository.save(notificationToBeUpdated);
     }
 
+    public void deleteAllByUserId(Long userId) {
+        notificationRepository.deleteAllByToUserId(userId);
+    }
+
     private Notification getNotificationById(Long notificationId) {
         return notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(

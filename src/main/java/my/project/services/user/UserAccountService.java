@@ -9,6 +9,7 @@ import my.project.models.dto.user.UserDTO;
 import my.project.repositories.user.UserRepository;
 import my.project.services.flashcards.ReviewService;
 import my.project.services.flashcards.WordService;
+import my.project.services.notification.NotificationService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class UserAccountService {
     private final ReviewService reviewService;
     private final WordService wordService;
     private final RoleService roleService;
+    private final NotificationService notificationService;
 
     @Transactional
     public void updateUserInfo(UserDTO userDTO) {
@@ -53,6 +55,7 @@ public class UserAccountService {
         user.getRoleStatistics().remove(currentRole);
 
         if (user.getRoleStatistics().isEmpty()) {
+            notificationService.deleteAllByUserId(user.getId());
             userRepository.delete(user);
         } else {
             userRepository.save(user);
