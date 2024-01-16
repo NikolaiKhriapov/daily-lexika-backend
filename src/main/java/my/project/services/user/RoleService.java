@@ -7,7 +7,6 @@ import my.project.models.entity.enumeration.Platform;
 import my.project.models.entity.user.RoleStatistics;
 import my.project.models.entity.user.RoleName;
 import my.project.models.entity.user.User;
-import my.project.repositories.user.RoleRepository;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -15,20 +14,18 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class RoleService {
 
-    private final RoleRepository roleRepository;
     private final MessageSource messageSource;
 
     public void addRoleToUserRoles(User user, RoleName roleName) {
         if (user.getRoleStatistics() == null) {
             user.setRoleStatistics(new HashSet<>());
         }
-        user.getRoleStatistics().add(getOrCreateAndGetRoleByRoleName(roleName));
+        user.getRoleStatistics().add(new RoleStatistics(roleName));
     }
 
     public Platform getPlatformByRoleName(RoleName roleName) {
@@ -79,10 +76,5 @@ public class RoleService {
     private boolean isUserRolesContainsRole(User user, RoleName roleName) {
         List<RoleName> userRoleNames = user.getRoleStatistics().stream().map(RoleStatistics::getRoleName).toList();
         return userRoleNames.contains(roleName);
-    }
-
-    private RoleStatistics getOrCreateAndGetRoleByRoleName(RoleName roleName) {
-        Optional<RoleStatistics> optionalRole = roleRepository.findByRoleName(roleName);
-        return optionalRole.orElseGet(() -> roleRepository.save(new RoleStatistics(roleName)));
     }
 }

@@ -97,7 +97,7 @@ create sequence role_statistics_id_sequence;
 
 create table users_role_statistics
 (
-    role_statistics_id bigint not null
+    role_statistics_id bigint not null unique
         references role_statistics,
     users_id           bigint not null
         references users,
