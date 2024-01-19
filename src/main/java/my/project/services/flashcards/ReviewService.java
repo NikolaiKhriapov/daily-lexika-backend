@@ -67,7 +67,7 @@ public class ReviewService {
         return reviewMapper.toDTO(getReview(reviewId));
     }
 
-    public void createReview(ReviewDTO newReviewDTO) {
+    public ReviewDTO createReview(ReviewDTO newReviewDTO) {
         Long userId = authenticationService.getAuthenticatedUser().getId();
 
         List<String> wordPackNamesOfExistingReviews = reviewRepository.findAllReviewNamesByUserId(userId);
@@ -79,7 +79,7 @@ public class ReviewService {
         }
 
         Review newReview = generateReview(newReviewDTO, userId);
-        reviewRepository.save(newReview);
+        return reviewMapper.toDTO(reviewRepository.save(newReview));
     }
 
     @Transactional
@@ -136,7 +136,7 @@ public class ReviewService {
         Long userId = authenticationService.getAuthenticatedUser().getId();
 
         Review review = getReview(reviewId);
-        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPack(review.getWordPack());
+        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPackName(review.getWordPack().getName());
 
         Integer newWords = wordService.countByUserIdAndWordDataIdInAndStatusEquals(userId, wordDataIds, NEW);
         Integer reviewWords = wordService.countByUserIdAndWordDataIdInAndStatusEquals(userId, wordDataIds, IN_REVIEW);
@@ -147,8 +147,7 @@ public class ReviewService {
                 review.getWordPack().getName(),
                 newWords,
                 reviewWords,
-                knownWords,
-                wordDataIds.size()
+                knownWords
         );
     }
 
@@ -171,7 +170,7 @@ public class ReviewService {
      * KNOWN -> if dateOfLastOccurrence >= totalStreak
      **/
     public List<Word> generateListOfWordsForReview(Long userId, WordPack wordPack, ReviewDTO reviewDTO) {
-        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPack(wordPack);
+        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPackName(wordPack.getName());
 
         wordService.createOrUpdateWordsForUser(userId, wordDataIds);
 
