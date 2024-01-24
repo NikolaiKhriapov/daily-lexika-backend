@@ -1,8 +1,8 @@
 package my.project.config.security.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -12,27 +12,37 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
-    @Value("#{'${cors.allowed-origins}'.split(',')}")
-    private List<String> allowedOrigins;
+    public static final List<String> ALLOWED_ORIGINS = List.of(
+            "http://localhost:8000",
+            "https://localhost:8000",
+            "http://104.197.124.72:3000",
+            "https://104.197.124.72:3000",
+            "https://dailylexika.com",
+            "https://www.dailylexika.com"
+    );
 
-    @Value("#{'${cors.allowed-methods}'.split(',')}")
-    private List<String> allowedMethods;
+    private CorsConfiguration getCorsConfiguration() {
+        final CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.setAllowedOrigins(ALLOWED_ORIGINS);
+        corsConfiguration.setAllowCredentials(true);
 
-    @Value("#{'${cors.allowed-headers}'.split(',')}")
-    private List<String> allowedHeaders;
 
-    @Value("#{'${cors.exposed-headers}'.split(',')}")
-    private List<String> exposedHeaders;
-
+        corsConfiguration.setExposedHeaders(List.of("Authorization"));
+        corsConfiguration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type", "Sentry-Trace", "baggage"));
+        corsConfiguration.applyPermitDefaultValues().addAllowedMethod(HttpMethod.PATCH);
+        corsConfiguration.addAllowedMethod(HttpMethod.PUT);
+        corsConfiguration.addAllowedMethod(HttpMethod.DELETE);
+        corsConfiguration.addAllowedMethod(HttpMethod.GET);
+        corsConfiguration.addAllowedMethod(HttpMethod.POST);
+        corsConfiguration.addAllowedMethod(HttpMethod.OPTIONS);
+        return corsConfiguration;
+    }
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(allowedOrigins);
-        configuration.setAllowedMethods(allowedMethods);
-        configuration.setAllowedHeaders(allowedHeaders);
-        configuration.setExposedHeaders(exposedHeaders);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", configuration);
+        source.registerCorsConfiguration("/**", getCorsConfiguration());
         return source;
     }
+
+
 }
