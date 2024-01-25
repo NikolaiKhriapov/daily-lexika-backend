@@ -5,6 +5,7 @@ import my.project.exception.ResourceNotFoundException;
 import my.project.exception.ResourceAlreadyExistsException;
 import my.project.models.dto.flashcards.ReviewStatisticsDTO;
 import my.project.models.entity.enumeration.Platform;
+import my.project.models.entity.user.RoleStatistics;
 import my.project.models.entity.user.User;
 import my.project.models.mapper.flashcards.ReviewMapper;
 import my.project.models.dto.flashcards.ReviewDTO;
@@ -202,8 +203,9 @@ public class ReviewService {
         return listOfWords;
     }
 
-    public void deleteAllByUserId(Long userId) {
-        reviewRepository.deleteAllByUserId(userId);
+    public void deleteAllByUserIdAndPlatform(Long userId, Platform platform) {
+        List<Review> allReviewsByUserId = reviewRepository.findAllByUserIdAndPlatform(userId, platform);
+        reviewRepository.deleteAll(allReviewsByUserId);
     }
 
     private Review getReview(Long reviewId) {
@@ -287,30 +289,32 @@ public class ReviewService {
     @Transactional
     public void updateUserStreak() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long daysFromLastStreak = DAYS.between(user.getDateOfLastStreak(), LocalDate.now());
-        Long differenceBetweenRecordStreakAndCurrentStreak = user.getRecordStreak() - user.getCurrentStreak();
+        RoleStatistics roleStatistics = roleService.getRoleStatistics();
 
-        updateCurrentStreak(user, daysFromLastStreak);
-        updateRecordStreak(user, differenceBetweenRecordStreakAndCurrentStreak, daysFromLastStreak);
-        user.setDateOfLastStreak(LocalDate.now());
+        Long daysFromLastStreak = DAYS.between(roleStatistics.getDateOfLastStreak(), LocalDate.now());
+        Long differenceBetweenRecordStreakAndCurrentStreak = roleStatistics.getRecordStreak() - roleStatistics.getCurrentStreak();
+
+        updateCurrentStreak(roleStatistics, daysFromLastStreak);
+        updateRecordStreak(roleStatistics, differenceBetweenRecordStreakAndCurrentStreak, daysFromLastStreak);
+        roleStatistics.setDateOfLastStreak(LocalDate.now());
 
         userRepository.save(user);
     }
 
-    private void updateCurrentStreak(User user, Long daysFromLastStreak) {
+    private void updateCurrentStreak(RoleStatistics roleStatistics, Long daysFromLastStreak) {
         if (daysFromLastStreak == 1) {
-            user.setCurrentStreak(user.getCurrentStreak() + 1);
+            roleStatistics.setCurrentStreak(roleStatistics.getCurrentStreak() + 1);
         } else if (daysFromLastStreak > 1) {
-            user.setCurrentStreak(1L);
+            roleStatistics.setCurrentStreak(1L);
         } else if (daysFromLastStreak < 0) {
             throw new RuntimeException(messageSource.getMessage(
                     "exception.statistics.updateUserStreak.erroneousCurrentStreak", null, Locale.getDefault()));
         }
     }
 
-    private void updateRecordStreak(User user, Long differenceBetweenRecordStreakAndCurrentStreak, Long daysFromLastStreak) {
+    private void updateRecordStreak(RoleStatistics roleStatistics, Long differenceBetweenRecordStreakAndCurrentStreak, Long daysFromLastStreak) {
         if (differenceBetweenRecordStreakAndCurrentStreak == 0 && daysFromLastStreak > 0) {
-            user.setRecordStreak(user.getRecordStreak() + 1);
+            roleStatistics.setRecordStreak(roleStatistics.getRecordStreak() + 1);
         } else if (differenceBetweenRecordStreakAndCurrentStreak < 0) {
             throw new RuntimeException(messageSource.getMessage(
                     "exception.statistics.updateUserStreak.erroneousCurrentStreak", null, Locale.getDefault()));

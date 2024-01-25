@@ -3,6 +3,7 @@ package my.project.models.mapper.flashcards;
 import lombok.AllArgsConstructor;
 import my.project.models.dto.flashcards.WordDTO;
 import my.project.models.entity.flashcards.*;
+import my.project.models.mapper.Mapper;
 import my.project.services.flashcards.WordDataService;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +18,7 @@ public class WordMapper implements Mapper<Word, WordDTO> {
 
     @Override
     public WordDTO toDTO(Word entity) {
-        WordData wordData = wordDataService.getWordData(entity.getWordDataId());
+        WordData wordData = wordDataService.getWordData(entity.getWordData().getId());
 
         return new WordDTO(
                 entity.getId(),
@@ -31,9 +32,6 @@ public class WordMapper implements Mapper<Word, WordDTO> {
                 entity.getTotalStreak(),
                 entity.getOccurrence(),
                 entity.getDateOfLastOccurrence(),
-                wordData.getListOfChineseCharacters().stream()
-                        .map(ChineseCharacter::getId)
-                        .collect(Collectors.toList()),
                 wordData.getListOfWordPacks().stream()
                         .map(WordPack::getName)
                         .collect(Collectors.toList())
@@ -41,7 +39,7 @@ public class WordMapper implements Mapper<Word, WordDTO> {
     }
 
     public WordDTO toDTOShort(Word entity) {
-        WordData wordData = wordDataService.getWordData(entity.getWordDataId());
+        WordData wordData = wordDataService.getWordData(entity.getWordData().getId());
 
         return new WordDTO(
                 entity.getId(),
@@ -53,7 +51,6 @@ public class WordMapper implements Mapper<Word, WordDTO> {
                 entity.getStatus(),
                 null,
                 entity.getTotalStreak(),
-                null,
                 null,
                 null,
                 null

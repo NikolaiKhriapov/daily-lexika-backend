@@ -15,7 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/v1/user/account")
+@RequestMapping("/api/v1/user/account")
 @RequiredArgsConstructor
 public class UserAccountController {
 

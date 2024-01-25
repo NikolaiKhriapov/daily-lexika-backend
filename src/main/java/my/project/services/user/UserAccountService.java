@@ -2,11 +2,14 @@ package my.project.services.user;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import my.project.models.entity.enumeration.Platform;
+import my.project.models.entity.user.RoleStatistics;
 import my.project.models.entity.user.User;
 import my.project.models.dto.user.UserDTO;
 import my.project.repositories.user.UserRepository;
 import my.project.services.flashcards.ReviewService;
 import my.project.services.flashcards.WordService;
+import my.project.services.notification.NotificationService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,8 @@ public class UserAccountService {
     private final PasswordEncoder passwordEncoder;
     private final ReviewService reviewService;
     private final WordService wordService;
+    private final RoleService roleService;
+    private final NotificationService notificationService;
 
     @Transactional
     public void updateUserInfo(UserDTO userDTO) {
@@ -43,14 +48,23 @@ public class UserAccountService {
     public void deleteAccount() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        deleteFlashcardsForUser(user);
+        RoleStatistics currentRole = roleService.getRoleStatistics();
+        Platform platform = roleService.getPlatformByRoleName(currentRole.getRoleName());
 
-        userRepository.delete(user);
+        deleteFlashcardsForUserByPlatform(user, platform);
+        user.getRoleStatistics().remove(currentRole);
+
+        if (user.getRoleStatistics().isEmpty()) {
+            notificationService.deleteAllByUserId(user.getId());
+            userRepository.delete(user);
+        } else {
+            userRepository.save(user);
+        }
     }
 
-    private void deleteFlashcardsForUser(User user) {
-        reviewService.deleteAllByUserId(user.getId());
-        wordService.deleteAllByUserId(user.getId());
+    private void deleteFlashcardsForUserByPlatform(User user, Platform platform) {
+        reviewService.deleteAllByUserIdAndPlatform(user.getId(), platform);
+        wordService.deleteAllByUserIdAndPlatform(user.getId(), platform);
     }
 }
 

@@ -28,7 +28,7 @@ public class Notification {
     public Notification(Long toUserId, String toUserEmail, String subject, String message) {
         this.toUserId = toUserId;
         this.toUserEmail = toUserEmail;
-        this.sender = "Chinese Learning App";
+        this.sender = "Daily Lexika";
         this.subject = subject;
         this.message = message;
         this.sentAt = LocalDateTime.now();

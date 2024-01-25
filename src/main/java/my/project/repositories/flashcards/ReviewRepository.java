@@ -20,6 +20,4 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT DISTINCT r.wordPack.name FROM reviews r WHERE r.userId = :userId")
     List<String> findAllReviewNamesByUserId(@Param("userId") Long userId);
-
-    void deleteAllByUserId(Long userId);
 }

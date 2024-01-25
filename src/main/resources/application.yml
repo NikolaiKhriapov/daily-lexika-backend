@@ -3,9 +3,9 @@ server:
 
 spring:
   application:
-    name: chinese-learning-app
+    name: daily-lexika-backend
   datasource:
-    url: jdbc:postgresql://localhost:5432/chinese_learning_app
+    url: jdbc:postgresql://localhost:5432/daily_lexika
     username: 'postgres'
     password: '1478236950'
   jpa:
@@ -17,7 +17,6 @@ spring:
       ddl-auto: validate
   flyway:
     locations: "classpath:db/migration"
-  #    enabled: false
   servlet:
     multipart:
       max-file-size: 10MB

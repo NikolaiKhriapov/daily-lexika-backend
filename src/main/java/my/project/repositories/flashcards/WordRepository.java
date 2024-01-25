@@ -1,10 +1,12 @@
 package my.project.repositories.flashcards;
 
+import my.project.models.entity.enumeration.Platform;
 import my.project.models.entity.enumeration.Status;
 import my.project.models.entity.flashcards.Word;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -16,7 +18,7 @@ public interface WordRepository extends JpaRepository<Word, Long> {
 
     List<Word> findByUserIdAndWordDataIdIn(Long userId, List<Long> wordDataIds);
 
-    @Query("SELECT w FROM words w WHERE w.userId = :userId AND w.wordDataId IN :wordDataIds " +
+    @Query("SELECT w FROM words w WHERE w.userId = :userId AND w.wordData.id IN :wordDataIds " +
             "ORDER BY CASE w.status " +
             "WHEN my.project.models.entity.enumeration.Status.KNOWN THEN 1 " +
             "WHEN my.project.models.entity.enumeration.Status.IN_REVIEW THEN 2 " +
@@ -26,12 +28,19 @@ public interface WordRepository extends JpaRepository<Word, Long> {
 
     List<Word> findByUserIdAndWordDataIdInAndStatusIn(Long userId, List<Long> wordDataIds, List<Status> status, Pageable pageable);
 
-    @Query("SELECT COUNT(w) FROM words w WHERE w.userId = :userId AND w.status = :status")
-    Integer countByUserIdAndStatusEquals(@Param("userId") Long userId, @Param("status") Status status);
+    @Query("SELECT COUNT(w) FROM words w " +
+            "WHERE w.userId = :userId " +
+            "AND w.status = :status " +
+            "AND w.wordData.platform = :platform")
+    Integer countByUserIdAndStatusEqualsAndPlatformEquals(
+            @Param("userId") Long userId,
+            @Param("status") Status status,
+            @Param("platform") Platform platform
+    );
 
     @Query("SELECT COUNT(w) FROM words w " +
             "WHERE w.userId = :userId " +
-            "AND w.wordDataId IN :wordDataIds " +
+            "AND w.wordData.id IN :wordDataIds " +
             "AND w.status = :status")
     Integer countByUserIdAndWordDataIdInAndStatusEquals(
             @Param("userId") Long userId,
@@ -41,7 +50,7 @@ public interface WordRepository extends JpaRepository<Word, Long> {
 
     @Query("SELECT w FROM words w " +
             "WHERE w.userId = :userId " +
-            "AND w.wordDataId IN :wordDataIds " +
+            "AND w.wordData.id IN :wordDataIds " +
             "AND w.status IN :statuses " +
             "AND (DATE_PART('day', AGE(CURRENT_DATE, w.dateOfLastOccurrence)) >= POWER(2, w.totalStreak)) " +
             "ORDER BY w.dateOfLastOccurrence DESC")
@@ -52,5 +61,6 @@ public interface WordRepository extends JpaRepository<Word, Long> {
             Pageable pageable
     );
 
-    void deleteAllByUserId(Long userId);
+    @Query("SELECT w FROM words w WHERE w.userId = :userId AND w.wordData.platform = :platform")
+    List<Word> findAllByUserIdAndPlatform(Long userId, Platform platform);
 }

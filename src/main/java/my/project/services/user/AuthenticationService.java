@@ -2,11 +2,8 @@ package my.project.services.user;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import my.project.exception.ResourceAlreadyExistsException;
-import my.project.exception.ResourceNotFoundException;
 import my.project.models.dto.user.UserDTO;
 import my.project.models.entity.notification.Notification;
-import my.project.models.entity.user.Role;
 import my.project.models.mapper.user.UserMapper;
 import my.project.services.notification.NotificationService;
 import my.project.models.dto.user.AuthenticationRequest;
@@ -16,7 +13,6 @@ import my.project.models.entity.user.User;
 import my.project.repositories.user.UserRepository;
 import my.project.models.entity.user.RoleName;
 import my.project.config.security.jwt.JwtService;
-import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,9 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -40,7 +33,6 @@ public class AuthenticationService {
     private final NotificationService notificationService;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
-    private final MessageSource messageSource;
 
     @Transactional
     public AuthenticationResponse register(RegistrationRequest registrationRequest) {
@@ -55,9 +47,6 @@ public class AuthenticationService {
                     .email(registrationRequest.email().toLowerCase())
                     .password(passwordEncoder.encode(registrationRequest.password()))
                     .role(roleName)
-                    .currentStreak(0L)
-                    .dateOfLastStreak(LocalDate.now().minusDays(1))
-                    .recordStreak(0L)
                     .build();
         } else {
             Authentication authentication = authenticationManager.authenticate(
@@ -68,7 +57,7 @@ public class AuthenticationService {
             );
             user = (User) authentication.getPrincipal();
 
-            throwIfUserAlreadyHasRole(user, roleName);
+            roleService.throwIfUserAlreadyHasRole(user, roleName);
 
             user.setRole(roleName);
         }
@@ -98,7 +87,7 @@ public class AuthenticationService {
 
         RoleName roleName = roleService.getRoleNameByPlatform(authenticationRequest.platform());
 
-        throwIfUserNotRegisteredOnPlatform(user, roleName);
+        roleService.throwIfUserNotRegisteredOnPlatform(user, roleName);
 
         user.setRole(roleName);
 
@@ -120,8 +109,20 @@ public class AuthenticationService {
                 new Notification(
                         user.getId(),
                         user.getEmail(),
-                        "Welcome to Chinese Learning App!",
-                        "Hi, %s, welcome to Chinese Learning App!".formatted(user.getName())
+                        "Welcome to Daily Lexika!",
+                        "Hello %s,\n\n".formatted(user.getName())
+                                + "Congratulations on joining our vibrant community of language learners! We're thrilled to have you on board. Get ready for an exciting journey of daily vocabulary learning using the powerful spaced repetition approach.\n\n"
+                                + "📚 What to Expect:\n"
+                                + "Personalized Learning: Our app tailors the experience just for you, ensuring that your learning journey is effective and enjoyable.\n"
+                                + "Spaced Repetition Magic: Say goodbye to cramming! Our spaced repetition technique will help you master new words and solidify your vocabulary in the most efficient way.\n\n"
+                                + "🚀 How to Get Started:\n"
+                                + "Explore the Dashboard: Take a tour of your personalized dashboard, where you'll find your daily reviews, word packs, and statistics.\n"
+                                + "Set Your Goals: Define your language learning goals. Whether it's acing exams, improving communication, or just having fun, we're here to support you.\n"
+                                + "Daily Check-ins: Make it a habit to check in daily. Consistency is key to language mastery.\n\n"
+                                + "Remember, the journey of a thousand words begins with a single step. We're here to make each step enjoyable and impactful.\n\n"
+                                + "Happy learning!\n\n"
+                                + "Best,\n"
+                                + "The Daily Lexika Team"
                 )
         );
     }
@@ -129,25 +130,5 @@ public class AuthenticationService {
     private boolean checkIfEmailAlreadyExists(String email) {
         Optional<User> userOptional = userRepository.findUserByEmail(email.toLowerCase());
         return userOptional.isPresent();
-    }
-
-    private void throwIfUserAlreadyHasRole(User user, RoleName roleName) {
-        List<RoleName> userRoleNames = user.getRoles().stream().map(Role::getRoleName).toList();
-        if (userRoleNames.contains(roleName)) {
-            throw new ResourceAlreadyExistsException(
-                    messageSource.getMessage("exception.authentication.userAlreadyRegisteredOnPlatform", null, Locale.getDefault())
-                            .formatted(user.getEmail(), roleService.getPlatformByRoleName(roleName))
-            );
-        }
-    }
-
-    private void throwIfUserNotRegisteredOnPlatform(User user, RoleName roleName) {
-        List<RoleName> roleNames = user.getRoles().stream().map(Role::getRoleName).toList();
-        if (!roleNames.contains(roleName)) {
-            throw new ResourceNotFoundException(
-                    messageSource.getMessage("exception.authentication.userNotRegisteredOnPlatform", null, Locale.getDefault())
-                            .formatted(user.getEmail(), roleService.getPlatformByRoleName(roleName))
-            );
-        }
     }
 }

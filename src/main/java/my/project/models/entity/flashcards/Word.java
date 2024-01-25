@@ -19,7 +19,8 @@ public class Word {
 
     private Long userId;
 
-    private Long wordDataId;
+    @OneToOne
+    private WordData wordData;
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -32,9 +33,9 @@ public class Word {
 
     private LocalDate dateOfLastOccurrence;
 
-    public Word(Long userId, Long wordDataId) {
+    public Word(Long userId, WordData wordData) {
         this.userId = userId;
-        this.wordDataId = wordDataId;
+        this.wordData = wordData;
         this.status = Status.NEW;
         this.currentStreak = 0;
         this.totalStreak = 0;

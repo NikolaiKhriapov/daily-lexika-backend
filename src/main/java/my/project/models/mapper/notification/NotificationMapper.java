@@ -2,6 +2,7 @@ package my.project.models.mapper.notification;
 
 import my.project.models.dto.notification.NotificationDTO;
 import my.project.models.entity.notification.Notification;
+import my.project.models.mapper.Mapper;
 import org.springframework.stereotype.Service;
 
 @Service

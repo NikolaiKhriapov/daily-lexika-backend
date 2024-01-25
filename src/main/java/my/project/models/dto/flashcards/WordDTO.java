@@ -35,8 +35,6 @@ public record WordDTO(
 
         LocalDate dateOfLastOccurrence,
 
-        List<Long> listOfChineseCharacterId,
-
         List<String> listOfWordPackNames
 ) {
 }
