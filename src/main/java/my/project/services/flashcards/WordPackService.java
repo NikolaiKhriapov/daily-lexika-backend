@@ -64,7 +64,7 @@ public class WordPackService {
     @Transactional
     public List<WordDTO> getAllWordsForWordPack(String wordPackName, Pageable pageable) {
         Long userId = authenticationService.getAuthenticatedUser().getId();
-        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPack(getWordPackByName(wordPackName));
+        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPackName(wordPackName);
 
         wordService.createOrUpdateWordsForUser(userId, wordDataIds);
 

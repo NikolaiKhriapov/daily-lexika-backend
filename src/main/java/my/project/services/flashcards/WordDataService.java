@@ -3,7 +3,6 @@ package my.project.services.flashcards;
 import lombok.RequiredArgsConstructor;
 import my.project.exception.ResourceNotFoundException;
 import my.project.models.entity.flashcards.WordData;
-import my.project.models.entity.flashcards.WordPack;
 import my.project.repositories.flashcards.WordDataRepository;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,7 @@ public class WordDataService {
                         "exception.wordData.notFound", null, Locale.getDefault())));
     }
 
-    public List<Long> getListOfAllWordDataIdsByWordPack(WordPack wordPack) {
-        return wordDataRepository.findAllWordDataIdsByWordPack(wordPack);
+    public List<Long> getListOfAllWordDataIdsByWordPackName(String wordPackName) {
+        return wordDataRepository.findAllWordDataIdsByWordPackName(wordPackName);
     }
 }

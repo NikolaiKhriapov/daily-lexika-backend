@@ -2,9 +2,7 @@ package my.project.services.user;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import my.project.models.dto.user.UserDTO;
 import my.project.models.entity.notification.Notification;
-import my.project.models.mapper.user.UserMapper;
 import my.project.services.notification.NotificationService;
 import my.project.models.dto.user.AuthenticationRequest;
 import my.project.models.dto.user.AuthenticationResponse;
@@ -13,14 +11,15 @@ import my.project.models.entity.user.User;
 import my.project.repositories.user.UserRepository;
 import my.project.models.entity.user.RoleName;
 import my.project.config.security.jwt.JwtService;
+import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -29,14 +28,14 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
     private final NotificationService notificationService;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
+    private final MessageSource messageSource;
 
     @Transactional
     public AuthenticationResponse register(RegistrationRequest registrationRequest) {
-        boolean isEmailAlreadyExists = checkIfEmailAlreadyExists(registrationRequest.email());
+        boolean isEmailAlreadyExists = userRepository.existsByEmail(registrationRequest.email().toLowerCase());
 
         RoleName roleName = roleService.getRoleNameByPlatform(registrationRequest.platform());
 
@@ -46,23 +45,19 @@ public class AuthenticationService {
                     .name(registrationRequest.name())
                     .email(registrationRequest.email().toLowerCase())
                     .password(passwordEncoder.encode(registrationRequest.password()))
-                    .role(roleName)
                     .build();
         } else {
-            Authentication authentication = authenticationManager.authenticate(
+            authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             registrationRequest.email(),
                             registrationRequest.password()
                     )
             );
-            user = (User) authentication.getPrincipal();
-
-            roleService.throwIfUserAlreadyHasRole(user, roleName);
-
-            user.setRole(roleName);
+            user = getUserByEmail(registrationRequest.email());
         }
 
         roleService.addRoleToUserRoles(user, roleName);
+        user.setRole(roleName);
 
         userRepository.save(user);
 
@@ -71,19 +66,18 @@ public class AuthenticationService {
         }
 
         String jwtToken = jwtService.generateToken(user);
-
         return new AuthenticationResponse(jwtToken);
     }
 
     @Transactional
     public AuthenticationResponse login(AuthenticationRequest authenticationRequest) {
-        Authentication authentication = authenticationManager.authenticate(
+        authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         authenticationRequest.email(),
                         authenticationRequest.password()
                 )
         );
-        User user = (User) authentication.getPrincipal();
+        User user = getUserByEmail(authenticationRequest.email());
 
         RoleName roleName = roleService.getRoleNameByPlatform(authenticationRequest.platform());
 
@@ -98,10 +92,6 @@ public class AuthenticationService {
 
     public User getAuthenticatedUser() {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
-
-    public UserDTO getAuthenticatedUserDTO() {
-        return userMapper.toDTO(getAuthenticatedUser());
     }
 
     private void sendWelcomeNotificationToUser(User user) {
@@ -127,8 +117,9 @@ public class AuthenticationService {
         );
     }
 
-    private boolean checkIfEmailAlreadyExists(String email) {
-        Optional<User> userOptional = userRepository.findUserByEmail(email.toLowerCase());
-        return userOptional.isPresent();
+    private User getUserByEmail(String email) {
+        return userRepository.findUserByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage(
+                        "exception.authentication.usernameNotFound", null, Locale.getDefault())));
     }
 }

@@ -5,7 +5,6 @@ public record ReviewStatisticsDTO(
         String wordPackName,
         int wordsNew,
         int wordsInReview,
-        int wordsKnown,
-        int wordsTotal
+        int wordsKnown
 ) {
 }
