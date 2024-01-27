@@ -165,8 +165,8 @@ public class TestDataSource {
                 arguments("Speakout (S) Unit 1", 0),
                 arguments("Speakout (S) Unit 1", 0),
                 arguments("Speakout (E) Unit 1", 0),
-                arguments("Speakout (PI) Unit 1", 0),
-                arguments("Speakout (PI) Unit 2", 0),
+                arguments("Speakout (PI) Unit 1", 73),
+                arguments("Speakout (PI) Unit 2", 22),
                 arguments("Speakout (I) Unit 1", 0),
                 arguments("Speakout (I) Unit 2", 0),
                 arguments("Speakout (UI) Unit 1", 0)
