@@ -6,7 +6,6 @@ import my.project.models.entity.flashcards.Word;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -63,4 +62,10 @@ public interface WordRepository extends JpaRepository<Word, Long> {
 
     @Query("SELECT w FROM words w WHERE w.userId = :userId AND w.wordData.platform = :platform")
     List<Word> findAllByUserIdAndPlatform(Long userId, Platform platform);
+
+    @Query("SELECT w FROM words w " +
+            "WHERE w.userId = :userId " +
+            "AND w.wordData.platform = :platform " +
+            "AND w.status = :status")
+    List<Word> findAllByUserIdAndPlatformAndStatus(Long userId, Platform platform, Status status, Pageable pageable);
 }

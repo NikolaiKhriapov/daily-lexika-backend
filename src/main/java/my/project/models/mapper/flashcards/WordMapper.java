@@ -7,6 +7,7 @@ import my.project.models.mapper.Mapper;
 import my.project.services.flashcards.WordDataService;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,18 +24,21 @@ public class WordMapper implements Mapper<Word, WordDTO> {
         return new WordDTO(
                 entity.getId(),
                 wordData.getNameChineseSimplified(),
-                wordData.getNameChineseTraditional(),
-                wordData.getPinyin(),
+                wordData.getTranscription(),
                 wordData.getNameEnglish(),
                 wordData.getNameRussian(),
+                wordData.getDefinition(),
+                Arrays.stream(wordData.getExamples().split(";"))
+                        .map(String::strip)
+                        .collect(Collectors.toSet()),
+                wordData.getListOfWordPacks().stream()
+                        .map(WordPack::getName)
+                        .toList(),
                 entity.getStatus(),
                 entity.getCurrentStreak(),
                 entity.getTotalStreak(),
                 entity.getOccurrence(),
-                entity.getDateOfLastOccurrence(),
-                wordData.getListOfWordPacks().stream()
-                        .map(WordPack::getName)
-                        .collect(Collectors.toList())
+                entity.getDateOfLastOccurrence()
         );
     }
 
@@ -44,14 +48,15 @@ public class WordMapper implements Mapper<Word, WordDTO> {
         return new WordDTO(
                 entity.getId(),
                 wordData.getNameChineseSimplified(),
-                wordData.getNameChineseTraditional(),
-                wordData.getPinyin(),
+                wordData.getTranscription(),
                 wordData.getNameEnglish(),
                 wordData.getNameRussian(),
+                null,
+                null,
+                null,
                 entity.getStatus(),
                 null,
                 entity.getTotalStreak(),
-                null,
                 null,
                 null
         );
@@ -60,6 +65,6 @@ public class WordMapper implements Mapper<Word, WordDTO> {
     public List<WordDTO> toDTOShortList(List<Word> entities) {
         return entities.stream()
                 .map(this::toDTOShort)
-                .collect(Collectors.toList());
+                .toList();
     }
 }
