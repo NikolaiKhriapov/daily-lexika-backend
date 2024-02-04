@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 public class ReviewMapper implements Mapper<Review, ReviewDTO> {
 
     private final WordMapper wordMapper;
+    private final WordPackMapper wordPackMapper;
 
     @Override
     public ReviewDTO toDTO(Review entity) {
@@ -21,7 +22,7 @@ public class ReviewMapper implements Mapper<Review, ReviewDTO> {
                 entity.getUserId(),
                 entity.getMaxNewWordsPerDay(),
                 entity.getMaxReviewWordsPerDay(),
-                entity.getWordPack().getName(),
+                wordPackMapper.toDTO(entity.getWordPack()),
                 entity.getListOfWords().stream()
                         .map(wordMapper::toDTOShort)
                         .collect(Collectors.toList()),

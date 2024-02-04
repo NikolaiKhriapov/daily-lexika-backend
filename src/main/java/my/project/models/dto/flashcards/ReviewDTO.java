@@ -20,7 +20,7 @@ public record ReviewDTO(
 
         Integer maxReviewWordsPerDay,
 
-        String wordPackName,
+        WordPackDTO wordPackDTO,
 
         @Nullable
         List<WordDTO> listOfWordDTO,

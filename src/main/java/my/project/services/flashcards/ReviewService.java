@@ -2,7 +2,6 @@ package my.project.services.flashcards;
 
 import lombok.RequiredArgsConstructor;
 import my.project.exception.ResourceNotFoundException;
-import my.project.exception.ResourceAlreadyExistsException;
 import my.project.models.dto.flashcards.ReviewStatisticsDTO;
 import my.project.models.entity.enumeration.Platform;
 import my.project.models.entity.user.RoleStatistics;
@@ -68,17 +67,11 @@ public class ReviewService {
     }
 
     public ReviewDTO createReview(ReviewDTO newReviewDTO) {
-        Long userId = authenticationService.getAuthenticatedUser().getId();
+        User user = authenticationService.getAuthenticatedUser();
 
-        List<String> wordPackNamesOfExistingReviews = reviewRepository.findAllReviewNamesByUserId(userId);
-        if (wordPackNamesOfExistingReviews.contains(newReviewDTO.wordPackName())) {
-            throw new ResourceAlreadyExistsException(
-                    messageSource.getMessage("exception.review.alreadyExists", null, Locale.getDefault())
-                            .formatted(newReviewDTO.wordPackName())
-            );
-        }
+        deleteReviewIfAlreadyExists(user, newReviewDTO);
 
-        Review newReview = generateReview(newReviewDTO, userId);
+        Review newReview = generateReview(newReviewDTO, user.getId());
         return reviewMapper.toDTO(reviewRepository.save(newReview));
     }
 
@@ -222,8 +215,19 @@ public class ReviewService {
         return null;
     }
 
+    private void deleteReviewIfAlreadyExists(User user, ReviewDTO reviewDTO) {
+        Platform platform = roleService.getPlatformByRoleName(user.getRole());
+
+        List<Review> existingReviews = reviewRepository.findAllByUserIdAndPlatform(user.getId(), platform);
+        for (Review existingReview : existingReviews) {
+            if (existingReview.getWordPack().getName().equals(reviewDTO.wordPackDTO().name())) {
+                deleteReview(existingReview.getId());
+            }
+        }
+    }
+
     private Review generateReview(ReviewDTO reviewDTO, Long userId) {
-        WordPack wordPack = wordPackService.getWordPackByName(reviewDTO.wordPackName());
+        WordPack wordPack = wordPackService.getWordPackByName(reviewDTO.wordPackDTO().name());
 
         List<Word> listOfWords = generateListOfWordsForReview(userId, wordPack, reviewDTO);
 
