@@ -25,6 +25,8 @@ public record ReviewDTO(
         @Nullable
         List<WordDTO> listOfWordDTO,
 
+        Integer actualSize,
+
         LocalDate dateLastCompleted,
 
         LocalDate dateGenerated

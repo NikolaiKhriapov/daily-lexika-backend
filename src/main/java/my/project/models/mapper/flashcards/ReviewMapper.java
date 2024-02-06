@@ -26,6 +26,7 @@ public class ReviewMapper implements Mapper<Review, ReviewDTO> {
                 entity.getListOfWords().stream()
                         .map(wordMapper::toDTOShort)
                         .collect(Collectors.toList()),
+                entity.getActualSize(),
                 entity.getDateLastCompleted(),
                 entity.getDateGenerated()
         );

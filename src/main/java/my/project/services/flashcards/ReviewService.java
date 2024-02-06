@@ -236,7 +236,8 @@ public class ReviewService {
                 reviewDTO.maxNewWordsPerDay(),
                 reviewDTO.maxReviewWordsPerDay(),
                 wordPack,
-                listOfWords
+                listOfWords,
+                listOfWords.size()
         );
     }
 
