@@ -1,6 +1,7 @@
 package my.project.util.data;
 
 import com.github.javafaker.Faker;
+import my.project.models.dto.flashcards.WordPackDTO;
 import my.project.models.entity.enumeration.Category;
 import my.project.models.entity.enumeration.Platform;
 
@@ -32,6 +33,16 @@ public class FakerUtil {
 
     // WordPack
 
+    public static WordPackDTO generateWordPackDTO(Platform platform) {
+        return new WordPackDTO(
+                generateWordPackName(platform),
+                generateWordPackDescription(),
+                generateWordPackCategory(platform),
+                100L,
+                null
+        );
+    }
+
     public static String generateWordPackName(Platform platform) {
         List<String> chineseWordPackNames = List.of("HSK 1", "HSK 2", "HSK 3", "HSK 4", "HSK 5", "HSK 6");
         List<String> englishWordPackNames = List.of("Speakout (S) Unit 1", "Speakout (E) Unit 1", "Speakout (PI) Unit 1", "Speakout (PI) Unit 2", "Speakout (I) Unit 1", "Speakout (I) Unit 2", "Speakout (UI) Unit 1");
@@ -62,11 +73,7 @@ public class FakerUtil {
         return generateStringCh(3);
     }
 
-    public static String generateNameChineseTraditional() {
-        return generateStringCh(3);
-    }
-
-    public static String generatePinyin() {
+    public static String generateTranscription() {
         return generateStringEn(10);
     }
 
@@ -76,6 +83,18 @@ public class FakerUtil {
 
     public static String generateNameRussian() {
         return generateStringRu(20);
+    }
+
+    public static String generateDefinition() {
+        return generateStringEn(50);
+    }
+
+    public static String generateExamples() {
+        return generateStringEn(20) + ";"
+                + generateStringEn(20) + ";"
+                + generateStringEn(20) + ";"
+                + generateStringEn(20) + ";"
+                + generateStringEn(20);
     }
 
     // helper methods

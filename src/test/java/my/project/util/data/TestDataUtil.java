@@ -108,8 +108,9 @@ public class TestDataUtil {
                 null,
                 FakerUtil.generateRandomInt(20),
                 FakerUtil.generateRandomInt(50),
-                FakerUtil.generateWordPackName(platform),
+                FakerUtil.generateWordPackDTO(platform),
                 null,
+                70,
                 null,
                 null
         );
@@ -128,10 +129,11 @@ public class TestDataUtil {
         return new WordData(
                 FakerUtil.generateId(),
                 FakerUtil.generateNameChineseSimplified(),
-                FakerUtil.generateNameChineseTraditional(),
-                FakerUtil.generatePinyin(),
+                FakerUtil.generateTranscription(),
                 FakerUtil.generateNameEnglish(),
                 FakerUtil.generateNameRussian(),
+                FakerUtil.generateDefinition(),
+                FakerUtil.generateExamples(),
                 wordPacks,
                 platform
         );
