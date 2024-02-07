@@ -8,7 +8,6 @@ import my.project.services.flashcards.WordDataService;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,31 +39,5 @@ public class WordMapper implements Mapper<Word, WordDTO> {
                 entity.getOccurrence(),
                 entity.getDateOfLastOccurrence()
         );
-    }
-
-    public WordDTO toDTOShort(Word entity) {
-        WordData wordData = wordDataService.getWordData(entity.getWordData().getId());
-
-        return new WordDTO(
-                entity.getId(),
-                wordData.getNameChineseSimplified(),
-                wordData.getTranscription(),
-                wordData.getNameEnglish(),
-                wordData.getNameRussian(),
-                null,
-                null,
-                null,
-                entity.getStatus(),
-                null,
-                entity.getTotalStreak(),
-                null,
-                null
-        );
-    }
-
-    public List<WordDTO> toDTOShortList(List<Word> entities) {
-        return entities.stream()
-                .map(this::toDTOShort)
-                .toList();
     }
 }

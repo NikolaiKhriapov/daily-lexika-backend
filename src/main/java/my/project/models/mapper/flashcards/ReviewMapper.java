@@ -24,7 +24,7 @@ public class ReviewMapper implements Mapper<Review, ReviewDTO> {
                 entity.getMaxReviewWordsPerDay(),
                 wordPackMapper.toDTO(entity.getWordPack()),
                 entity.getListOfWords().stream()
-                        .map(wordMapper::toDTOShort)
+                        .map(wordMapper::toDTO)
                         .collect(Collectors.toList()),
                 entity.getActualSize(),
                 entity.getDateLastCompleted(),

@@ -17,11 +17,6 @@ public class WordController {
 
     private final WordService wordService;
 
-    @GetMapping("/{wordId}")
-    public ResponseEntity<WordDTO> getWord(@PathVariable("wordId") Long wordId) {
-        return ResponseEntity.ok(wordService.getWordDTOById(wordId));
-    }
-
     @GetMapping("/status/{status}")
     public ResponseEntity<List<WordDTO>> getAllWordsByStatus(
             @PathVariable("status") Status status,

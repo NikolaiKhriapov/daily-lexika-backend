@@ -70,6 +70,6 @@ public class WordPackService {
 
         Page<Word> wordsPage = wordService.findByUserIdAndWordDataIdIn(userId, wordDataIds, pageable);
 
-        return new ArrayList<>(wordMapper.toDTOShortList(wordsPage.getContent()));
+        return new ArrayList<>(wordMapper.toDTOList(wordsPage.getContent()));
     }
 }

@@ -209,7 +209,7 @@ public class ReviewService {
     private WordDTO showOneReviewWord(Review review) {
         if (!review.getListOfWords().isEmpty()) {
             Word word = review.getListOfWords().get(0);
-            return wordMapper.toDTOShort(word);
+            return wordMapper.toDTO(word);
         }
         review.setDateLastCompleted(LocalDate.now());
         return null;
