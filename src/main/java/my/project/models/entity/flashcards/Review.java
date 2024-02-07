@@ -32,6 +32,8 @@ public class Review {
     @OrderColumn
     private List<Word> listOfWords;
 
+    private Integer actualSize;
+
     private LocalDate dateLastCompleted;
 
     private LocalDate dateGenerated;
@@ -40,12 +42,14 @@ public class Review {
                   Integer maxNewWordsPerDay,
                   Integer maxReviewWordsPerDay,
                   WordPack wordPack,
-                  List<Word> listOfWords) {
+                  List<Word> listOfWords,
+                  Integer actualSize) {
         this.userId = userId;
         this.maxNewWordsPerDay = maxNewWordsPerDay;
         this.maxReviewWordsPerDay = maxReviewWordsPerDay;
         this.wordPack = wordPack;
         this.listOfWords = listOfWords;
+        this.actualSize = actualSize;
         this.dateGenerated = LocalDate.now();
     }
 }

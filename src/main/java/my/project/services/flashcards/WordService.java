@@ -1,22 +1,53 @@
 package my.project.services.flashcards;
 
 import lombok.RequiredArgsConstructor;
+import my.project.exception.ResourceNotFoundException;
+import my.project.models.dto.flashcards.WordDTO;
 import my.project.models.entity.enumeration.Platform;
 import my.project.models.entity.enumeration.Status;
 import my.project.models.entity.flashcards.Word;
+import my.project.models.entity.user.RoleStatistics;
+import my.project.models.mapper.flashcards.WordMapper;
 import my.project.repositories.flashcards.WordRepository;
+import my.project.services.user.AuthenticationService;
+import my.project.services.user.RoleService;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
 public class WordService {
 
     private final WordRepository wordRepository;
+    private final WordMapper wordMapper;
     private final WordDataService wordDataService;
+    private final RoleService roleService;
+    private final AuthenticationService authenticationService;
+    private final MessageSource messageSource;
+
+    public Word getWordById(Long wordId) {
+        return wordRepository.findById(wordId)
+                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
+                        "exception.word.notFound", null, Locale.getDefault())));
+    }
+
+    public WordDTO getWordDTOById(Long wordId) {
+        Word word = getWordById(wordId);
+        return wordMapper.toDTO(word);
+    }
+
+    public List<WordDTO> getAllWordsByStatus(Status status, Pageable pageable) {
+        Long userId = authenticationService.getAuthenticatedUser().getId();
+        RoleStatistics currentRole = roleService.getRoleStatistics();
+        Platform platform = roleService.getPlatformByRoleName(currentRole.getRoleName());
+        List<Word> allWordsByStatus = wordRepository.findAllByUserIdAndPlatformAndStatus(userId, platform, status, pageable);
+        return wordMapper.toDTOList(allWordsByStatus);
+    }
 
     public void createOrUpdateWordsForUser(Long userId, List<Long> wordDataIds) {
         List<Word> existingWords = wordRepository.findByUserIdAndWordDataIdIn(userId, wordDataIds);

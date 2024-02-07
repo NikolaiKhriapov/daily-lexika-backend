@@ -2,7 +2,6 @@ package my.project.services.flashcards;
 
 import lombok.RequiredArgsConstructor;
 import my.project.exception.ResourceNotFoundException;
-import my.project.exception.ResourceAlreadyExistsException;
 import my.project.models.dto.flashcards.ReviewStatisticsDTO;
 import my.project.models.entity.enumeration.Platform;
 import my.project.models.entity.user.RoleStatistics;
@@ -67,19 +66,13 @@ public class ReviewService {
         return reviewMapper.toDTO(getReview(reviewId));
     }
 
-    public void createReview(ReviewDTO newReviewDTO) {
-        Long userId = authenticationService.getAuthenticatedUser().getId();
+    public ReviewDTO createReview(ReviewDTO newReviewDTO) {
+        User user = authenticationService.getAuthenticatedUser();
 
-        List<String> wordPackNamesOfExistingReviews = reviewRepository.findAllReviewNamesByUserId(userId);
-        if (wordPackNamesOfExistingReviews.contains(newReviewDTO.wordPackName())) {
-            throw new ResourceAlreadyExistsException(
-                    messageSource.getMessage("exception.review.alreadyExists", null, Locale.getDefault())
-                            .formatted(newReviewDTO.wordPackName())
-            );
-        }
+        deleteReviewIfAlreadyExists(user, newReviewDTO);
 
-        Review newReview = generateReview(newReviewDTO, userId);
-        reviewRepository.save(newReview);
+        Review newReview = generateReview(newReviewDTO, user.getId());
+        return reviewMapper.toDTO(reviewRepository.save(newReview));
     }
 
     @Transactional
@@ -136,7 +129,7 @@ public class ReviewService {
         Long userId = authenticationService.getAuthenticatedUser().getId();
 
         Review review = getReview(reviewId);
-        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPack(review.getWordPack());
+        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPackName(review.getWordPack().getName());
 
         Integer newWords = wordService.countByUserIdAndWordDataIdInAndStatusEquals(userId, wordDataIds, NEW);
         Integer reviewWords = wordService.countByUserIdAndWordDataIdInAndStatusEquals(userId, wordDataIds, IN_REVIEW);
@@ -147,8 +140,7 @@ public class ReviewService {
                 review.getWordPack().getName(),
                 newWords,
                 reviewWords,
-                knownWords,
-                wordDataIds.size()
+                knownWords
         );
     }
 
@@ -171,7 +163,7 @@ public class ReviewService {
      * KNOWN -> if dateOfLastOccurrence >= totalStreak
      **/
     public List<Word> generateListOfWordsForReview(Long userId, WordPack wordPack, ReviewDTO reviewDTO) {
-        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPack(wordPack);
+        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPackName(wordPack.getName());
 
         wordService.createOrUpdateWordsForUser(userId, wordDataIds);
 
@@ -223,8 +215,19 @@ public class ReviewService {
         return null;
     }
 
+    private void deleteReviewIfAlreadyExists(User user, ReviewDTO reviewDTO) {
+        Platform platform = roleService.getPlatformByRoleName(user.getRole());
+
+        List<Review> existingReviews = reviewRepository.findAllByUserIdAndPlatform(user.getId(), platform);
+        for (Review existingReview : existingReviews) {
+            if (existingReview.getWordPack().getName().equals(reviewDTO.wordPackDTO().name())) {
+                deleteReview(existingReview.getId());
+            }
+        }
+    }
+
     private Review generateReview(ReviewDTO reviewDTO, Long userId) {
-        WordPack wordPack = wordPackService.getWordPackByName(reviewDTO.wordPackName());
+        WordPack wordPack = wordPackService.getWordPackByName(reviewDTO.wordPackDTO().name());
 
         List<Word> listOfWords = generateListOfWordsForReview(userId, wordPack, reviewDTO);
 
@@ -233,7 +236,8 @@ public class ReviewService {
                 reviewDTO.maxNewWordsPerDay(),
                 reviewDTO.maxReviewWordsPerDay(),
                 wordPack,
-                listOfWords
+                listOfWords,
+                listOfWords.size()
         );
     }
 

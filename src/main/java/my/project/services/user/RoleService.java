@@ -25,6 +25,7 @@ public class RoleService {
         if (user.getRoleStatistics() == null) {
             user.setRoleStatistics(new HashSet<>());
         }
+        throwIfUserAlreadyHasThisRole(user, roleName);
         user.getRoleStatistics().add(new RoleStatistics(roleName));
     }
 
@@ -41,8 +42,8 @@ public class RoleService {
 
     public RoleName getRoleNameByPlatform(Platform platform) {
         return switch (platform) {
-            case CHINESE -> RoleName.USER_CHINESE;
             case ENGLISH -> RoleName.USER_ENGLISH;
+            case CHINESE -> RoleName.USER_CHINESE;
         };
     }
 
@@ -52,16 +53,8 @@ public class RoleService {
         return user.getRoleStatistics().stream()
                 .filter(role -> role.getRoleName().equals(user.getRole()))
                 .findFirst()
-                .orElse(null);
-    }
-
-    public void throwIfUserAlreadyHasRole(User user, RoleName roleName) {
-        if (isUserRolesContainsRole(user, roleName)) {
-            throw new ResourceAlreadyExistsException(
-                    messageSource.getMessage("exception.authentication.userAlreadyRegisteredOnPlatform", null, Locale.getDefault())
-                            .formatted(user.getEmail(), getPlatformByRoleName(roleName))
-            );
-        }
+                .orElseThrow(() -> new IllegalStateException(messageSource.getMessage(
+                        "exception.role.setOfRoleStatisticsDoesNotContainCurrentRole", null, Locale.getDefault())));
     }
 
     public void throwIfUserNotRegisteredOnPlatform(User user, RoleName roleName) {
@@ -76,5 +69,14 @@ public class RoleService {
     private boolean isUserRolesContainsRole(User user, RoleName roleName) {
         List<RoleName> userRoleNames = user.getRoleStatistics().stream().map(RoleStatistics::getRoleName).toList();
         return userRoleNames.contains(roleName);
+    }
+
+    private void throwIfUserAlreadyHasThisRole(User user, RoleName roleName) {
+        if (isUserRolesContainsRole(user, roleName)) {
+            throw new ResourceAlreadyExistsException(
+                    messageSource.getMessage("exception.authentication.userAlreadyRegisteredOnPlatform", null, Locale.getDefault())
+                            .formatted(user.getEmail(), getPlatformByRoleName(roleName))
+            );
+        }
     }
 }

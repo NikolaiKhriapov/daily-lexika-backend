@@ -112,17 +112,18 @@ public class ExcelDataHandler {
                         switch (cellIdx) {
                             case 0 -> wordData.setId((long) currentCell.getNumericCellValue());
                             case 1 -> wordData.setNameChineseSimplified(currentCell.getStringCellValue());
-                            case 2 -> wordData.setNameChineseTraditional(currentCell.getStringCellValue());
-                            case 3 -> wordData.setPinyin(currentCell.getStringCellValue());
-                            case 4 -> wordData.setNameEnglish(currentCell.getStringCellValue());
-                            case 5 -> wordData.setNameRussian(currentCell.getStringCellValue());
-                            case 6 -> {
+                            case 2 -> wordData.setTranscription(currentCell.getStringCellValue());
+                            case 3 -> wordData.setNameEnglish(currentCell.getStringCellValue());
+                            case 4 -> wordData.setNameRussian(currentCell.getStringCellValue());
+                            case 5 -> {
                                 List<WordPack> listOfWordPacks = new ArrayList<>();
                                 WordPack wordPack = wordPackRepository.findById(currentCell.getStringCellValue())
                                         .orElseThrow(() -> new IllegalStateException("NOT FOUND"));
                                 listOfWordPacks.add(wordPack);
                                 wordData.setListOfWordPacks(listOfWordPacks);
                             }
+                            case 6 -> wordData.setDefinition(currentCell.getStringCellValue());
+                            case 7 -> wordData.setExamples(currentCell.getStringCellValue());
                             default -> {
                             }
                         }
@@ -131,14 +132,18 @@ public class ExcelDataHandler {
                         switch (cellIdx) {
                             case 0 -> wordData.setId((long) currentCell.getNumericCellValue());
                             case 1 -> wordData.setNameEnglish(currentCell.getStringCellValue());
-                            case 2 -> wordData.setNameRussian(currentCell.getStringCellValue());
-                            case 3 -> {
+                            case 2 -> wordData.setTranscription(currentCell.getStringCellValue());
+                            case 3 -> wordData.setNameRussian(currentCell.getStringCellValue());
+                            case 4 -> wordData.setNameChineseSimplified(currentCell.getStringCellValue());
+                            case 5 -> {
                                 List<WordPack> listOfWordPacks = new ArrayList<>();
                                 WordPack wordPack = wordPackRepository.findById(currentCell.getStringCellValue())
                                         .orElseThrow(() -> new IllegalStateException("NOT FOUND"));
                                 listOfWordPacks.add(wordPack);
                                 wordData.setListOfWordPacks(listOfWordPacks);
                             }
+                            case 6 -> wordData.setDefinition(currentCell.getStringCellValue());
+                            case 7 -> wordData.setExamples(currentCell.getStringCellValue());
                             default -> {
                             }
                         }
@@ -196,12 +201,12 @@ public class ExcelDataHandler {
                 WordData wordDataToBeUpdated = wordDataRepository.findById(wordData.getId())
                         .orElseThrow(() -> new IllegalStateException("NOT FOUND"));
                 wordDataToBeUpdated.setNameChineseSimplified(wordData.getNameChineseSimplified());
-                wordDataToBeUpdated.setNameChineseTraditional(wordData.getNameChineseTraditional());
-                wordDataToBeUpdated.setPinyin(wordData.getPinyin());
+                wordDataToBeUpdated.setTranscription(wordData.getTranscription());
                 wordDataToBeUpdated.setNameEnglish(wordData.getNameEnglish());
                 wordDataToBeUpdated.setNameRussian(wordData.getNameRussian());
                 wordDataToBeUpdated.setListOfWordPacks(wordData.getListOfWordPacks());
-                wordDataToBeUpdated.setListOfWordPacks(wordData.getListOfWordPacks());
+                wordDataToBeUpdated.setDefinition(wordData.getDefinition());
+                wordDataToBeUpdated.setExamples(wordData.getExamples());
                 wordDataToBeUpdated.setPlatform(wordData.getPlatform());
                 wordsToBeUpdated.add(wordDataToBeUpdated);
             }

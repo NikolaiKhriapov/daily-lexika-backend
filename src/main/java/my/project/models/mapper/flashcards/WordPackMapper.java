@@ -28,7 +28,7 @@ public class WordPackMapper implements Mapper<WordPack, WordPackDTO> {
                 entity.getName(),
                 entity.getDescription(),
                 entity.getCategory(),
-                (long) wordDataService.getListOfAllWordDataIdsByWordPack(entity).size(),
+                (long) wordDataService.getListOfAllWordDataIdsByWordPackName(entity.getName()).size(),
                 reviewId
         );
     }
