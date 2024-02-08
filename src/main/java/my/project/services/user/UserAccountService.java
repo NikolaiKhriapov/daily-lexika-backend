@@ -2,6 +2,7 @@ package my.project.services.user;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import my.project.models.dto.user.PasswordUpdateRequest;
 import my.project.models.entity.enumeration.Platform;
 import my.project.models.entity.user.RoleStatistics;
 import my.project.models.entity.user.User;
@@ -37,11 +38,22 @@ public class UserAccountService {
         if (userDTO.email() != null && !Objects.equals(userDTO.email(), user.getEmail())) {
             user.setEmail(userDTO.email());
         }
-        if (userDTO.password() != null) {
-            user.setPassword(passwordEncoder.encode(userDTO.password()));
-        }
 
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void updatePassword(PasswordUpdateRequest request) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        boolean passwordsMatch = passwordEncoder.matches(request.passwordCurrent(), user.getPassword());
+
+        if (passwordsMatch) {
+            user.setPassword(passwordEncoder.encode(request.passwordNew()));
+            userRepository.save(user);
+        } else {
+            throw new IllegalStateException("Incorrect password");
+        }
     }
 
     @Transactional

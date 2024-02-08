@@ -1,6 +1,7 @@
 package my.project.controllers.user;
 
 import lombok.RequiredArgsConstructor;
+import my.project.models.dto.user.PasswordUpdateRequest;
 import my.project.models.dto.user.UserDTO;
 import my.project.services.user.UserAccountService;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,12 @@ public class UserAccountController {
     @PatchMapping("/info")
     public ResponseEntity<Void> updateUserInfo(@RequestBody UserDTO userDTO) {
         userAccountService.updateUserInfo(userDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<Void> updatePassword(@RequestBody PasswordUpdateRequest passwordUpdateRequest) {
+        userAccountService.updatePassword(passwordUpdateRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
