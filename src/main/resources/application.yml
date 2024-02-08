@@ -33,9 +33,12 @@ cors:
 file-location:
   data-excel: "src/main/resources/static/data/Data.xlsx"
 
-#logging:
-#  level:
-#    root: debug
+logging:
+  level:
+    org:
+      springframework:
+        web: debug
+    root: info
 
 #file-storage:
 #  profile-photo-directory: "backend/file-storage/src/main/resources/static/images/user-%s/profile-photo/"

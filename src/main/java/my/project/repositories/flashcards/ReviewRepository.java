@@ -7,12 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT r FROM reviews r WHERE r.userId = :userId AND r.wordPack.name = :wordPackName")
-    Review findByUserIdAndWordPackName(Long userId, String wordPackName);
+    Optional<Review> findByUserIdAndWordPackName(Long userId, String wordPackName);
 
     @Query("SELECT r FROM reviews r WHERE r.userId = :userId AND r.wordPack.platform = :platform")
     List<Review> findAllByUserIdAndPlatform(Long userId, Platform platform);
