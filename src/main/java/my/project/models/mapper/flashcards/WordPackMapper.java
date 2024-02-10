@@ -10,6 +10,8 @@ import my.project.services.flashcards.WordDataService;
 import my.project.services.user.AuthenticationService;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class WordPackMapper implements Mapper<WordPack, WordPackDTO> {
@@ -21,8 +23,8 @@ public class WordPackMapper implements Mapper<WordPack, WordPackDTO> {
     @Override
     public WordPackDTO toDTO(WordPack entity) {
         Long userId = authenticationService.getAuthenticatedUser().getId();
-        Review review = reviewRepository.findByUserIdAndWordPackName(userId, entity.getName());
-        Long reviewId = review != null ? review.getId() : null;
+        Optional<Review> review = reviewRepository.findByUserIdAndWordPackName(userId, entity.getName());
+        Long reviewId = review.map(Review::getId).orElse(null);
 
         return new WordPackDTO(
                 entity.getName(),

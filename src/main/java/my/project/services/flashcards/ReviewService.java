@@ -227,7 +227,7 @@ public class ReviewService {
     }
 
     private Review generateReview(ReviewDTO reviewDTO, Long userId) {
-        WordPack wordPack = wordPackService.getWordPackByName(reviewDTO.wordPackDTO().name());
+        WordPack wordPack = wordPackService.findByName(reviewDTO.wordPackDTO().name());
 
         List<Word> listOfWords = generateListOfWordsForReview(userId, wordPack, reviewDTO);
 

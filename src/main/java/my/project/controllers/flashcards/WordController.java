@@ -18,11 +18,9 @@ public class WordController {
     private final WordService wordService;
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<WordDTO>> getAllWordsByStatus(
-            @PathVariable("status") Status status,
-            @RequestParam("page") int page,
-            @RequestParam("size") int size
-    ) {
+    public ResponseEntity<List<WordDTO>> getAllWordsByStatus(@PathVariable("status") Status status,
+                                                             @RequestParam("page") int page,
+                                                             @RequestParam("size") int size) {
         return ResponseEntity.ok(wordService.getAllWordsByStatus(status, PageRequest.of(page, size)));
     }
 }

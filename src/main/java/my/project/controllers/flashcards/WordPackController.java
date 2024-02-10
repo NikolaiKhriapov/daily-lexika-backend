@@ -5,6 +5,7 @@ import my.project.models.dto.flashcards.WordDTO;
 import my.project.models.dto.flashcards.WordPackDTO;
 import my.project.services.flashcards.WordPackService;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,20 +20,44 @@ public class WordPackController {
 
     @GetMapping
     public ResponseEntity<List<WordPackDTO>> getAllWordPacks() {
-        return ResponseEntity.ok(wordPackService.getAllWordPacks());
+        return ResponseEntity.ok(wordPackService.getAllWordPacksForUser());
     }
 
     @GetMapping("/{wordPackName}")
     public ResponseEntity<WordPackDTO> getWordPack(@PathVariable("wordPackName") String wordPackName) {
-        return ResponseEntity.ok(wordPackService.getWordPackDTOByName(wordPackName));
+        return ResponseEntity.ok(wordPackService.getWordPackByName(wordPackName));
     }
 
     @GetMapping("/{wordPackName}/words")
-    public ResponseEntity<List<WordDTO>> getAllWordsForWordPack(
-            @PathVariable("wordPackName") String wordPackName,
-            @RequestParam("page") int page,
-            @RequestParam("size") int size
-    ) {
+    public ResponseEntity<List<WordDTO>> getAllWordsForWordPack(@PathVariable("wordPackName") String wordPackName,
+                                                                @RequestParam("page") int page,
+                                                                @RequestParam("size") int size) {
         return ResponseEntity.ok(wordPackService.getAllWordsForWordPack(wordPackName, PageRequest.of(page, size)));
+    }
+
+    @PostMapping
+    public ResponseEntity<Void> createCustomWordPack(@RequestBody WordPackDTO wordPackDTO) {
+        wordPackService.createCustomWordPack(wordPackDTO);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{wordPackName}")
+    public ResponseEntity<Void> deleteCustomWordPack(@PathVariable("wordPackName") String wordPackName) {
+        wordPackService.deleteCustomWordPack(wordPackName);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{wordPackName}/add-word/{wordDataId}")
+    public ResponseEntity<WordPackDTO> addWordToCustomWordPack(@PathVariable("wordPackName") String wordPackName,
+                                                               @PathVariable("wordDataId") Long wordDataId) {
+        wordPackService.addWordToCustomWordPack(wordPackName, wordDataId);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{wordPackName}/remove-word/{wordDataId}")
+    public ResponseEntity<WordPackDTO> removeWordFromCustomWordPack(@PathVariable("wordPackName") String wordPackName,
+                                                                    @PathVariable("wordDataId") Long wordDataId) {
+        wordPackService.removeWordFromCustomWordPack(wordPackName, wordDataId);
+        return ResponseEntity.ok().build();
     }
 }

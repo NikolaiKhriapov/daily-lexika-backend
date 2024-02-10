@@ -3,36 +3,39 @@ package my.project.config.datahandler;
 import lombok.RequiredArgsConstructor;
 import my.project.models.entity.flashcards.WordData;
 import my.project.models.entity.enumeration.Platform;
-import my.project.repositories.flashcards.WordDataRepository;
 import my.project.models.entity.enumeration.Category;
 import my.project.models.entity.flashcards.WordPack;
-import my.project.repositories.flashcards.WordPackRepository;
+import my.project.services.flashcards.WordDataService;
+import my.project.services.flashcards.WordPackService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
 public class ExcelDataHandler {
 
-    private final WordPackRepository wordPackRepository;
-    private final WordDataRepository wordDataRepository;
+    private final WordPackService wordPackService;
+    private final WordDataService wordDataService;
+    private final MessageSource messageSource;
 
+    @Transactional
     public void importWordPacks(String file, String fileSheet, Platform platform) {
         List<WordPack> listOfWordPacks = getWordPacksFromExcel(file, fileSheet, platform);
         saveWordPacksToDatabase(listOfWordPacks);
         System.out.println("ExcelDataHandler Report: " + fileSheet + " updated!");
     }
 
+    @Transactional
     public void importWords(String file, String[] fileSheets, Platform platform) {
         for (String fileSheet : fileSheets) {
             List<WordData> listOfWordData = getWordsFromExcel(file, fileSheet, platform);
@@ -112,16 +115,10 @@ public class ExcelDataHandler {
                         switch (cellIdx) {
                             case 0 -> wordData.setId((long) currentCell.getNumericCellValue());
                             case 1 -> wordData.setNameChineseSimplified(currentCell.getStringCellValue());
-                            case 2 -> wordData.setTranscription(currentCell.getStringCellValue());
+                            case 2 -> wordData.setTranscription(currentCell.getStringCellValue().replaceAll("(?<!,) ", ""));
                             case 3 -> wordData.setNameEnglish(currentCell.getStringCellValue());
                             case 4 -> wordData.setNameRussian(currentCell.getStringCellValue());
-                            case 5 -> {
-                                List<WordPack> listOfWordPacks = new ArrayList<>();
-                                WordPack wordPack = wordPackRepository.findById(currentCell.getStringCellValue())
-                                        .orElseThrow(() -> new IllegalStateException("NOT FOUND"));
-                                listOfWordPacks.add(wordPack);
-                                wordData.setListOfWordPacks(listOfWordPacks);
-                            }
+                            case 5 -> wordData.setListOfWordPacks(getWordPacksFromCellValue(wordData, currentCell.getStringCellValue()));
                             case 6 -> wordData.setDefinition(currentCell.getStringCellValue());
                             case 7 -> wordData.setExamples(currentCell.getStringCellValue());
                             default -> {
@@ -135,13 +132,7 @@ public class ExcelDataHandler {
                             case 2 -> wordData.setTranscription(currentCell.getStringCellValue());
                             case 3 -> wordData.setNameRussian(currentCell.getStringCellValue());
                             case 4 -> wordData.setNameChineseSimplified(currentCell.getStringCellValue());
-                            case 5 -> {
-                                List<WordPack> listOfWordPacks = new ArrayList<>();
-                                WordPack wordPack = wordPackRepository.findById(currentCell.getStringCellValue())
-                                        .orElseThrow(() -> new IllegalStateException("NOT FOUND"));
-                                listOfWordPacks.add(wordPack);
-                                wordData.setListOfWordPacks(listOfWordPacks);
-                            }
+                            case 5 -> wordData.setListOfWordPacks(getWordPacksFromCellValue(wordData, currentCell.getStringCellValue()));
                             case 6 -> wordData.setDefinition(currentCell.getStringCellValue());
                             case 7 -> wordData.setExamples(currentCell.getStringCellValue());
                             default -> {
@@ -162,12 +153,13 @@ public class ExcelDataHandler {
             workbook.close();
             return listOfWordData;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to parse Excel file: " + e.getMessage());
+            throw new RuntimeException(messageSource.getMessage("exception.excel.parse", null, Locale.getDefault())
+                    .formatted(e.getMessage()));
         }
     }
 
     private void saveWordPacksToDatabase(List<WordPack> listOfWordPacks) {
-        List<WordPack> allWordPacks = wordPackRepository.findAll();
+        List<WordPack> allWordPacks = wordPackService.findAll();
         List<String> allWordPackNames = allWordPacks.stream()
                 .map(WordPack::getName)
                 .toList();
@@ -177,29 +169,26 @@ public class ExcelDataHandler {
             if (!allWordPackNames.contains(wordPack.getName())) {
                 wordsPacksToBeSavedOrUpdated.add(wordPack);
             } else {
-                WordPack wordPackToBeUpdated = wordPackRepository.findById(wordPack.getName())
-                        .orElseThrow(() -> new IllegalStateException("NOT FOUND"));
+                WordPack wordPackToBeUpdated = wordPackService.findByName(wordPack.getName());
                 wordPackToBeUpdated.setDescription(wordPack.getDescription());
                 wordPackToBeUpdated.setCategory(wordPack.getCategory());
                 wordPackToBeUpdated.setPlatform(wordPack.getPlatform());
                 wordsPacksToBeSavedOrUpdated.add(wordPackToBeUpdated);
             }
         }
-        wordPackRepository.saveAll(wordsPacksToBeSavedOrUpdated);
+        wordPackService.saveAll(wordsPacksToBeSavedOrUpdated);
     }
 
     private void saveWordsToDatabase(List<WordData> listOfWordData) {
-        List<WordData> allWordData = wordDataRepository.findAll();
+        List<WordData> allWordData = wordDataService.findAll();
         List<Long> allWordsId = allWordData.stream().map(WordData::getId).toList();
 
-        List<WordData> wordsToBeSaved = new ArrayList<>();
-        List<WordData> wordsToBeUpdated = new ArrayList<>();
+        List<WordData> wordsToBeSavedOrUpdated = new ArrayList<>();
         for (WordData wordData : listOfWordData) {
             if (!allWordsId.contains(wordData.getId())) {
-                wordsToBeSaved.add(wordData);
+                wordsToBeSavedOrUpdated.add(wordData);
             } else {
-                WordData wordDataToBeUpdated = wordDataRepository.findById(wordData.getId())
-                        .orElseThrow(() -> new IllegalStateException("NOT FOUND"));
+                WordData wordDataToBeUpdated = wordDataService.findById(wordData.getId());
                 wordDataToBeUpdated.setNameChineseSimplified(wordData.getNameChineseSimplified());
                 wordDataToBeUpdated.setTranscription(wordData.getTranscription());
                 wordDataToBeUpdated.setNameEnglish(wordData.getNameEnglish());
@@ -208,10 +197,27 @@ public class ExcelDataHandler {
                 wordDataToBeUpdated.setDefinition(wordData.getDefinition());
                 wordDataToBeUpdated.setExamples(wordData.getExamples());
                 wordDataToBeUpdated.setPlatform(wordData.getPlatform());
-                wordsToBeUpdated.add(wordDataToBeUpdated);
+                wordsToBeSavedOrUpdated.add(wordDataToBeUpdated);
             }
         }
-        wordDataRepository.saveAll(wordsToBeSaved);
-        wordDataRepository.saveAll(wordsToBeUpdated);
+        wordDataService.saveAll(wordsToBeSavedOrUpdated);
+    }
+
+    private List<WordPack> getWordPacksFromCellValue(WordData wordData, String stringCellValue) {
+        List<WordPack> listOfWordPacks = new ArrayList<>();
+
+        List<String> wordPackNames = Arrays.stream(stringCellValue.split(";")).toList();
+        wordPackNames.forEach(wordPackName -> {
+            WordPack wordPack = wordPackService.findByName(wordPackName);
+            listOfWordPacks.add(wordPack);
+        });
+
+        WordData wordDataExisting = wordDataService.findById(wordData.getId());
+        for (WordPack wordPack : wordDataExisting.getListOfWordPacks()) {
+            if (wordPack.getCategory() == Category.CUSTOM) {
+                listOfWordPacks.add(wordPack);
+            }
+        }
+        return listOfWordPacks;
     }
 }

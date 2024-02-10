@@ -40,7 +40,7 @@ public class WordService {
                 .filter(wordDataId -> existingWords.stream()
                         .noneMatch(word -> word.getWordData().getId().equals(wordDataId))
                 )
-                .map(wordDataId -> new Word(userId, wordDataService.getWordData(wordDataId))) // TODO::: change to mapper
+                .map(wordDataId -> new Word(userId, wordDataService.findById(wordDataId))) // TODO::: change to mapper
                 .toList();
 
         wordRepository.saveAll(wordsToBeSaved);
