@@ -212,11 +212,14 @@ public class ExcelDataHandler {
             listOfWordPacks.add(wordPack);
         });
 
-        WordData wordDataExisting = wordDataService.findById(wordData.getId());
-        for (WordPack wordPack : wordDataExisting.getListOfWordPacks()) {
-            if (wordPack.getCategory() == Category.CUSTOM) {
-                listOfWordPacks.add(wordPack);
+        try {
+            WordData wordDataExisting = wordDataService.findById(wordData.getId());
+            for (WordPack wordPack : wordDataExisting.getListOfWordPacks()) {
+                if (wordPack.getCategory() == Category.CUSTOM) {
+                    listOfWordPacks.add(wordPack);
+                }
             }
+        } catch (Exception ignored) {
         }
         return listOfWordPacks;
     }
