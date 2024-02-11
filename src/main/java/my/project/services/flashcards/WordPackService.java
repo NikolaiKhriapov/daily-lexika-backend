@@ -6,11 +6,13 @@ import my.project.exception.BadRequestException;
 import my.project.exception.ResourceAlreadyExistsException;
 import my.project.exception.ResourceNotFoundException;
 import my.project.models.dto.flashcards.WordDTO;
+import my.project.models.dto.flashcards.WordDataDTO;
 import my.project.models.entity.enumeration.Category;
 import my.project.models.entity.enumeration.Platform;
 import my.project.models.entity.flashcards.Review;
 import my.project.models.entity.flashcards.WordData;
 import my.project.models.entity.user.User;
+import my.project.models.mapper.flashcards.WordDataMapper;
 import my.project.models.mapper.flashcards.WordPackMapper;
 import my.project.models.dto.flashcards.WordPackDTO;
 import my.project.models.mapper.flashcards.WordMapper;
@@ -39,6 +41,7 @@ public class WordPackService {
     private final WordMapper wordMapper;
     private final WordService wordService;
     private final WordDataService wordDataService;
+    private final WordDataMapper wordDataMapper;
     private final AuthenticationService authenticationService;
     private final RoleService roleService;
     private final MessageSource messageSource;
@@ -128,7 +131,7 @@ public class WordPackService {
         wordPackRepository.delete(wordPack);
     }
 
-    public void addWordToCustomWordPack(String wordPackName, Long wordDataId) {
+    public WordDataDTO addWordToCustomWordPack(String wordPackName, Long wordDataId) {
         WordPack wordPack = findByName(wordPackName);
 
         throwIfWordPackCategoryNotCustom(wordPack);
@@ -144,10 +147,10 @@ public class WordPackService {
         }
         wordData.setListOfWordPacks(listOfWordPacks);
 
-        wordDataService.save(wordData);
+        return wordDataMapper.toDTO(wordDataService.save(wordData));
     }
 
-    public void removeWordFromCustomWordPack(String wordPackName, Long wordDataId) {
+    public WordDataDTO removeWordFromCustomWordPack(String wordPackName, Long wordDataId) {
         WordPack wordPack = findByName(wordPackName);
 
         throwIfWordPackCategoryNotCustom(wordPack);
@@ -163,7 +166,7 @@ public class WordPackService {
         }
         wordData.setListOfWordPacks(listOfWordPacks);
 
-        wordDataService.save(wordData);
+        return wordDataMapper.toDTO(wordDataService.save(wordData));
     }
 
     private void throwIfReviewExistsForWordPack(String wordPackName) {

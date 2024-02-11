@@ -15,8 +15,8 @@ public class WordDataController {
 
     private final WordDataService wordDataService;
 
-    @GetMapping("/search/{searchQuery}")
-    public ResponseEntity<List<WordDataDTO>> search(@PathVariable("searchQuery") String searchQuery) {
-        return ResponseEntity.ok(wordDataService.search(searchQuery));
+    @GetMapping
+    public ResponseEntity<List<WordDataDTO>> getAllWordData() {
+        return ResponseEntity.ok(wordDataService.getAllWordData());
     }
 }

@@ -2,6 +2,7 @@ package my.project.controllers.flashcards;
 
 import lombok.RequiredArgsConstructor;
 import my.project.models.dto.flashcards.WordDTO;
+import my.project.models.dto.flashcards.WordDataDTO;
 import my.project.models.dto.flashcards.WordPackDTO;
 import my.project.services.flashcards.WordPackService;
 import org.springframework.data.domain.PageRequest;
@@ -48,16 +49,14 @@ public class WordPackController {
     }
 
     @GetMapping("/{wordPackName}/add-word/{wordDataId}")
-    public ResponseEntity<WordPackDTO> addWordToCustomWordPack(@PathVariable("wordPackName") String wordPackName,
+    public ResponseEntity<WordDataDTO> addWordToCustomWordPack(@PathVariable("wordPackName") String wordPackName,
                                                                @PathVariable("wordDataId") Long wordDataId) {
-        wordPackService.addWordToCustomWordPack(wordPackName, wordDataId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(wordPackService.addWordToCustomWordPack(wordPackName, wordDataId));
     }
 
     @GetMapping("/{wordPackName}/remove-word/{wordDataId}")
-    public ResponseEntity<WordPackDTO> removeWordFromCustomWordPack(@PathVariable("wordPackName") String wordPackName,
+    public ResponseEntity<WordDataDTO> removeWordFromCustomWordPack(@PathVariable("wordPackName") String wordPackName,
                                                                     @PathVariable("wordDataId") Long wordDataId) {
-        wordPackService.removeWordFromCustomWordPack(wordPackName, wordDataId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(wordPackService.removeWordFromCustomWordPack(wordPackName, wordDataId));
     }
 }
