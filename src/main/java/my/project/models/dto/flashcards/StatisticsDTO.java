@@ -5,9 +5,9 @@ import java.util.List;
 public record StatisticsDTO(
         Long currentStreak,
         Long recordStreak,
-        int wordsKnown,
-//        int charactersKnown,
-//        int idiomsKnown
+        Integer wordsKnown,
+        Integer charactersKnown,
+//        Integer idiomsKnown
         List<ReviewStatisticsDTO> listOfReviewStatisticsDTO
 ) {
 }
