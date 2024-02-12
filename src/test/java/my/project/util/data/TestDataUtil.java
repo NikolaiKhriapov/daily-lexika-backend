@@ -5,6 +5,8 @@ import my.project.models.dto.flashcards.ReviewStatisticsDTO;
 import my.project.models.dto.user.AuthenticationRequest;
 import my.project.models.dto.user.RegistrationRequest;
 import my.project.models.entity.enumeration.Platform;
+import my.project.models.entity.enumeration.Status;
+import my.project.models.entity.flashcards.Word;
 import my.project.models.entity.flashcards.WordData;
 import my.project.models.entity.flashcards.WordPack;
 import my.project.models.entity.user.RoleName;
@@ -139,12 +141,16 @@ public class TestDataUtil {
         );
     }
 
-    public static List<WordData> generateWordData(List<WordPack> wordPacks, Platform platform, int number) {
-        List<WordData> wordData = new ArrayList<>();
-        for (int i = 0; i < number; i++) {
-            wordData.add(generateWordData(wordPacks, platform));
+    public static Word generateWord(Platform platform, Status status) {
+        List<WordPack> listOfWordPacks = List.of(generateWordPack(platform), generateWordPack(platform));
+        Word word = new Word(FakerUtil.generateId(), generateWordData(listOfWordPacks, platform));
+        word.setStatus(status);
+        switch (status) {
+            case NEW -> word.setTotalStreak(0);
+            case IN_REVIEW -> word.setTotalStreak(FakerUtil.generateRandomInt(4));
+            case KNOWN -> word.setTotalStreak(5);
         }
-        return wordData;
+        return word;
     }
 
     // Statistics

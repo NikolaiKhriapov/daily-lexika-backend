@@ -27,11 +27,11 @@ public interface WordRepository extends JpaRepository<Word, Long> {
 
     List<Word> findByUserIdAndWordDataIdInAndStatusIn(Long userId, List<Long> wordDataIds, List<Status> status, Pageable pageable);
 
-    @Query("SELECT COUNT(w) FROM words w " +
+    @Query("SELECT w FROM words w " +
             "WHERE w.userId = :userId " +
             "AND w.status = :status " +
             "AND w.wordData.platform = :platform")
-    Integer countByUserIdAndStatusEqualsAndPlatformEquals(
+    List<Word> findByUserIdAndStatusEqualsAndPlatformEquals(
             @Param("userId") Long userId,
             @Param("status") Status status,
             @Param("platform") Platform platform
