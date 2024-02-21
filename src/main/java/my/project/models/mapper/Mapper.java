@@ -8,7 +8,7 @@ public interface Mapper<E, D> {
     D toDTO(E entity);
 
     default E toEntity(D dto) {
-        throw new UnsupportedOperationException("toEntity conversion is not supported"); //TODO::: fix
+        throw new UnsupportedOperationException("toEntity conversion is not supported");
     }
 
     default List<D> toDTOList(List<E> entities) {

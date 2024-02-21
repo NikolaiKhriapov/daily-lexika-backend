@@ -1,6 +1,7 @@
 package my.project.services.notification;
 
 import lombok.RequiredArgsConstructor;
+import my.project.exception.InternalServerErrorException;
 import my.project.exception.ResourceNotFoundException;
 import my.project.models.dto.notification.NotificationDTO;
 import my.project.models.mapper.notification.NotificationMapper;
@@ -64,7 +65,7 @@ public class NotificationService {
 
     private void verifyNotificationIsForThisUser(Notification notification, Long userId) {
         if (!Objects.equals(notification.getToUserId(), userId)) {
-            throw new RuntimeException(messageSource.getMessage(
+            throw new InternalServerErrorException(messageSource.getMessage(
                     "exception.notification.invalidUser", null, Locale.getDefault()));
         }
     }

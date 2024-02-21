@@ -17,4 +17,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT r FROM reviews r WHERE r.userId = :userId AND r.wordPack.platform = :platform")
     List<Review> findAllByUserIdAndPlatform(Long userId, Platform platform);
+
+    @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END " +
+            "FROM reviews r " +
+            "WHERE r.userId = :userId " +
+            "AND r.wordPack.platform = :platform " +
+            "AND r.wordPack.name = :wordPackName")
+    boolean existsByUserIdAndPlatformAndWordPackName(Long userId, Platform platform, String wordPackName);
 }

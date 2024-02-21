@@ -15,10 +15,15 @@ public class UserAccountController {
 
     private final UserAccountService userAccountService;
 
+    @GetMapping("/info")
+    public ResponseEntity<UserDTO> getUserInfo() {
+        return ResponseEntity.ok(userAccountService.getUserInfo());
+    }
+
     @PatchMapping("/info")
-    public ResponseEntity<Void> updateUserInfo(@RequestBody UserDTO userDTO) {
-        userAccountService.updateUserInfo(userDTO);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<UserDTO> updateUserInfo(@RequestBody UserDTO userDTO) {
+        return ResponseEntity.ok(userAccountService.updateUserInfo(userDTO));
+
     }
 
     @PatchMapping("/password")

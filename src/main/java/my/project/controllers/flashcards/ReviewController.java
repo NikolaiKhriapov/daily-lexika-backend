@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,20 +21,20 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getAllReviews());
     }
 
-    @GetMapping("/{reviewId}")
-    public ResponseEntity<ReviewDTO> getReview(@PathVariable("reviewId") Long reviewId) {
-        return ResponseEntity.ok(reviewService.getReviewById(reviewId));
+    @PatchMapping("/{reviewId}")
+    public ResponseEntity<ReviewDTO> updateReview(@PathVariable("reviewId") Long reviewId,
+                                                  @RequestBody ReviewDTO reviewDTO) {
+        return ResponseEntity.status(HttpStatus.OK).body(reviewService.updateReview(reviewId, reviewDTO));
     }
 
     @PostMapping
-    public ResponseEntity<ReviewDTO> createReview(@RequestBody ReviewDTO newReviewDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.createReview(newReviewDTO));
+    public ResponseEntity<ReviewDTO> createReview(@RequestBody ReviewDTO reviewDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.createReview(reviewDTO));
     }
 
-    @PatchMapping("/{reviewId}")
-    public ResponseEntity<Void> refreshReview(@PathVariable("reviewId") Long reviewId) {
-        reviewService.refreshReview(reviewId);
-        return new ResponseEntity<>(HttpStatus.OK);
+    @PatchMapping("/refresh/{reviewId}")
+    public ResponseEntity<ReviewDTO> refreshReview(@PathVariable("reviewId") Long reviewId) {
+        return ResponseEntity.status(HttpStatus.OK).body(reviewService.refreshReview(reviewId));
     }
 
     @DeleteMapping("/{reviewId}")
@@ -45,7 +44,7 @@ public class ReviewController {
     }
 
     @GetMapping("/{reviewId}/action")
-    public ResponseEntity<Map<String, Object>> processReviewAction(
+    public ResponseEntity<ReviewDTO> processReviewAction(
             @PathVariable("reviewId") Long reviewId,
             @RequestParam(value = "answer", required = false) Boolean isCorrect
     ) {
