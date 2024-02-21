@@ -7,8 +7,10 @@ import my.project.models.entity.enumeration.Platform;
 import my.project.models.entity.user.RoleStatistics;
 import my.project.models.entity.user.User;
 import my.project.models.dto.user.UserDTO;
+import my.project.models.mapper.user.UserMapper;
 import my.project.repositories.user.UserRepository;
 import my.project.services.flashcards.ReviewService;
+import my.project.services.flashcards.WordPackService;
 import my.project.services.flashcards.WordService;
 import my.project.services.notification.NotificationService;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,14 +24,21 @@ import java.util.*;
 public class UserAccountService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final ReviewService reviewService;
     private final WordService wordService;
+    private final WordPackService wordPackService;
     private final RoleService roleService;
     private final NotificationService notificationService;
 
+    public UserDTO getUserInfo() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userMapper.toDTO(user);
+    }
+
     @Transactional
-    public void updateUserInfo(UserDTO userDTO) {
+    public UserDTO updateUserInfo(UserDTO userDTO) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if (userDTO.name() != null && !Objects.equals(userDTO.name(), user.getName())) {
@@ -39,7 +48,7 @@ public class UserAccountService {
             user.setEmail(userDTO.email());
         }
 
-        userRepository.save(user);
+        return userMapper.toDTO(userRepository.save(user));
     }
 
     @Transactional
@@ -77,6 +86,7 @@ public class UserAccountService {
     private void deleteFlashcardsForUserByPlatform(User user, Platform platform) {
         reviewService.deleteAllByUserIdAndPlatform(user.getId(), platform);
         wordService.deleteAllByUserIdAndPlatform(user.getId(), platform);
+        wordPackService.deleteAllByUserIdAndPlatform(user.getId(), platform);
     }
 }
 

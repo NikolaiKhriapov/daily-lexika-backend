@@ -61,11 +61,6 @@ public class WordPackService {
         wordPackRepository.saveAll(wordPacks);
     }
 
-    public WordPackDTO getWordPackByName(String wordPackName) {
-        WordPack wordPack = findByName(wordPackName);
-        return wordPackMapper.toDTO(wordPack);
-    }
-
     public List<WordPackDTO> getAllWordPacksForUser() {
         User user = authenticationService.getAuthenticatedUser();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
@@ -97,7 +92,6 @@ public class WordPackService {
         return new ArrayList<>(wordMapper.toDTOList(wordsPage.getContent()));
     }
 
-    //TODO::: when deleting account, delete all custom wordpacks
     public void createCustomWordPack(WordPackDTO wordPackDTO) {
         User user = authenticationService.getAuthenticatedUser();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
@@ -167,6 +161,11 @@ public class WordPackService {
         wordData.setListOfWordPacks(listOfWordPacks);
 
         return wordDataMapper.toDTO(wordDataService.save(wordData));
+    }
+
+    public void deleteAllByUserIdAndPlatform(Long userId, Platform platform) {
+        List<WordPack> allWordPacksCustom = wordPackRepository.findAllByPlatformAndUserIdAndCategoryCustom(platform, userId);
+        allWordPacksCustom.forEach(wordPack -> deleteCustomWordPack(wordPack.getName()));
     }
 
     private void throwIfReviewExistsForWordPack(String wordPackName) {

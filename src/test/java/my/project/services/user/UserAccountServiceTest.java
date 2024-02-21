@@ -1,8 +1,10 @@
 package my.project.services.user;
 
 import my.project.config.AbstractUnitTest;
+import my.project.models.mapper.user.UserMapper;
 import my.project.repositories.user.UserRepository;
 import my.project.services.flashcards.ReviewService;
+import my.project.services.flashcards.WordPackService;
 import my.project.services.flashcards.WordService;
 import my.project.services.notification.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,11 +17,15 @@ class UserAccountServiceTest extends AbstractUnitTest {
     @Mock
     private UserRepository userRepository;
     @Mock
+    private UserMapper userMapper;
+    @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
     private ReviewService reviewService;
     @Mock
     private WordService wordService;
+    @Mock
+    private WordPackService wordPackService;
     @Mock
     private RoleService roleService;
     @Mock
@@ -29,9 +35,11 @@ class UserAccountServiceTest extends AbstractUnitTest {
     void setUp() {
         underTest = new UserAccountService(
                 userRepository,
+                userMapper,
                 passwordEncoder,
                 reviewService,
                 wordService,
+                wordPackService,
                 roleService,
                 notificationService
         );

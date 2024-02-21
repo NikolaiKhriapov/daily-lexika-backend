@@ -7,8 +7,6 @@ import my.project.config.AbstractIntegrationTest;
 import my.project.util.MockMvcService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithUserDetails;
 
@@ -61,22 +59,6 @@ class ReviewControllerIT extends AbstractIntegrationTest {
     }
 
     @Test
-    void getReview() {
-        // Given
-        ReviewDTO expected = mockMvcService
-                .performPost(URI_REVIEWS, generateReviewDTO(CHINESE), status().isCreated())
-                .getResponse(ReviewDTO.class);
-
-        // When
-        ReviewDTO actual = mockMvcService
-                .performGet(URI_REVIEWS + "/" + expected.id(), status().isOk())
-                .getResponse(ReviewDTO.class);
-
-        // Then
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
     void createReview() {
         // Given
         ReviewDTO reviewDTO = generateReviewDTO(CHINESE);
@@ -103,12 +85,11 @@ class ReviewControllerIT extends AbstractIntegrationTest {
                 .getResponse(ReviewDTO.class);
 
         // When
-        mockMvcService.performPatch(URI_REVIEWS + "/" + reviewDTO.id(), status().isOk());
+        mockMvcService.performPatch(URI_REVIEWS + "/refresh/" + reviewDTO.id(), status().isOk());
 
         // Then
         ReviewDTO reviewDTOAfterRefresh = mockMvcService
                 .performGet(URI_REVIEWS + "/" + reviewDTO.id() + "/action?answer=true", status().isOk()) // TODO::: fix
-                .performGet(URI_REVIEWS + "/" + reviewDTO.id(), status().isOk())
                 .getResponse(ReviewDTO.class);
 
         assertThat(reviewDTOAfterRefresh.id()).isEqualTo(reviewDTO.id());

@@ -24,11 +24,6 @@ public class WordPackController {
         return ResponseEntity.ok(wordPackService.getAllWordPacksForUser());
     }
 
-    @GetMapping("/{wordPackName}")
-    public ResponseEntity<WordPackDTO> getWordPack(@PathVariable("wordPackName") String wordPackName) {
-        return ResponseEntity.ok(wordPackService.getWordPackByName(wordPackName));
-    }
-
     @GetMapping("/{wordPackName}/words")
     public ResponseEntity<List<WordDTO>> getAllWordsForWordPack(@PathVariable("wordPackName") String wordPackName,
                                                                 @RequestParam("page") int page,

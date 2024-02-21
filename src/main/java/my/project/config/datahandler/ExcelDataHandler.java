@@ -1,6 +1,7 @@
 package my.project.config.datahandler;
 
 import lombok.RequiredArgsConstructor;
+import my.project.exception.InternalServerErrorException;
 import my.project.models.entity.flashcards.WordData;
 import my.project.models.entity.enumeration.Platform;
 import my.project.models.entity.enumeration.Category;
@@ -82,7 +83,7 @@ public class ExcelDataHandler {
             workbook.close();
             return listOfWordPacks;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to parse Excel file: " + e.getMessage());
+            throw new InternalServerErrorException("Failed to parse Excel file: " + e.getMessage());
         }
     }
 
@@ -153,7 +154,7 @@ public class ExcelDataHandler {
             workbook.close();
             return listOfWordData;
         } catch (IOException e) {
-            throw new RuntimeException(messageSource.getMessage("exception.excel.parse", null, Locale.getDefault())
+            throw new InternalServerErrorException(messageSource.getMessage("exception.excel.parse", null, Locale.getDefault())
                     .formatted(e.getMessage()));
         }
     }
