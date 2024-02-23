@@ -95,10 +95,15 @@ public class WordPackService {
     public void createCustomWordPack(WordPackDTO wordPackDTO) {
         User user = authenticationService.getAuthenticatedUser();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
+        String wordPackName = wordPackDTO.name().trim();
 
-        if (!wordPackRepository.existsById(wordPackDTO.name() + "__" + user.getId())) {
+        if (wordPackName.contains(";") || wordPackName.isBlank()) {
+            throw new BadRequestException(messageSource.getMessage("exception.wordPack.invalidName", null, Locale.getDefault()));
+        }
+
+        if (!wordPackRepository.existsById(wordPackName + "__" + user.getId())) {
             wordPackRepository.save(new WordPack(
-                    wordPackDTO.name() + "__" + user.getId(),
+                    wordPackName + "__" + user.getId(),
                     wordPackDTO.description(),
                     Category.CUSTOM,
                     platform
