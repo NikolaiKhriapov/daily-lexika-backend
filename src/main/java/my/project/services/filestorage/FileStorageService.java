@@ -3,8 +3,8 @@ package my.project.services.filestorage;
 import lombok.RequiredArgsConstructor;
 import my.project.exception.InternalServerErrorException;
 import my.project.exception.ResourceNotFoundException;
-import my.project.models.dto.filestorage.FileStorageProperties;
-import my.project.models.dto.filestorage.*;
+import my.project.models.dtos.filestorage.FileStorageProperties;
+import my.project.models.dtos.filestorage.*;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 

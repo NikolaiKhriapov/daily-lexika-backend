@@ -1,7 +1,7 @@
 package my.project.services.user;
 
 import my.project.config.AbstractUnitTest;
-import my.project.models.mapper.user.UserMapper;
+import my.project.models.mappers.user.UserMapper;
 import my.project.repositories.user.UserRepository;
 import my.project.services.flashcards.ReviewService;
 import my.project.services.flashcards.WordPackService;
@@ -51,7 +51,7 @@ class UserAccountServiceTest extends AbstractUnitTest {
 //        User user = generateUser(RoleName.USER_CHINESE);
 //        mockAuthentication(user);
 //
-//        UserDTO userDTO = willCallRealMethod().given(userMapper.toDTO(user));
+//        UserDto userDTO = willCallRealMethod().given(userMapper.toDTO(user));
 //
 //        // When
 //        underTest.updateUserInfo(userDTO);

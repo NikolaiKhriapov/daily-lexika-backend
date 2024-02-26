@@ -1,14 +1,14 @@
 package my.project.controllers.user;
 
-import my.project.models.dto.user.AuthenticationRequest;
-import my.project.models.dto.user.AuthenticationResponse;
-import my.project.models.dto.user.RegistrationRequest;
+import my.project.models.dtos.user.AuthenticationRequest;
+import my.project.models.dtos.user.AuthenticationResponse;
+import my.project.models.dtos.user.RegistrationRequest;
 import my.project.config.AbstractIntegrationTest;
 import my.project.util.MockMvcService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static my.project.models.entity.enumeration.Platform.CHINESE;
+import static my.project.models.entities.enumeration.Platform.CHINESE;
 import static my.project.util.CommonConstants.*;
 import static my.project.util.data.TestDataUtil.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;

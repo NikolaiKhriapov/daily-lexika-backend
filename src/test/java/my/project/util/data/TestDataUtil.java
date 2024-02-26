@@ -1,17 +1,17 @@
 package my.project.util.data;
 
-import my.project.models.dto.flashcards.ReviewDTO;
-import my.project.models.dto.flashcards.ReviewStatisticsDTO;
-import my.project.models.dto.user.AuthenticationRequest;
-import my.project.models.dto.user.RegistrationRequest;
-import my.project.models.entity.enumeration.Platform;
-import my.project.models.entity.enumeration.Status;
-import my.project.models.entity.flashcards.Word;
-import my.project.models.entity.flashcards.WordData;
-import my.project.models.entity.flashcards.WordPack;
-import my.project.models.entity.user.RoleName;
-import my.project.models.entity.user.RoleStatistics;
-import my.project.models.entity.user.User;
+import my.project.models.dtos.flashcards.ReviewDto;
+import my.project.models.dtos.flashcards.ReviewStatisticsDto;
+import my.project.models.dtos.user.AuthenticationRequest;
+import my.project.models.dtos.user.RegistrationRequest;
+import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.enumeration.Status;
+import my.project.models.entities.flashcards.Word;
+import my.project.models.entities.flashcards.WordData;
+import my.project.models.entities.flashcards.WordPack;
+import my.project.models.entities.user.RoleName;
+import my.project.models.entities.user.RoleStatistics;
+import my.project.models.entities.user.User;
 import org.mockito.Mockito;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.Authentication;
@@ -104,8 +104,8 @@ public class TestDataUtil {
         return user;
     }
 
-    public static ReviewDTO generateReviewDTO(Platform platform) {
-        return new ReviewDTO(
+    public static ReviewDto generateReviewDTO(Platform platform) {
+        return new ReviewDto(
                 null,
                 null,
                 FakerUtil.generateRandomInt(20),
@@ -165,8 +165,8 @@ public class TestDataUtil {
         );
     }
 
-    public static ReviewStatisticsDTO generateReviewStatisticsDTO(Platform platform) {
-        return new ReviewStatisticsDTO(
+    public static ReviewStatisticsDto generateReviewStatisticsDTO(Platform platform) {
+        return new ReviewStatisticsDto(
                 FakerUtil.generateId(),
                 FakerUtil.generateWordPackName(platform),
                 FakerUtil.generateRandomInt(100),

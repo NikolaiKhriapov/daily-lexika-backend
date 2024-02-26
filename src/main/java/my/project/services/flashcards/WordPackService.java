@@ -5,19 +5,19 @@ import lombok.RequiredArgsConstructor;
 import my.project.exception.BadRequestException;
 import my.project.exception.ResourceAlreadyExistsException;
 import my.project.exception.ResourceNotFoundException;
-import my.project.models.dto.flashcards.WordDTO;
-import my.project.models.dto.flashcards.WordDataDTO;
-import my.project.models.entity.enumeration.Category;
-import my.project.models.entity.enumeration.Platform;
-import my.project.models.entity.flashcards.Review;
-import my.project.models.entity.flashcards.WordData;
-import my.project.models.entity.user.User;
-import my.project.models.mapper.flashcards.WordDataMapper;
-import my.project.models.mapper.flashcards.WordPackMapper;
-import my.project.models.dto.flashcards.WordPackDTO;
-import my.project.models.mapper.flashcards.WordMapper;
-import my.project.models.entity.flashcards.WordPack;
-import my.project.models.entity.flashcards.Word;
+import my.project.models.dtos.flashcards.WordDto;
+import my.project.models.dtos.flashcards.WordDataDto;
+import my.project.models.dtos.flashcards.WordPackDto;
+import my.project.models.entities.enumeration.Category;
+import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.flashcards.Review;
+import my.project.models.entities.flashcards.WordData;
+import my.project.models.entities.user.User;
+import my.project.models.entities.flashcards.WordPack;
+import my.project.models.entities.flashcards.Word;
+import my.project.models.mappers.flashcards.WordDataMapper;
+import my.project.models.mappers.flashcards.WordMapper;
+import my.project.models.mappers.flashcards.WordPackMapper;
 import my.project.repositories.flashcards.ReviewRepository;
 import my.project.repositories.flashcards.WordPackRepository;
 import my.project.services.user.AuthenticationService;
@@ -61,7 +61,7 @@ public class WordPackService {
         wordPackRepository.saveAll(wordPacks);
     }
 
-    public List<WordPackDTO> getAllWordPacksForUser() {
+    public List<WordPackDto> getAllWordPacksForUser() {
         User user = authenticationService.getAuthenticatedUser();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
@@ -72,27 +72,22 @@ public class WordPackService {
         allWordPacks.addAll(allWordPacksNotCustom);
         allWordPacks.addAll(allWordPacksCustom);
 
-        List<WordPackDTO> allWordPackDTOs = new ArrayList<>();
-        for (WordPack oneWordPack : allWordPacks) {
-            allWordPackDTOs.add(wordPackMapper.toDTO(oneWordPack));
-        }
-
-        return allWordPackDTOs;
+        return wordPackMapper.toDtoList(allWordPacks);
     }
 
     @Transactional
-    public List<WordDTO> getAllWordsForWordPack(String wordPackName, Pageable pageable) {
+    public List<WordDto> getAllWordsForWordPack(String wordPackName, Pageable pageable) {
         Long userId = authenticationService.getAuthenticatedUser().getId();
-        List<Long> wordDataIds = wordDataService.getListOfAllWordDataIdsByWordPackName(wordPackName);
+        List<Long> wordDataIds = wordDataService.getAllWordDataIdByWordPackName(wordPackName);
 
         wordService.createOrUpdateWordsForUser(userId, wordDataIds);
 
         Page<Word> wordsPage = wordService.findByUserIdAndWordDataIdIn(userId, wordDataIds, pageable);
 
-        return new ArrayList<>(wordMapper.toDTOList(wordsPage.getContent()));
+        return new ArrayList<>(wordMapper.toDtoList(wordsPage.getContent()));
     }
 
-    public void createCustomWordPack(WordPackDTO wordPackDTO) {
+    public void createCustomWordPack(WordPackDto wordPackDTO) {
         User user = authenticationService.getAuthenticatedUser();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
         String wordPackName = wordPackDTO.name().trim();
@@ -122,15 +117,15 @@ public class WordPackService {
 
         List<WordData> listOfWordData = wordDataService.findAllByWordPack(wordPack);
         listOfWordData.forEach(wordData -> {
-            List<WordPack> wp = wordData.getListOfWordPacks();
-            wp.remove(wordPack);
-            wordData.setListOfWordPacks(wp);
+            List<WordPack> listOfWordPacks = wordData.getListOfWordPacks();
+            listOfWordPacks.remove(wordPack);
+            wordData.setListOfWordPacks(listOfWordPacks);
         });
 
         wordPackRepository.delete(wordPack);
     }
 
-    public WordDataDTO addWordToCustomWordPack(String wordPackName, Long wordDataId) {
+    public WordDataDto addWordToCustomWordPack(String wordPackName, Long wordDataId) {
         WordPack wordPack = findByName(wordPackName);
 
         throwIfWordPackCategoryNotCustom(wordPack);
@@ -146,10 +141,10 @@ public class WordPackService {
         }
         wordData.setListOfWordPacks(listOfWordPacks);
 
-        return wordDataMapper.toDTO(wordDataService.save(wordData));
+        return wordDataMapper.toDto(wordDataService.save(wordData));
     }
 
-    public WordDataDTO removeWordFromCustomWordPack(String wordPackName, Long wordDataId) {
+    public WordDataDto removeWordFromCustomWordPack(String wordPackName, Long wordDataId) {
         WordPack wordPack = findByName(wordPackName);
 
         throwIfWordPackCategoryNotCustom(wordPack);
@@ -165,7 +160,7 @@ public class WordPackService {
         }
         wordData.setListOfWordPacks(listOfWordPacks);
 
-        return wordDataMapper.toDTO(wordDataService.save(wordData));
+        return wordDataMapper.toDto(wordDataService.save(wordData));
     }
 
     public void deleteAllByUserIdAndPlatform(Long userId, Platform platform) {
@@ -176,7 +171,7 @@ public class WordPackService {
     private void throwIfReviewExistsForWordPack(String wordPackName) {
         Long userId = authenticationService.getAuthenticatedUser().getId();
 
-        Optional<Review> review = reviewRepository.findByUserIdAndWordPackName(userId, wordPackName);
+        Optional<Review> review = reviewRepository.findByUserIdAndWordPack_Name(userId, wordPackName);
         review.ifPresent(reviewRepository::delete);
     }
 

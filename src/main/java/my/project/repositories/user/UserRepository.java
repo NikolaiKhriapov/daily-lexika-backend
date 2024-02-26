@@ -1,6 +1,6 @@
 package my.project.repositories.user;
 
-import my.project.models.entity.user.User;
+import my.project.models.entities.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,6 +10,5 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findUserByEmail(String email);
-
     boolean existsByEmail(String email);
 }
