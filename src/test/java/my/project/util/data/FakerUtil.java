@@ -1,9 +1,9 @@
 package my.project.util.data;
 
 import com.github.javafaker.Faker;
-import my.project.models.dto.flashcards.WordPackDTO;
-import my.project.models.entity.enumeration.Category;
-import my.project.models.entity.enumeration.Platform;
+import my.project.models.dtos.flashcards.WordPackDto;
+import my.project.models.entities.enumeration.Category;
+import my.project.models.entities.enumeration.Platform;
 
 import java.util.List;
 
@@ -33,11 +33,12 @@ public class FakerUtil {
 
     // WordPack
 
-    public static WordPackDTO generateWordPackDTO(Platform platform) {
-        return new WordPackDTO(
+    public static WordPackDto generateWordPackDTO(Platform platform) {
+        return new WordPackDto(
                 generateWordPackName(platform),
                 generateWordPackDescription(),
                 generateWordPackCategory(platform),
+                platform,
                 100L,
                 null
         );

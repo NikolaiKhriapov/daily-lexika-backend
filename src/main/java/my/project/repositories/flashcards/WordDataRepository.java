@@ -1,7 +1,7 @@
 package my.project.repositories.flashcards;
 
-import my.project.models.entity.flashcards.WordData;
-import my.project.models.entity.flashcards.WordPack;
+import my.project.models.entities.flashcards.WordData;
+import my.project.models.entities.flashcards.WordPack;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -1,7 +1,7 @@
 package my.project.controllers.notification;
 
 import lombok.AllArgsConstructor;
-import my.project.models.dto.notification.NotificationDTO;
+import my.project.models.dtos.notification.NotificationDto;
 import my.project.services.notification.NotificationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping
-    public ResponseEntity<List<NotificationDTO>> getAllNotifications() {
+    public ResponseEntity<List<NotificationDto>> getAllNotifications() {
         return ResponseEntity.ok(notificationService.getAllNotifications());
     }
 

@@ -1,10 +1,11 @@
 package my.project.controllers.user;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import my.project.models.dto.user.AuthenticationRequest;
-import my.project.models.dto.user.AuthenticationResponse;
+import my.project.models.dtos.user.AuthenticationRequest;
+import my.project.models.dtos.user.AuthenticationResponse;
 import my.project.services.user.AuthenticationService;
-import my.project.models.dto.user.RegistrationRequest;
+import my.project.models.dtos.user.RegistrationRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,12 +21,12 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody RegistrationRequest registrationRequest) {
+    public ResponseEntity<AuthenticationResponse> register(@RequestBody @Valid RegistrationRequest registrationRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(authenticationService.register(registrationRequest));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest authenticationRequest) {
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody @Valid AuthenticationRequest authenticationRequest) {
         return ResponseEntity.ok(authenticationService.login(authenticationRequest));
     }
 }

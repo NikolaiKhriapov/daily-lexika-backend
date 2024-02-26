@@ -5,10 +5,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static my.project.models.entity.enumeration.Platform.CHINESE;
-import static my.project.models.entity.enumeration.Platform.ENGLISH;
-import static my.project.models.entity.user.RoleName.USER_CHINESE;
-import static my.project.models.entity.user.RoleName.USER_ENGLISH;
+import static my.project.models.entities.enumeration.Platform.CHINESE;
+import static my.project.models.entities.enumeration.Platform.ENGLISH;
+import static my.project.models.entities.user.RoleName.USER_CHINESE;
+import static my.project.models.entities.user.RoleName.USER_ENGLISH;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 public class TestDataSource {
@@ -53,8 +53,8 @@ public class TestDataSource {
 
     /**
      * argument(0): 'user.role' (user current role; 'null' means that user is not yet registered on any platform)
-     * argument(1): input ('user.role' to be added to 'user.roleStatistics'; platform which the user is being registered on)
-     * argument(2): expected 'user.roleStatistics' (platforms on which the user is to be registered)
+     * argument(1): input ('user.role' to be added to 'user.setOfRoleStatisticsDto'; platform which the user is being registered on)
+     * argument(2): expected 'user.setOfRoleStatisticsDto' (platforms on which the user is to be registered)
      */
     public static Stream<Arguments> addRoleToUserRoles() {
         return Stream.of(
@@ -67,7 +67,7 @@ public class TestDataSource {
 
     /**
      * argument(0): 'user.role' (user current role)
-     * argument(1): 'user.roleStatistics' (platforms on which the user is already registered)
+     * argument(1): 'user.setOfRoleStatisticsDto' (platforms on which the user is already registered)
      */
     public static Stream<Arguments> addRoleToUserRoles_throwIfUserAlreadyHasThisRole() {
         return Stream.of(
@@ -102,8 +102,8 @@ public class TestDataSource {
 
     /**
      * argument(0): 'user.role' (user current role)
-     * argument(1): 'user.roleStatistics' (platforms on which the user is already registered)
-     * argument(2): expected ('roleStatistics.roleName')
+     * argument(1): 'user.setOfRoleStatisticsDto' (platforms on which the user is already registered)
+     * argument(2): expected ('setOfRoleStatisticsDto.roleName')
      */
     public static Stream<Arguments> getRoleStatistics() {
         return Stream.of(
@@ -116,7 +116,7 @@ public class TestDataSource {
 
     /**
      * argument(0): 'user.role' (user current role)
-     * argument(1): 'user.roleStatistics' (platforms on which the user is already registered)
+     * argument(1): 'user.setOfRoleStatisticsDto' (platforms on which the user is already registered)
      */
     public static Stream<Arguments> getRoleStatistics_throwWhenSetOfRoleStatisticsDoesNotContainCurrentRole() {
         return Stream.of(

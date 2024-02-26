@@ -1,13 +1,13 @@
 package my.project.services.user;
 
 import my.project.config.security.jwt.JwtService;
-import my.project.models.dto.user.AuthenticationRequest;
-import my.project.models.dto.user.AuthenticationResponse;
-import my.project.models.dto.user.RegistrationRequest;
-import my.project.models.entity.enumeration.Platform;
-import my.project.models.entity.user.RoleName;
-import my.project.models.entity.user.RoleStatistics;
-import my.project.models.entity.user.User;
+import my.project.models.dtos.user.AuthenticationRequest;
+import my.project.models.dtos.user.AuthenticationResponse;
+import my.project.models.dtos.user.RegistrationRequest;
+import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.user.RoleName;
+import my.project.models.entities.user.RoleStatistics;
+import my.project.models.entities.user.User;
 import my.project.repositories.user.UserRepository;
 import my.project.services.notification.NotificationService;
 import my.project.config.AbstractUnitTest;

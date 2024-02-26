@@ -2,10 +2,10 @@ package my.project.config.datahandler;
 
 import lombok.RequiredArgsConstructor;
 import my.project.exception.InternalServerErrorException;
-import my.project.models.entity.flashcards.WordData;
-import my.project.models.entity.enumeration.Platform;
-import my.project.models.entity.enumeration.Category;
-import my.project.models.entity.flashcards.WordPack;
+import my.project.models.entities.flashcards.WordData;
+import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.enumeration.Category;
+import my.project.models.entities.flashcards.WordPack;
 import my.project.services.flashcards.WordDataService;
 import my.project.services.flashcards.WordPackService;
 import org.apache.poi.ss.usermodel.Cell;

@@ -2,10 +2,10 @@ package my.project.services.user;
 
 import my.project.exception.ResourceAlreadyExistsException;
 import my.project.exception.ResourceNotFoundException;
-import my.project.models.entity.enumeration.Platform;
-import my.project.models.entity.user.RoleName;
-import my.project.models.entity.user.RoleStatistics;
-import my.project.models.entity.user.User;
+import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.user.RoleName;
+import my.project.models.entities.user.RoleStatistics;
+import my.project.models.entities.user.User;
 import my.project.config.AbstractUnitTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

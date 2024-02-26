@@ -1,7 +1,7 @@
 package my.project.controllers.flashcards;
 
 import lombok.RequiredArgsConstructor;
-import my.project.models.dto.flashcards.WordDataDTO;
+import my.project.models.dtos.flashcards.WordDataDto;
 import my.project.services.flashcards.WordDataService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +16,7 @@ public class WordDataController {
     private final WordDataService wordDataService;
 
     @GetMapping
-    public ResponseEntity<List<WordDataDTO>> getAllWordData() {
+    public ResponseEntity<List<WordDataDto>> getAllWordData() {
         return ResponseEntity.ok(wordDataService.getAllWordData());
     }
 }

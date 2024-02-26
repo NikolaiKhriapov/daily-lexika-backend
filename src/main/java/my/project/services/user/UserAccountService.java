@@ -2,12 +2,12 @@ package my.project.services.user;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import my.project.models.dto.user.PasswordUpdateRequest;
-import my.project.models.entity.enumeration.Platform;
-import my.project.models.entity.user.RoleStatistics;
-import my.project.models.entity.user.User;
-import my.project.models.dto.user.UserDTO;
-import my.project.models.mapper.user.UserMapper;
+import my.project.models.dtos.user.PasswordUpdateRequest;
+import my.project.models.dtos.user.UserDto;
+import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.user.RoleStatistics;
+import my.project.models.entities.user.User;
+import my.project.models.mappers.user.UserMapper;
 import my.project.repositories.user.UserRepository;
 import my.project.services.flashcards.ReviewService;
 import my.project.services.flashcards.WordPackService;
@@ -16,8 +16,6 @@ import my.project.services.notification.NotificationService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -32,23 +30,18 @@ public class UserAccountService {
     private final RoleService roleService;
     private final NotificationService notificationService;
 
-    public UserDTO getUserInfo() {
+    public UserDto getUserInfo() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userMapper.toDTO(user);
     }
 
     @Transactional
-    public UserDTO updateUserInfo(UserDTO userDTO) {
+    public UserDto updateUserInfo(UserDto userDTO) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if (userDTO.name() != null && !Objects.equals(userDTO.name(), user.getName())) {
-            user.setName(userDTO.name());
-        }
-        if (userDTO.email() != null && !Objects.equals(userDTO.email(), user.getEmail())) {
-            user.setEmail(userDTO.email());
-        }
+        User updatedUser = userMapper.partialUpdate(userDTO, user);
 
-        return userMapper.toDTO(userRepository.save(user));
+        return userMapper.toDTO(userRepository.save(updatedUser));
     }
 
     @Transactional

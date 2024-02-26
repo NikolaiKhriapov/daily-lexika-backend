@@ -1,7 +1,7 @@
 package my.project.controllers.flashcards;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import my.project.models.dto.flashcards.ReviewDTO;
+import my.project.models.dtos.flashcards.ReviewDto;
 import my.project.repositories.flashcards.ReviewRepository;
 import my.project.config.AbstractIntegrationTest;
 import my.project.util.MockMvcService;
@@ -12,7 +12,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 
 import java.util.List;
 
-import static my.project.models.entity.enumeration.Platform.CHINESE;
+import static my.project.models.entities.enumeration.Platform.CHINESE;
 import static my.project.util.CommonConstants.TEST_EMAIL_CHINESE;
 import static my.project.util.CommonConstants.URI_REVIEWS;
 import static my.project.util.data.TestDataUtil.*;
@@ -36,7 +36,7 @@ class ReviewControllerIT extends AbstractIntegrationTest {
     void getAllReviews_shouldReturnZeroUponRegistration() {
         // Given
         // When
-        List<ReviewDTO> actual = mockMvcService
+        List<ReviewDto> actual = mockMvcService
                 .performGet(URI_REVIEWS, status().isOk())
                 .getResponse(new TypeReference<>() {});
 
@@ -50,7 +50,7 @@ class ReviewControllerIT extends AbstractIntegrationTest {
         mockMvcService.performPost(URI_REVIEWS, generateReviewDTO(CHINESE), status().isCreated());
 
         // When
-        List<ReviewDTO> actual = mockMvcService
+        List<ReviewDto> actual = mockMvcService
                 .performGet(URI_REVIEWS, status().isOk())
                 .getResponse(new TypeReference<>() {});
 
@@ -61,8 +61,8 @@ class ReviewControllerIT extends AbstractIntegrationTest {
     @Test
     void createReview() {
         // Given
-        ReviewDTO reviewDTO = generateReviewDTO(CHINESE);
-        List<ReviewDTO> allReviewsBefore = mockMvcService
+        ReviewDto reviewDTO = generateReviewDTO(CHINESE);
+        List<ReviewDto> allReviewsBefore = mockMvcService
                 .performGet(URI_REVIEWS, status().isOk())
                 .getResponse(new TypeReference<>() {});
 
@@ -70,7 +70,7 @@ class ReviewControllerIT extends AbstractIntegrationTest {
         mockMvcService.performPost(URI_REVIEWS, reviewDTO, status().isCreated());
 
         // Then
-        List<ReviewDTO> allReviewsAfter = mockMvcService
+        List<ReviewDto> allReviewsAfter = mockMvcService
                 .performGet(URI_REVIEWS, status().isOk())
                 .getResponse(new TypeReference<>() {});
 
@@ -80,29 +80,29 @@ class ReviewControllerIT extends AbstractIntegrationTest {
     @Test
     void refreshReview() {
         // Given
-        ReviewDTO reviewDTO = mockMvcService
+        ReviewDto reviewDTO = mockMvcService
                 .performPost(URI_REVIEWS, generateReviewDTO(CHINESE), status().isCreated())
-                .getResponse(ReviewDTO.class);
+                .getResponse(ReviewDto.class);
 
         // When
         mockMvcService.performPatch(URI_REVIEWS + "/refresh/" + reviewDTO.id(), status().isOk());
 
         // Then
-        ReviewDTO reviewDTOAfterRefresh = mockMvcService
+        ReviewDto reviewDtoAfterRefresh = mockMvcService
                 .performGet(URI_REVIEWS + "/" + reviewDTO.id() + "/action?answer=true", status().isOk()) // TODO::: fix
-                .getResponse(ReviewDTO.class);
+                .getResponse(ReviewDto.class);
 
-        assertThat(reviewDTOAfterRefresh.id()).isEqualTo(reviewDTO.id());
-        assertThat(reviewDTOAfterRefresh.listOfWordDTO()).isNotEqualTo(reviewDTO.listOfWordDTO());
+        assertThat(reviewDtoAfterRefresh.id()).isEqualTo(reviewDTO.id());
+        assertThat(reviewDtoAfterRefresh.listOfWordDto()).isNotEqualTo(reviewDTO.listOfWordDto());
     }
 
     @Test
     void deleteReview() {
         // Given
-        ReviewDTO reviewDTO = mockMvcService
+        ReviewDto reviewDTO = mockMvcService
                 .performPost(URI_REVIEWS, generateReviewDTO(CHINESE), status().isCreated())
-                .getResponse(ReviewDTO.class);
-        List<ReviewDTO> allReviewsBefore = mockMvcService
+                .getResponse(ReviewDto.class);
+        List<ReviewDto> allReviewsBefore = mockMvcService
                 .performGet(URI_REVIEWS, status().isOk())
                 .getResponse(new TypeReference<>() {});
 
@@ -110,7 +110,7 @@ class ReviewControllerIT extends AbstractIntegrationTest {
         mockMvcService.performDelete(URI_REVIEWS + "/" + reviewDTO.id(), status().isNoContent());
 
         // Then
-        List<ReviewDTO> allReviewsAfter = mockMvcService
+        List<ReviewDto> allReviewsAfter = mockMvcService
                 .performGet(URI_REVIEWS, status().isOk())
                 .getResponse(new TypeReference<>() {});
 
@@ -122,9 +122,9 @@ class ReviewControllerIT extends AbstractIntegrationTest {
 //    @CsvSource({"true, 1", "false, 0"})
 //    void processReviewAction(Boolean answer, int reducedBy) {
 //        // Given
-//        ReviewDTO reviewDTO = mockMvcService
+//        ReviewDto reviewDTO = mockMvcService
 //                .performPost(URI_REVIEWS, generateReviewDTO(CHINESE), status().isCreated())
-//                .getResponse(ReviewDTO.class);
+//                .getResponse(ReviewDto.class);
 //
 //        // When
 //        Map<String, Object> response = mockMvcService
@@ -134,7 +134,7 @@ class ReviewControllerIT extends AbstractIntegrationTest {
 //        // Then
 //        if (response != null) {
 //            assertThat(response.get("reviewUpdatedSize"))
-//                    .isEqualTo(reviewDTO.listOfWordDTO().size() - reducedBy);
+//                    .isEqualTo(reviewDTO.WordDtoList().size() - reducedBy);
 //            assertThat(response.get("reviewWordDTO"))
 //                    .isNotNull()
 //                    .asString().contains("id", "nameChineseSimplified", "nameChineseTraditional", "pinyin",
