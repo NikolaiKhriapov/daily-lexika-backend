@@ -3,14 +3,34 @@ package my.project.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.*;
 
 @ControllerAdvice
 public class DefaultExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiErrorDTO> handleValidationExceptions(MethodArgumentNotValidException e, HttpServletRequest request) {
+        List<String> errors = new ArrayList<>();
+        e.getBindingResult()
+                .getAllErrors()
+                .forEach((error) -> errors.add(error.getDefaultMessage()));
+
+        ApiErrorDTO apiErrorDTO = new ApiErrorDTO(
+                request.getRequestURI(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST,
+                LocalDateTime.now(),
+                errors.get(0),
+                errors.toString()
+        );
+
+        return new ResponseEntity<>(apiErrorDTO, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiErrorDTO> handleException(ResourceNotFoundException e, HttpServletRequest request) {
