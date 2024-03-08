@@ -30,7 +30,7 @@ public class JwtService {
                 .setIssuer(ISSUER)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(Date.from(Instant.now().plus(1, DAYS)))
+                .setExpiration(Date.from(Instant.now().plus(7, DAYS)))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
