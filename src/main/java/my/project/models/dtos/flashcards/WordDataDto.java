@@ -19,7 +19,6 @@ public record WordDataDto(
         String nameRussian,
         String definition,
         Set<String> examples,
-        String audio,
         List<String> listOfWordPackNames,
         Platform platform
 

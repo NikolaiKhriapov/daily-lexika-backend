@@ -210,7 +210,7 @@ public class ExcelDataHandler {
     private List<WordPack> getWordPacksFromCellValue(WordData wordData, String stringCellValue) {
         List<WordPack> listOfWordPacks = new ArrayList<>();
 
-        List<String> wordPackNames = Arrays.stream(stringCellValue.split(";")).toList();
+        List<String> wordPackNames = Arrays.stream(stringCellValue.split("\\|\\|")).toList();
         wordPackNames.forEach(wordPackName -> {
             WordPack wordPack = wordPackService.findByName(wordPackName);
             listOfWordPacks.add(wordPack);
@@ -240,7 +240,7 @@ public class ExcelDataHandler {
         }
         if (!wordData.getExamples().equals("[TODO]")) {
             String examples = wordData.getExamples();
-            int count = examples.split(";").length;
+            int count = examples.split("\\|\\|").length;
             if (count != 5) {
                 System.out.println("!!!!! Error with examples: " + wordData.getId());
             }

@@ -21,7 +21,7 @@ public interface WordDataMapper {
 
     @Named("mapExamples")
     default Set<String> mapExamples(String examples) {
-        return Arrays.stream(examples.split(";"))
+        return Arrays.stream(examples.split("\\|\\|"))
                 .map(String::strip)
                 .collect(Collectors.toSet());
     }
