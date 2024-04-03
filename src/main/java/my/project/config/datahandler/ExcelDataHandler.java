@@ -240,7 +240,7 @@ public class ExcelDataHandler {
         }
         if (!wordData.getExamples().equals("[TODO]")) {
             String examples = wordData.getExamples();
-            int count = examples.split("\\|\\|").length;
+            int count = examples.split(System.lineSeparator()).length;
             if (count != 5) {
                 System.out.println("!!!!! Error with examples: " + wordData.getId());
             }
