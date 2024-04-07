@@ -210,7 +210,7 @@ public class ExcelDataHandler {
     private List<WordPack> getWordPacksFromCellValue(WordData wordData, String stringCellValue) {
         List<WordPack> listOfWordPacks = new ArrayList<>();
 
-        List<String> wordPackNames = Arrays.stream(stringCellValue.split("\\|\\|")).toList();
+        List<String> wordPackNames = Arrays.stream(stringCellValue.split(";")).toList();
         wordPackNames.forEach(wordPackName -> {
             WordPack wordPack = wordPackService.findByName(wordPackName);
             listOfWordPacks.add(wordPack);
