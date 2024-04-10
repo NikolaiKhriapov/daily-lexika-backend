@@ -1,18 +1,11 @@
 package my.project.models.entities.enumeration;
 
 public enum Category {
-    HSK,
-    WORK,
-    NEWS,
-    SPORT,
-    FOOD,
-    TRAVEL,
+    HSK, // HSK 1, HSK 2, HSK 3, HSK 4, HSK 5, HSK 6, HSK 7-9
 
-    SPEAKOUT_STARTER,
-    SPEAKOUT_ELEMENTARY,
-    SPEAKOUT_PRE_INTERMEDIATE,
-    SPEAKOUT_INTERMEDIATE,
-    SPEAKOUT_UPPER_INTERMEDIATE,
+    CEFR, // A1, A2, B1, B2, C1
+//    SPEAKOUT, // Speakout Starter, Speakout Elementary, Speakout Pre-intermediate, Speakout Intermediate, Speakout Upper Intermediate
 
-    CUSTOM
+    OTHER, // Lifestyle, Relationships, Travel, Health, Sports, Science & Technology, Business & Finance, Education
+    CUSTOM // {Custom}
 }

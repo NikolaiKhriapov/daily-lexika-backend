@@ -37,12 +37,10 @@ public class ExcelDataHandler {
     }
 
     @Transactional
-    public void importWords(String file, String[] fileSheets, Platform platform) {
-        for (String fileSheet : fileSheets) {
-            List<WordData> listOfWordData = getWordsFromExcel(file, fileSheet, platform);
-            saveWordsToDatabase(listOfWordData);
-            System.out.println("ExcelDataHandler Report: " + fileSheet + " updated!");
-        }
+    public void importWords(String file, String fileSheet, Platform platform) {
+        List<WordData> listOfWordData = getWordsFromExcel(file, fileSheet, platform);
+        saveWordsToDatabase(listOfWordData);
+        System.out.println("ExcelDataHandler Report: " + fileSheet + " updated!");
     }
 
     private List<WordPack> getWordPacksFromExcel(String file, String fileSheet, Platform platform) {
@@ -119,9 +117,9 @@ public class ExcelDataHandler {
                             case 2 -> wordData.setTranscription(currentCell.getStringCellValue().replaceAll("(?<!,) ", ""));
                             case 3 -> wordData.setNameEnglish(currentCell.getStringCellValue());
                             case 4 -> wordData.setNameRussian(currentCell.getStringCellValue());
-                            case 5 -> wordData.setListOfWordPacks(getWordPacksFromCellValue(wordData, currentCell.getStringCellValue()));
-                            case 6 -> wordData.setDefinition(currentCell.getStringCellValue());
-                            case 7 -> wordData.setExamples(currentCell.getStringCellValue());
+                            case 5 -> wordData.setDefinition(currentCell.getStringCellValue());
+                            case 6 -> wordData.setExamples(currentCell.getStringCellValue());
+                            case 7 -> wordData.setListOfWordPacks(getWordPacksFromCellValue(wordData, currentCell.getStringCellValue()));
                             default -> {
                             }
                         }
@@ -133,9 +131,9 @@ public class ExcelDataHandler {
                             case 2 -> wordData.setTranscription(currentCell.getStringCellValue());
                             case 3 -> wordData.setNameRussian(currentCell.getStringCellValue());
                             case 4 -> wordData.setNameChineseSimplified(currentCell.getStringCellValue());
-                            case 5 -> wordData.setListOfWordPacks(getWordPacksFromCellValue(wordData, currentCell.getStringCellValue()));
-                            case 6 -> wordData.setDefinition(currentCell.getStringCellValue());
-                            case 7 -> wordData.setExamples(currentCell.getStringCellValue());
+                            case 5 -> wordData.setDefinition(currentCell.getStringCellValue());
+                            case 6 -> wordData.setExamples(currentCell.getStringCellValue());
+                            case 7 -> wordData.setListOfWordPacks(getWordPacksFromCellValue(wordData, currentCell.getStringCellValue()));
                             default -> {
                             }
                         }
@@ -144,8 +142,13 @@ public class ExcelDataHandler {
                     cellIdx++;
                 }
 
+//                validateExcelWordData(wordData);
+
                 if (wordData.getNameEnglish().length() > 250) {
                     wordData.setNameEnglish(wordData.getNameEnglish().substring(0, 250) + "...");
+                }
+                if (wordData.getNameRussian().length() > 250) {
+                    wordData.setNameRussian(wordData.getNameRussian().substring(0, 250) + "...");
                 }
                 wordData.setPlatform(platform);
 
@@ -223,5 +226,28 @@ public class ExcelDataHandler {
         } catch (Exception ignored) {
         }
         return listOfWordPacks;
+    }
+
+    private void validateExcelWordData(WordData wordData) {
+        if (wordData.getNameChineseSimplified().length() > 19) {
+            System.out.println("!!!!! Error with name_chinese (long): " + wordData.getId());
+        }
+        if (wordData.getNameChineseSimplified().contains(",") || wordData.getNameChineseSimplified().contains(";") || wordData.getNameChineseSimplified().contains("；") || wordData.getNameChineseSimplified().contains(" ")) {
+            System.out.println("!!!!! Error with name_chinese (symbol): " + wordData.getId());
+        }
+        if (wordData.getPlatform() == Platform.CHINESE && !(wordData.getTranscription().startsWith("/") || wordData.getTranscription().endsWith("/"))) {
+            System.out.println("!!!!! Error with transcription: " + wordData.getId());
+        }
+        if (!wordData.getExamples().equals("[TODO]")) {
+            String examples = wordData.getExamples();
+            int count = examples.split(System.lineSeparator()).length;
+            if (count != 5) {
+                System.out.println("!!!!! Error with examples: " + wordData.getId());
+            }
+        }
+        if (wordData.getNameEnglish().length() > 250 || wordData.getNameRussian().length() > 250) { //TODO::: change to sout
+            System.out.println("!!!!! Error with name_english: " + wordData.getId());
+            wordData.setNameEnglish(wordData.getNameEnglish().substring(0, 250) + "...");
+        }
     }
 }

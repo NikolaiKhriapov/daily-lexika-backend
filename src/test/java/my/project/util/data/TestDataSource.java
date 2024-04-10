@@ -161,15 +161,7 @@ public class TestDataSource {
                 arguments("HSK 4", 995),
                 arguments("HSK 5", 1067),
                 arguments("HSK 6", 1134),
-                arguments("HSK 7-9", 5619),
-                arguments("Speakout (S) Unit 1", 0),
-                arguments("Speakout (S) Unit 1", 0),
-                arguments("Speakout (E) Unit 1", 0),
-                arguments("Speakout (PI) Unit 1", 75),
-                arguments("Speakout (PI) Unit 2", 22),
-                arguments("Speakout (I) Unit 1", 0),
-                arguments("Speakout (I) Unit 2", 0),
-                arguments("Speakout (UI) Unit 1", 0)
+                arguments("HSK 7-9", 5619)
         );
     }
 }
