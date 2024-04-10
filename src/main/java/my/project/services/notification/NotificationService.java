@@ -1,14 +1,15 @@
 package my.project.services.notification;
 
 import lombok.RequiredArgsConstructor;
+import my.project.exception.InternalServerErrorException;
 import my.project.exception.ResourceNotFoundException;
-import my.project.models.dto.notification.NotificationDTO;
-import my.project.models.mapper.notification.NotificationMapper;
+import my.project.models.dtos.notification.NotificationDto;
+import my.project.models.mappers.notification.NotificationMapper;
 import my.project.repositories.notification.NotificationRepository;
-import my.project.models.entity.notification.Notification;
-import my.project.models.dto.user.UserDTO;
-import my.project.models.entity.user.User;
-import my.project.models.mapper.user.UserMapper;
+import my.project.models.entities.notification.Notification;
+import my.project.models.dtos.user.UserDto;
+import my.project.models.entities.user.User;
+import my.project.models.mappers.user.UserMapper;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,15 +27,15 @@ public class NotificationService {
     private final NotificationMapper notificationMapper;
     private final MessageSource messageSource;
 
-    private UserDTO getAuthenticatedUser() {
+    private UserDto getAuthenticatedUser() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userMapper.toDTO(user);
     }
 
-    public List<NotificationDTO> getAllNotifications() {
+    public List<NotificationDto> getAllNotifications() {
         Long userId = getAuthenticatedUser().id();
         List<Notification> listOfNotifications = notificationRepository.findAllByToUserId(userId);
-        return notificationMapper.toDTOList(listOfNotifications);
+        return notificationMapper.toDtoList(listOfNotifications);
     }
 
     public void sendNotification(Notification notification) {
@@ -64,7 +65,7 @@ public class NotificationService {
 
     private void verifyNotificationIsForThisUser(Notification notification, Long userId) {
         if (!Objects.equals(notification.getToUserId(), userId)) {
-            throw new RuntimeException(messageSource.getMessage(
+            throw new InternalServerErrorException(messageSource.getMessage(
                     "exception.notification.invalidUser", null, Locale.getDefault()));
         }
     }

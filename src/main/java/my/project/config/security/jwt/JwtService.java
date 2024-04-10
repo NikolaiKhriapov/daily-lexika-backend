@@ -5,7 +5,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import my.project.models.entity.user.User;
+import my.project.models.entities.user.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +30,7 @@ public class JwtService {
                 .setIssuer(ISSUER)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(Date.from(Instant.now().plus(1, DAYS)))
+                .setExpiration(Date.from(Instant.now().plus(7, DAYS)))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -61,10 +61,7 @@ public class JwtService {
     }
 
     public String generateToken(User user) {
-        Map<String, Object> extraClaims = Map.of(
-                "name", user.getName(),
-                "role", user.getRole()
-        );
+        Map<String, Object> extraClaims = Map.of();
         return generateToken(extraClaims, user);
     }
 

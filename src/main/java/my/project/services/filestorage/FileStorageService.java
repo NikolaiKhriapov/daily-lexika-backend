@@ -1,9 +1,10 @@
 package my.project.services.filestorage;
 
 import lombok.RequiredArgsConstructor;
+import my.project.exception.InternalServerErrorException;
 import my.project.exception.ResourceNotFoundException;
-import my.project.models.dto.filestorage.FileStorageProperties;
-import my.project.models.dto.filestorage.*;
+import my.project.models.dtos.filestorage.FileStorageProperties;
+import my.project.models.dtos.filestorage.*;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class FileStorageService {
         try {
             return Files.readAllBytes(Path.of(fileDirectoryAndName));
         } catch (IOException e) {
-            throw new RuntimeException(messageSource.getMessage(
+            throw new InternalServerErrorException(messageSource.getMessage(
                     "exception.fileStorage.getPhoto.cannotRead", null, Locale.getDefault()));
         }
     }
@@ -48,7 +49,7 @@ public class FileStorageService {
                 Path oldFileNameAndPath = Paths.get(photo);
                 Files.delete(oldFileNameAndPath);
             } catch (IOException e) {
-                throw new RuntimeException(messageSource.getMessage(
+                throw new InternalServerErrorException(messageSource.getMessage(
                         "exception.fileStorage.deletePhoto.notDeleted", null, Locale.getDefault()));
             }
         }

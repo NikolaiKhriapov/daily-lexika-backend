@@ -1,8 +1,9 @@
 package my.project.util.data;
 
 import com.github.javafaker.Faker;
-import my.project.models.entity.enumeration.Category;
-import my.project.models.entity.enumeration.Platform;
+import my.project.models.dtos.flashcards.WordPackDto;
+import my.project.models.entities.enumeration.Category;
+import my.project.models.entities.enumeration.Platform;
 
 import java.util.List;
 
@@ -32,9 +33,20 @@ public class FakerUtil {
 
     // WordPack
 
+    public static WordPackDto generateWordPackDTO(Platform platform) {
+        return new WordPackDto(
+                generateWordPackName(platform),
+                generateWordPackDescription(),
+                generateWordPackCategory(platform),
+                platform,
+                100L,
+                null
+        );
+    }
+
     public static String generateWordPackName(Platform platform) {
         List<String> chineseWordPackNames = List.of("HSK 1", "HSK 2", "HSK 3", "HSK 4", "HSK 5", "HSK 6");
-        List<String> englishWordPackNames = List.of("Speakout (S) Unit 1", "Speakout (E) Unit 1", "Speakout (PI) Unit 1", "Speakout (PI) Unit 2", "Speakout (I) Unit 1", "Speakout (I) Unit 2", "Speakout (UI) Unit 1");
+        List<String> englishWordPackNames = List.of("A1", "A2", "B1", "B2", "C1");
 
         return switch (platform) {
             case CHINESE -> chineseWordPackNames.get(generateRandomInt(chineseWordPackNames.size()));
@@ -47,8 +59,8 @@ public class FakerUtil {
     }
 
     public static Category generateWordPackCategory(Platform platform) {
-        List<Category> chineseCategories = List.of(Category.HSK, Category.WORK, Category.NEWS, Category.SPORT, Category.FOOD, Category.TRAVEL);
-        List<Category> englishCategories = List.of(Category.SPEAKOUT_STARTER, Category.SPEAKOUT_ELEMENTARY, Category.SPEAKOUT_PRE_INTERMEDIATE, Category.SPEAKOUT_INTERMEDIATE, Category.SPEAKOUT_UPPER_INTERMEDIATE);
+        List<Category> chineseCategories = List.of(Category.HSK, Category.CUSTOM);
+        List<Category> englishCategories = List.of(Category.CEFR, Category.CUSTOM);
 
         return switch (platform) {
             case CHINESE -> chineseCategories.get(generateRandomInt(chineseCategories.size()));
@@ -62,11 +74,7 @@ public class FakerUtil {
         return generateStringCh(3);
     }
 
-    public static String generateNameChineseTraditional() {
-        return generateStringCh(3);
-    }
-
-    public static String generatePinyin() {
+    public static String generateTranscription() {
         return generateStringEn(10);
     }
 
@@ -76,6 +84,18 @@ public class FakerUtil {
 
     public static String generateNameRussian() {
         return generateStringRu(20);
+    }
+
+    public static String generateDefinition() {
+        return generateStringEn(50);
+    }
+
+    public static String generateExamples() {
+        return generateStringEn(20) + ";"
+                + generateStringEn(20) + ";"
+                + generateStringEn(20) + ";"
+                + generateStringEn(20) + ";"
+                + generateStringEn(20);
     }
 
     // helper methods
