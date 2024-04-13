@@ -1,11 +1,14 @@
 package my.project.models.mappers.flashcards;
 
 import my.project.models.dtos.flashcards.WordPackDto;
+import my.project.models.entities.enumeration.Platform;
 import my.project.models.entities.flashcards.Review;
 import my.project.models.entities.flashcards.WordPack;
+import my.project.models.entities.user.User;
 import my.project.repositories.flashcards.ReviewRepository;
 import my.project.services.flashcards.WordDataService;
 import my.project.services.user.AuthenticationService;
+import my.project.services.user.RoleService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,6 +22,8 @@ public abstract class WordPackMapper {
     protected WordDataService wordDataService;
     @Autowired
     protected AuthenticationService authenticationService;
+    @Autowired
+    protected RoleService roleService;
     @Autowired
     protected ReviewRepository reviewRepository;
 
@@ -36,7 +41,10 @@ public abstract class WordPackMapper {
     }
 
     @Named("mapTotalWords")
-    protected long mapTotalWords(WordPack entity) {
-        return wordDataService.getAllWordDataIdByWordPackName(entity.getName()).size();
+    protected Long mapTotalWords(WordPack entity) {
+        User user = authenticationService.getAuthenticatedUser();
+        Platform platform = roleService.getPlatformByRoleName(user.getRole());
+
+        return wordDataService.countByWordPackNameAndPlatform(entity.getName(), platform);
     }
 }

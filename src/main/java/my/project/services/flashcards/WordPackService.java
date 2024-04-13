@@ -10,11 +10,8 @@ import my.project.models.dtos.flashcards.WordDataDto;
 import my.project.models.dtos.flashcards.WordPackDto;
 import my.project.models.entities.enumeration.Category;
 import my.project.models.entities.enumeration.Platform;
-import my.project.models.entities.flashcards.Review;
-import my.project.models.entities.flashcards.WordData;
+import my.project.models.entities.flashcards.*;
 import my.project.models.entities.user.User;
-import my.project.models.entities.flashcards.WordPack;
-import my.project.models.entities.flashcards.Word;
 import my.project.models.mappers.flashcards.WordDataMapper;
 import my.project.models.mappers.flashcards.WordMapper;
 import my.project.models.mappers.flashcards.WordPackMapper;
@@ -65,8 +62,8 @@ public class WordPackService {
         User user = authenticationService.getAuthenticatedUser();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
-        List<WordPack> allWordPacksNotCustom = wordPackRepository.findAllByPlatformAndCategoryNotCustom(platform);
-        List<WordPack> allWordPacksCustom = wordPackRepository.findAllByPlatformAndUserIdAndCategoryCustom(platform, user.getId());
+        List<WordPack> allWordPacksNotCustom = wordPackRepository.findByPlatformInAndCategoryNot(List.of(platform, Platform.SHARED), Category.CUSTOM);
+        List<WordPack> allWordPacksCustom = wordPackRepository.findAllByUserIdAndPlatformAndCategoryCustom(user.getId(), platform);
 
         List<WordPack> allWordPacks = new ArrayList<>();
         allWordPacks.addAll(allWordPacksNotCustom);
@@ -77,12 +74,14 @@ public class WordPackService {
 
     @Transactional
     public List<WordDto> getAllWordsForWordPack(String wordPackName, Pageable pageable) {
-        Long userId = authenticationService.getAuthenticatedUser().getId();
-        List<Long> wordDataIds = wordDataService.getAllWordDataIdByWordPackName(wordPackName);
+        User user = authenticationService.getAuthenticatedUser();
+        Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
-        wordService.createOrUpdateWordsForUser(userId, wordDataIds);
+        List<Long> wordDataIds = wordDataService.findAllWordDataIdByWordPackNameAndPlatform(wordPackName, platform);
 
-        Page<Word> wordsPage = wordService.findByUserIdAndWordDataIdIn(userId, wordDataIds, pageable);
+        wordService.createOrUpdateWordsForUser(user.getId(), wordDataIds);
+
+        Page<Word> wordsPage = wordService.findByUserIdAndWordDataIdIn(user.getId(), wordDataIds, pageable);
 
         return new ArrayList<>(wordMapper.toDtoList(wordsPage.getContent()));
     }
@@ -110,12 +109,15 @@ public class WordPackService {
     }
 
     public void deleteCustomWordPack(String wordPackName) {
+        User user = authenticationService.getAuthenticatedUser();
+        Platform platform = roleService.getPlatformByRoleName(user.getRole());
+
         WordPack wordPack = findByName(wordPackName);
 
         throwIfReviewExistsForWordPack(wordPackName);
         throwIfWordPackCategoryNotCustom(wordPack);
 
-        List<WordData> listOfWordData = wordDataService.findAllByWordPack(wordPack);
+        List<WordData> listOfWordData = wordDataService.findAllByWordPackAndPlatform(wordPack, platform);
         listOfWordData.forEach(wordData -> {
             List<WordPack> listOfWordPacks = wordData.getListOfWordPacks();
             listOfWordPacks.remove(wordPack);
@@ -164,7 +166,7 @@ public class WordPackService {
     }
 
     public void deleteAllByUserIdAndPlatform(Long userId, Platform platform) {
-        List<WordPack> allWordPacksCustom = wordPackRepository.findAllByPlatformAndUserIdAndCategoryCustom(platform, userId);
+        List<WordPack> allWordPacksCustom = wordPackRepository.findAllByUserIdAndPlatformAndCategoryCustom(userId, platform);
         allWordPacksCustom.forEach(wordPack -> deleteCustomWordPack(wordPack.getName()));
     }
 

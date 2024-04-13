@@ -44,6 +44,10 @@ public class RoleService {
         return switch (platform) {
             case ENGLISH -> RoleName.USER_ENGLISH;
             case CHINESE -> RoleName.USER_CHINESE;
+            case SHARED -> throw new IllegalStateException(
+                    messageSource.getMessage("exception.role.invalidPlatform", null, Locale.getDefault())
+                            .formatted(platform)
+            );
         };
     }
 
