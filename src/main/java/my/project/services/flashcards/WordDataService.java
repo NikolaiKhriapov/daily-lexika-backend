@@ -36,8 +36,8 @@ public class WordDataService {
         return wordDataRepository.findAll();
     }
 
-    public List<WordData> findAllByWordPack(WordPack wordPack) {
-        return wordDataRepository.findAllByWordPack(wordPack);
+    public List<WordData> findAllByWordPackAndPlatform(WordPack wordPack, Platform platform) {
+        return wordDataRepository.findAllByListOfWordPacks_NameAndPlatform(wordPack.getName(), platform);
     }
 
     public WordData save(WordData wordData) {
@@ -52,13 +52,16 @@ public class WordDataService {
         User user = authenticationService.getAuthenticatedUser();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
-        List<WordData> allWordData = findAll().stream()
-                .filter(wordData -> wordData.getPlatform() == platform).toList();
+        List<WordData> allWordData = wordDataRepository.findAllByPlatform(platform);
 
-    return wordDataMapper.toDtoList(allWordData);
+        return wordDataMapper.toDtoList(allWordData);
     }
 
-    public List<Long> getAllWordDataIdByWordPackName(String wordPackName) {
-        return wordDataRepository.findAllWordDataIdsByWordPackName(wordPackName);
+    public List<Long> findAllWordDataIdByWordPackNameAndPlatform(String wordPackName, Platform platform) {
+        return wordDataRepository.findAllWordDataIdsByWordPackNameAndPlatform(wordPackName, platform);
+    }
+
+    public Long countByWordPackNameAndPlatform(String wordPackName, Platform platform) {
+        return wordDataRepository.countByListOfWordPacks_NameAndPlatform(wordPackName, platform);
     }
 }
