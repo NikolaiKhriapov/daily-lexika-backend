@@ -51,6 +51,7 @@ public class FakerUtil {
         return switch (platform) {
             case CHINESE -> chineseWordPackNames.get(generateRandomInt(chineseWordPackNames.size()));
             case ENGLISH -> englishWordPackNames.get(generateRandomInt(englishWordPackNames.size()));
+            default -> throw new RuntimeException("Unsupported platform");
         };
     }
 
@@ -65,6 +66,7 @@ public class FakerUtil {
         return switch (platform) {
             case CHINESE -> chineseCategories.get(generateRandomInt(chineseCategories.size()));
             case ENGLISH -> englishCategories.get(generateRandomInt(englishCategories.size()));
+            default -> throw new RuntimeException("Unsupported platform");
         };
     }
 
