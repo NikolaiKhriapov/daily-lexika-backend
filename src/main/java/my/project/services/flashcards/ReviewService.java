@@ -133,14 +133,15 @@ public class ReviewService {
     }
 
     public ReviewStatisticsDto getReviewStatistics(Long reviewId) {
-        Long userId = authenticationService.getAuthenticatedUser().getId();
+        User user = authenticationService.getAuthenticatedUser();
+        Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
         Review review = getReview(reviewId);
-        List<Long> wordDataIds = wordDataService.getAllWordDataIdByWordPackName(review.getWordPack().getName());
+        List<Long> wordDataIds = wordDataService.findAllWordDataIdByWordPackNameAndPlatform(review.getWordPack().getName(), platform);
 
-        Integer newWords = wordService.countByUserIdAndWordData_IdInAndStatus(userId, wordDataIds, NEW);
-        Integer reviewWords = wordService.countByUserIdAndWordData_IdInAndStatus(userId, wordDataIds, IN_REVIEW);
-        Integer knownWords = wordService.countByUserIdAndWordData_IdInAndStatus(userId, wordDataIds, KNOWN);
+        Integer newWords = wordService.countByUserIdAndWordData_IdInAndStatus(user.getId(), wordDataIds, NEW);
+        Integer reviewWords = wordService.countByUserIdAndWordData_IdInAndStatus(user.getId(), wordDataIds, IN_REVIEW);
+        Integer knownWords = wordService.countByUserIdAndWordData_IdInAndStatus(user.getId(), wordDataIds, KNOWN);
 
         return new ReviewStatisticsDto(
                 review.getId(),
@@ -170,19 +171,21 @@ public class ReviewService {
      * KNOWN -> if dateOfLastOccurrence >= totalStreak
      **/
     public List<Word> generateListOfWordsForReview(WordPack wordPack, ReviewDto reviewDto) {
-        Long userId = authenticationService.getAuthenticatedUser().getId();
-        List<Long> wordDataIds = wordDataService.getAllWordDataIdByWordPackName(wordPack.getName());
+        User user = authenticationService.getAuthenticatedUser();
+        Platform platform = roleService.getPlatformByRoleName(user.getRole());
+
+        List<Long> wordDataIds = wordDataService.findAllWordDataIdByWordPackNameAndPlatform(wordPack.getName(), platform);
 
         if (wordDataIds.isEmpty()) {
             throw new BadRequestException(messageSource.getMessage(
                     "exception.wordPack.noWordData", null, Locale.getDefault()));
         }
 
-        wordService.createOrUpdateWordsForUser(userId, wordDataIds);
+        wordService.createOrUpdateWordsForUser(user.getId(), wordDataIds);
 
         Pageable pageableNew = PageRequest.of(0, reviewDto.maxNewWordsPerDay());
         List<Word> newWords = wordService.findByUserIdAndWordDataIdInAndStatusIn(
-                userId,
+                user.getId(),
                 wordDataIds,
                 new ArrayList<>(List.of(NEW)),
                 pageableNew
@@ -190,7 +193,7 @@ public class ReviewService {
 
         Pageable pageableReviewAndKnown = PageRequest.of(0, reviewDto.maxReviewWordsPerDay());
         List<Word> reviewAndKnownWords = wordService.findByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrdered(
-                userId,
+                user.getId(),
                 wordDataIds,
                 new ArrayList<>(List.of(IN_REVIEW, KNOWN)),
                 pageableReviewAndKnown

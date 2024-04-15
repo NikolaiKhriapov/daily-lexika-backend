@@ -7,7 +7,6 @@ import org.mapstruct.*;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
@@ -20,10 +19,10 @@ public interface WordDataMapper {
     List<WordDataDto> toDtoList(List<WordData> entityList);
 
     @Named("mapExamples")
-    default Set<String> mapExamples(String examples) {
+    default List<String> mapExamples(String examples) {
         return Arrays.stream(examples.split(System.lineSeparator()))
                 .map(String::strip)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
     }
 
     @Named("mapListOfWordPackNames")

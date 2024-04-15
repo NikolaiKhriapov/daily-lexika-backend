@@ -5,7 +5,6 @@ import my.project.models.entities.flashcards.WordData;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Set;
 
 /**
  * DTO for {@link WordData}
@@ -18,7 +17,7 @@ public record WordDataDto(
         String nameEnglish,
         String nameRussian,
         String definition,
-        Set<String> examples,
+        List<String> examples,
         List<String> listOfWordPackNames,
         Platform platform
 

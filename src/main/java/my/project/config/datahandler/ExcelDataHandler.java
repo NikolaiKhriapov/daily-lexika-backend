@@ -74,7 +74,11 @@ public class ExcelDataHandler {
                     }
                     cellIdx++;
                 }
-                wordPack.setPlatform(platform);
+                if (wordPack.getCategory() == Category.OTHER) {
+                    wordPack.setPlatform(Platform.SHARED);
+                } else {
+                    wordPack.setPlatform(platform);
+                }
 
                 listOfWordPacks.add(wordPack);
             }
@@ -110,20 +114,6 @@ public class ExcelDataHandler {
                 while (cellsInRow.hasNext()) {
                     Cell currentCell = cellsInRow.next();
 
-                    if (platform == Platform.CHINESE) {
-                        switch (cellIdx) {
-                            case 0 -> wordData.setId((long) currentCell.getNumericCellValue());
-                            case 1 -> wordData.setNameChineseSimplified(currentCell.getStringCellValue());
-                            case 2 -> wordData.setTranscription(currentCell.getStringCellValue().replaceAll("(?<!,) ", ""));
-                            case 3 -> wordData.setNameEnglish(currentCell.getStringCellValue());
-                            case 4 -> wordData.setNameRussian(currentCell.getStringCellValue());
-                            case 5 -> wordData.setDefinition(currentCell.getStringCellValue());
-                            case 6 -> wordData.setExamples(currentCell.getStringCellValue());
-                            case 7 -> wordData.setListOfWordPacks(getWordPacksFromCellValue(wordData, currentCell.getStringCellValue()));
-                            default -> {
-                            }
-                        }
-                    }
                     if (platform == Platform.ENGLISH) {
                         switch (cellIdx) {
                             case 0 -> wordData.setId((long) currentCell.getNumericCellValue());
@@ -138,11 +128,27 @@ public class ExcelDataHandler {
                             }
                         }
                     }
+                    if (platform == Platform.CHINESE) {
+                        switch (cellIdx) {
+                            case 0 -> wordData.setId((long) currentCell.getNumericCellValue());
+                            case 1 -> wordData.setNameChineseSimplified(currentCell.getStringCellValue());
+                            case 2 -> wordData.setTranscription(currentCell.getStringCellValue().replaceAll("(?<!,) ", ""));
+                            case 3 -> wordData.setNameEnglish(currentCell.getStringCellValue());
+                            case 4 -> wordData.setNameRussian(currentCell.getStringCellValue());
+                            case 5 -> wordData.setDefinition(currentCell.getStringCellValue());
+                            case 6 -> wordData.setExamples(currentCell.getStringCellValue());
+                            case 7 -> wordData.setListOfWordPacks(getWordPacksFromCellValue(wordData, currentCell.getStringCellValue()));
+                            default -> {
+                            }
+                        }
+                    }
 
                     cellIdx++;
                 }
 
-//                validateExcelWordData(wordData);
+                wordData.setPlatform(platform);
+
+                validateExcelWordData(wordData);
 
                 if (wordData.getNameEnglish().length() > 250) {
                     wordData.setNameEnglish(wordData.getNameEnglish().substring(0, 250) + "...");
@@ -150,7 +156,6 @@ public class ExcelDataHandler {
                 if (wordData.getNameRussian().length() > 250) {
                     wordData.setNameRussian(wordData.getNameRussian().substring(0, 250) + "...");
                 }
-                wordData.setPlatform(platform);
 
                 listOfWordData.add(wordData);
             }
@@ -229,25 +234,73 @@ public class ExcelDataHandler {
     }
 
     private void validateExcelWordData(WordData wordData) {
+        switch (wordData.getPlatform()) {
+            //TODO::: add validation for characters language
+            //TODO::: 'definitions' must not end with '.'
+//            case ENGLISH -> validateExcelWordDataEnglish(wordData);
+//            case CHINESE -> validateExcelWordDataChinese(wordData);
+        }
+    }
+
+    private void validateExcelWordDataEnglish(WordData wordData) {
+        if (wordData.getNameEnglish().length() > 250) {
+            System.out.println("!!!!! Excel data (EN_Words) validation failed (name_english): " + wordData.getId());
+        }
+        if (!wordData.getTranscription().startsWith("/") || !wordData.getTranscription().endsWith("/") || wordData.getTranscription().contains("/ /")) {
+            System.out.println("!!!!! Excel data (EN_Words) validation failed (transcription): " + wordData.getId());
+        }
+        if (wordData.getNameRussian().length() > 250) {
+            System.out.println("!!!!! Excel data (EN_Words) validation failed (name_russian): " + wordData.getId());
+        }
+        if (wordData.getNameChineseSimplified().length() > 19 || wordData.getNameChineseSimplified().contains(",") || wordData.getNameChineseSimplified().contains(";") || wordData.getNameChineseSimplified().contains("；") || wordData.getNameChineseSimplified().contains(" ")) {
+            System.out.println("!!!!! Excel data (EN_Words) validation failed (name_chinese): " + wordData.getId());
+        }
+        if (wordData.getExamples().split(System.lineSeparator()).length != 5) {
+            System.out.println("!!!!! Excel data (EN_Words) validation failed (examples): " + wordData.getId());
+        }
+    }
+
+    private void validateExcelWordDataChinese(WordData wordData) {
         if (wordData.getNameChineseSimplified().length() > 19) {
-            System.out.println("!!!!! Error with name_chinese (long): " + wordData.getId());
+            System.out.println("!!!!! Excel data (CH_Words) validation failed (name_chinese): " + wordData.getId());
         }
-        if (wordData.getNameChineseSimplified().contains(",") || wordData.getNameChineseSimplified().contains(";") || wordData.getNameChineseSimplified().contains("；") || wordData.getNameChineseSimplified().contains(" ")) {
-            System.out.println("!!!!! Error with name_chinese (symbol): " + wordData.getId());
-        }
-        if (wordData.getPlatform() == Platform.CHINESE && !(wordData.getTranscription().startsWith("/") || wordData.getTranscription().endsWith("/"))) {
-            System.out.println("!!!!! Error with transcription: " + wordData.getId());
-        }
-        if (!wordData.getExamples().equals("[TODO]")) {
-            String examples = wordData.getExamples();
-            int count = examples.split(System.lineSeparator()).length;
-            if (count != 5) {
-                System.out.println("!!!!! Error with examples: " + wordData.getId());
+        if (!wordData.getTranscription().equals("[TODO]")) {
+            if (wordData.getTranscription().split(" ").length != wordData.getNameChineseSimplified().length()) {
+                if (wordData.getTranscription().endsWith("r")) {
+                    if (wordData.getTranscription().split(" ").length != (wordData.getNameChineseSimplified().length() - 1)) {
+                        System.out.println("!!!!! Excel data (CH_Words) validation failed (transcription0): " + wordData.getId() + " " + wordData.getTranscription() + " " + wordData.getTranscription().split(" ").length + " ::: " + (wordData.getNameChineseSimplified().length()));
+                    }
+                } else {
+                    System.out.println("!!!!! Excel data (CH_Words) validation failed (transcription): " + wordData.getId() + " " + wordData.getTranscription() + " " + wordData.getTranscription().split(" ").length + " ::: " + wordData.getNameChineseSimplified().length());
+                }
             }
         }
-        if (wordData.getNameEnglish().length() > 250 || wordData.getNameRussian().length() > 250) { //TODO::: change to sout
-            System.out.println("!!!!! Error with name_english: " + wordData.getId());
-            wordData.setNameEnglish(wordData.getNameEnglish().substring(0, 250) + "...");
+        if (!wordData.getNameEnglish().equals("[TODO]")) {
+            if (wordData.getNameEnglish().length() > 250 || wordData.getNameEnglish().contains(";") || wordData.getNameEnglish().contains("  ")) {
+                System.out.println("!!!!! Excel data (CH_Words) validation failed (name_english): " + wordData.getId());
+            }
+        }
+        if (!wordData.getNameRussian().equals("[TODO]")) {
+            if (wordData.getNameRussian().length() > 250 || wordData.getNameRussian().contains(";") || wordData.getNameRussian().contains("  ")) {
+                System.out.println("!!!!! Excel data (CH_Words) validation failed (name_russian): " + wordData.getId());
+            }
+        }
+        if (!wordData.getDefinition().equals("[TODO]")) {
+            if (wordData.getDefinition().endsWith(".") && !wordData.getDefinition().endsWith("etc.")) {
+                System.out.println("!!!!! Excel data (CH_Words) validation failed (definition): " + wordData.getId());
+            }
+        }
+        if (!wordData.getExamples().equals("[TODO]")) {
+            String[] examplesArray = wordData.getExamples().split(System.lineSeparator() + System.lineSeparator());
+            if (examplesArray.length != 5) {
+                System.out.println("!!!!! Excel data (CH_Words) validation failed (examples): " + wordData.getId());
+            } else {
+                Arrays.stream(examplesArray).forEach(oneExample -> {
+                    if (oneExample.split(System.lineSeparator()).length != 4) {
+                        System.out.println("!!!!! Excel data (CH_Words) validation failed (examples): " + wordData.getId());
+                    }
+                });
+            }
         }
     }
 }
