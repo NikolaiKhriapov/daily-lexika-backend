@@ -62,7 +62,7 @@ public class WordPackService {
         User user = authenticationService.getAuthenticatedUser();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
-        List<WordPack> allWordPacksNotCustom = wordPackRepository.findByPlatformInAndCategoryNot(List.of(platform, Platform.SHARED), Category.CUSTOM);
+        List<WordPack> allWordPacksNotCustom = wordPackRepository.findAllByPlatformAndCategoryNot(platform, Category.CUSTOM);
         List<WordPack> allWordPacksCustom = wordPackRepository.findAllByUserIdAndPlatformAndCategoryCustom(user.getId(), platform);
 
         List<WordPack> allWordPacks = new ArrayList<>();
@@ -95,9 +95,11 @@ public class WordPackService {
             throw new BadRequestException(messageSource.getMessage("exception.wordPack.invalidName", null, Locale.getDefault()));
         }
 
-        if (!wordPackRepository.existsById(wordPackName + "__" + user.getId())) {
+        String wordPackNameDecorated = decorateWordPackName(wordPackName, user.getId(), platform);
+
+        if (!wordPackRepository.existsById(wordPackNameDecorated)) {
             wordPackRepository.save(new WordPack(
-                    wordPackName + "__" + user.getId(),
+                    wordPackNameDecorated,
                     wordPackDTO.description(),
                     Category.CUSTOM,
                     platform
@@ -106,6 +108,14 @@ public class WordPackService {
             throw new ResourceAlreadyExistsException(messageSource.getMessage("exception.wordPack.alreadyExists", null, Locale.getDefault())
                     .formatted(wordPackDTO.name()));
         }
+    }
+
+    private String decorateWordPackName(String wordPackName, Long userId, Platform platform) {
+        String prefix = switch (platform) {
+            case CHINESE -> "CH__";
+            case ENGLISH -> "EN__";
+        };
+        return prefix + wordPackName + "__" + userId;
     }
 
     public void deleteCustomWordPack(String wordPackName) {

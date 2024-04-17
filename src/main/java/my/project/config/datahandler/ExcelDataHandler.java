@@ -74,11 +74,7 @@ public class ExcelDataHandler {
                     }
                     cellIdx++;
                 }
-                if (wordPack.getCategory() == Category.OTHER) {
-                    wordPack.setPlatform(Platform.SHARED);
-                } else {
-                    wordPack.setPlatform(platform);
-                }
+                wordPack.setPlatform(platform);
 
                 listOfWordPacks.add(wordPack);
             }
@@ -123,7 +119,7 @@ public class ExcelDataHandler {
                             case 4 -> wordData.setNameChineseSimplified(currentCell.getStringCellValue());
                             case 5 -> wordData.setDefinition(currentCell.getStringCellValue());
                             case 6 -> wordData.setExamples(currentCell.getStringCellValue());
-                            case 7 -> wordData.setListOfWordPacks(getWordPacksFromCellValue(wordData, currentCell.getStringCellValue()));
+                            case 7 -> wordData.setListOfWordPacks(getWordPacksFromCellValue(wordData, currentCell.getStringCellValue(), "EN__"));
                             default -> {
                             }
                         }
@@ -137,7 +133,7 @@ public class ExcelDataHandler {
                             case 4 -> wordData.setNameRussian(currentCell.getStringCellValue());
                             case 5 -> wordData.setDefinition(currentCell.getStringCellValue());
                             case 6 -> wordData.setExamples(currentCell.getStringCellValue());
-                            case 7 -> wordData.setListOfWordPacks(getWordPacksFromCellValue(wordData, currentCell.getStringCellValue()));
+                            case 7 -> wordData.setListOfWordPacks(getWordPacksFromCellValue(wordData, currentCell.getStringCellValue(), "CH__"));
                             default -> {
                             }
                         }
@@ -212,10 +208,12 @@ public class ExcelDataHandler {
         wordDataService.saveAll(wordsToBeSavedOrUpdated);
     }
 
-    private List<WordPack> getWordPacksFromCellValue(WordData wordData, String stringCellValue) {
+    private List<WordPack> getWordPacksFromCellValue(WordData wordData, String stringCellValue, String prefix) {
         List<WordPack> listOfWordPacks = new ArrayList<>();
 
-        List<String> wordPackNames = Arrays.stream(stringCellValue.split(";")).toList();
+        List<String> wordPackNames = Arrays.stream(stringCellValue.split(";"))
+                .map(wordPackName -> prefix + wordPackName)
+                .toList();
         wordPackNames.forEach(wordPackName -> {
             WordPack wordPack = wordPackService.findByName(wordPackName);
             listOfWordPacks.add(wordPack);
