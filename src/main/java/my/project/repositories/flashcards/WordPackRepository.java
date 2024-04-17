@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface WordPackRepository extends JpaRepository<WordPack, String> {
 
-    List<WordPack> findByPlatformInAndCategoryNot(List<Platform> platforms, Category category);
+    List<WordPack> findAllByPlatformAndCategoryNot(Platform platform, Category category);
 
     @Query("""
                 SELECT wp FROM word_packs wp
