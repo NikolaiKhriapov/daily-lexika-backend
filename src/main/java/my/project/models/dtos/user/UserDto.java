@@ -1,5 +1,6 @@
 package my.project.models.dtos.user;
 
+import jakarta.validation.constraints.NotEmpty;
 import my.project.models.entities.user.RoleName;
 import my.project.models.entities.user.User;
 
@@ -12,9 +13,15 @@ import java.util.Set;
 public record UserDto(
 
         Long id,
+
+        @NotEmpty
         String name,
+
+        @NotEmpty
         String email,
+
         RoleName role,
+
         Set<RoleStatisticsDto> setOfRoleStatisticsDto
 
 ) implements Serializable {
