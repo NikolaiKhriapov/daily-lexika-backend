@@ -6,12 +6,13 @@ import my.project.models.entities.enumeration.Platform;
 import my.project.models.entities.enumeration.Status;
 import my.project.models.entities.flashcards.Word;
 import my.project.models.entities.user.RoleStatistics;
+import my.project.models.entities.user.User;
 import my.project.models.mappers.flashcards.WordMapper;
 import my.project.repositories.flashcards.WordRepository;
-import my.project.services.user.AuthenticationService;
 import my.project.services.user.RoleService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,23 +25,36 @@ public class WordService {
     private final WordMapper wordMapper;
     private final WordDataService wordDataService;
     private final RoleService roleService;
-    private final AuthenticationService authenticationService;
 
     public List<WordDto> getAllWordsByStatus(Status status, Pageable pageable) {
-        Long userId = authenticationService.getAuthenticatedUser().getId();
+        Long userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         RoleStatistics currentRole = roleService.getRoleStatistics();
         Platform platform = roleService.getPlatformByRoleName(currentRole.getRoleName());
         List<Word> allWordsByStatus = wordRepository.findByUserIdAndWordData_PlatformAndStatus(userId, platform, status, pageable);
         return wordMapper.toDtoList(allWordsByStatus);
     }
 
-    public void createOrUpdateWordsForUser(Long userId, List<Long> wordDataIds) {
+    public void createAllWordsForUserAndPlatform(Long userId, Platform platform) {
+        List<Long> allWordDataIdByPlatform = wordDataService.findAllWordDataIdByPlatform(platform);
+        List<Word> allExistingWordsByUser = wordRepository.findAllByUserId(userId);
+
+        List<Word> wordsToBeSaved = allWordDataIdByPlatform.stream()
+                .filter(wordDataId -> allExistingWordsByUser.stream()
+                        .noneMatch(word -> word.getWordData().getId().equals(wordDataId))
+                )
+                .map(wordDataId -> new Word(userId, wordDataService.findById(wordDataId)))
+                .toList();
+
+        wordRepository.saveAll(wordsToBeSaved);
+    }
+
+    public synchronized void updateWordsForUser(Long userId, List<Long> wordDataIds) {
         List<Word> existingWords = wordRepository.findByUserIdAndWordDataIdIn(userId, wordDataIds);
         List<Word> wordsToBeSaved = wordDataIds.stream()
                 .filter(wordDataId -> existingWords.stream()
                         .noneMatch(word -> word.getWordData().getId().equals(wordDataId))
                 )
-                .map(wordDataId -> new Word(userId, wordDataService.findById(wordDataId))) // TODO::: change to mapper
+                .map(wordDataId -> new Word(userId, wordDataService.findById(wordDataId)))
                 .toList();
 
         wordRepository.saveAll(wordsToBeSaved);
@@ -60,6 +74,10 @@ public class WordService {
 
     public List<Word> findByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrdered(Long userId, List<Long> wordDataIds, List<Status> statuses, Pageable pageable) {
         return wordRepository.findByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrdered(userId, wordDataIds, statuses, pageable);
+    }
+
+    public void deleteAllByWordDataId(List<Long> wordDataIds) {
+        wordDataIds.forEach(wordRepository::deleteAllByWordData_Id);
     }
 
     public void deleteAllByUserIdAndPlatform(Long userId, Platform platform) {

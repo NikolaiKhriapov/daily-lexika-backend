@@ -8,6 +8,7 @@ import my.project.models.entities.enumeration.Category;
 import my.project.models.entities.flashcards.WordPack;
 import my.project.services.flashcards.WordDataService;
 import my.project.services.flashcards.WordPackService;
+import my.project.services.flashcards.WordService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -27,6 +28,7 @@ public class ExcelDataHandler {
 
     private final WordPackService wordPackService;
     private final WordDataService wordDataService;
+    private final WordService wordService;
     private final MessageSource messageSource;
 
     @Transactional
@@ -39,7 +41,7 @@ public class ExcelDataHandler {
     @Transactional
     public void importWords(String file, String fileSheet, Platform platform) {
         List<WordData> listOfWordData = getWordsFromExcel(file, fileSheet, platform);
-        saveWordsToDatabase(listOfWordData);
+        saveWordsToDatabase(listOfWordData, platform);
         System.out.println("ExcelDataHandler Report: " + fileSheet + " updated!");
     }
 
@@ -184,13 +186,21 @@ public class ExcelDataHandler {
         wordPackService.saveAll(wordsPacksToBeSavedOrUpdated);
     }
 
-    private void saveWordsToDatabase(List<WordData> listOfWordData) {
-        List<WordData> allWordData = wordDataService.findAll();
-        List<Long> allWordsId = allWordData.stream().map(WordData::getId).toList();
+    private void saveWordsToDatabase(List<WordData> listOfNewWordData, Platform platform) {
+        List<WordData> allExistingWordData = wordDataService.findAllByPlatform(platform);
+        List<Long> allExistingWordDataIds = allExistingWordData.stream().map(WordData::getId).toList();
+        List<Long> allNewWordDataIds = listOfNewWordData.stream().map(WordData::getId).toList();
+
+        List<WordData> wordsToBeDeleted = new ArrayList<>();
+        for (WordData wordData : allExistingWordData) {
+            if (!allNewWordDataIds.contains(wordData.getId())) {
+                wordsToBeDeleted.add(wordData);
+            }
+        }
 
         List<WordData> wordsToBeSavedOrUpdated = new ArrayList<>();
-        for (WordData wordData : listOfWordData) {
-            if (!allWordsId.contains(wordData.getId())) {
+        for (WordData wordData : listOfNewWordData) {
+            if (!allExistingWordDataIds.contains(wordData.getId())) {
                 wordsToBeSavedOrUpdated.add(wordData);
             } else {
                 WordData wordDataToBeUpdated = wordDataService.findById(wordData.getId());
@@ -206,6 +216,9 @@ public class ExcelDataHandler {
             }
         }
         wordDataService.saveAll(wordsToBeSavedOrUpdated);
+
+        wordService.deleteAllByWordDataId(wordsToBeDeleted.stream().map(WordData::getId).toList());
+        wordDataService.deleteAll(wordsToBeDeleted);
     }
 
     private List<WordPack> getWordPacksFromCellValue(WordData wordData, String stringCellValue, String prefix) {

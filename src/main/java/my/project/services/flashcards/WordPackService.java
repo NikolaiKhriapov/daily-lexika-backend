@@ -17,11 +17,11 @@ import my.project.models.mappers.flashcards.WordMapper;
 import my.project.models.mappers.flashcards.WordPackMapper;
 import my.project.repositories.flashcards.ReviewRepository;
 import my.project.repositories.flashcards.WordPackRepository;
-import my.project.services.user.AuthenticationService;
 import my.project.services.user.RoleService;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -39,7 +39,6 @@ public class WordPackService {
     private final WordService wordService;
     private final WordDataService wordDataService;
     private final WordDataMapper wordDataMapper;
-    private final AuthenticationService authenticationService;
     private final RoleService roleService;
     private final MessageSource messageSource;
     private final ReviewRepository reviewRepository;
@@ -59,7 +58,7 @@ public class WordPackService {
     }
 
     public List<WordPackDto> getAllWordPacksForUser() {
-        User user = authenticationService.getAuthenticatedUser();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
         List<WordPack> allWordPacksNotCustom = wordPackRepository.findAllByPlatformAndCategoryNot(platform, Category.CUSTOM);
@@ -74,12 +73,10 @@ public class WordPackService {
 
     @Transactional
     public List<WordDto> getAllWordsForWordPack(String wordPackName, Pageable pageable) {
-        User user = authenticationService.getAuthenticatedUser();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
         List<Long> wordDataIds = wordDataService.findAllWordDataIdByWordPackNameAndPlatform(wordPackName, platform);
-
-        wordService.createOrUpdateWordsForUser(user.getId(), wordDataIds);
 
         Page<Word> wordsPage = wordService.findByUserIdAndWordDataIdIn(user.getId(), wordDataIds, pageable);
 
@@ -87,7 +84,7 @@ public class WordPackService {
     }
 
     public void createCustomWordPack(WordPackDto wordPackDTO) {
-        User user = authenticationService.getAuthenticatedUser();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
         String wordPackName = wordPackDTO.name().trim();
 
@@ -119,7 +116,7 @@ public class WordPackService {
     }
 
     public void deleteCustomWordPack(String wordPackName) {
-        User user = authenticationService.getAuthenticatedUser();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
         WordPack wordPack = findByName(wordPackName);
@@ -181,7 +178,7 @@ public class WordPackService {
     }
 
     private void throwIfReviewExistsForWordPack(String wordPackName) {
-        Long userId = authenticationService.getAuthenticatedUser().getId();
+        Long userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
 
         Optional<Review> review = reviewRepository.findByUserIdAndWordPack_Name(userId, wordPackName);
         review.ifPresent(reviewRepository::delete);

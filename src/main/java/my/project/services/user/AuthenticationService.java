@@ -3,6 +3,7 @@ package my.project.services.user;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import my.project.models.entities.notification.Notification;
+import my.project.services.flashcards.WordService;
 import my.project.services.notification.NotificationService;
 import my.project.models.dtos.user.AuthenticationRequest;
 import my.project.models.dtos.user.AuthenticationResponse;
@@ -31,6 +32,7 @@ public class AuthenticationService {
     private final NotificationService notificationService;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
+    private final WordService wordService;
     private final MessageSource messageSource;
 
     @Transactional
@@ -60,6 +62,7 @@ public class AuthenticationService {
         user.setRole(roleName);
 
         userRepository.save(user);
+        wordService.createAllWordsForUserAndPlatform(user.getId(), registrationRequest.platform());
 
         if (!isEmailAlreadyExists) {
             sendWelcomeNotificationToUser(user);

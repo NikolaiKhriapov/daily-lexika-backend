@@ -9,9 +9,9 @@ import my.project.models.entities.flashcards.WordPack;
 import my.project.models.entities.user.User;
 import my.project.models.mappers.flashcards.WordDataMapper;
 import my.project.repositories.flashcards.WordDataRepository;
-import my.project.services.user.AuthenticationService;
 import my.project.services.user.RoleService;
 import org.springframework.context.MessageSource;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -22,7 +22,6 @@ public class WordDataService {
 
     private final WordDataRepository wordDataRepository;
     private final WordDataMapper wordDataMapper;
-    private final AuthenticationService authenticationService;
     private final RoleService roleService;
     private final MessageSource messageSource;
 
@@ -32,8 +31,8 @@ public class WordDataService {
                         "exception.wordData.notFound", null, Locale.getDefault())));
     }
 
-    public List<WordData> findAll() {
-        return wordDataRepository.findAll();
+    public List<WordData> findAllByPlatform(Platform platform) {
+        return wordDataRepository.findAllByPlatform(platform);
     }
 
     public List<WordData> findAllByWordPackAndPlatform(WordPack wordPack, Platform platform) {
@@ -48,13 +47,21 @@ public class WordDataService {
         wordDataRepository.saveAll(listOfWordData);
     }
 
+    public void deleteAll(List<WordData> listOfWordData) {
+        wordDataRepository.deleteAll(listOfWordData);
+    }
+
     public List<WordDataDto> getAllWordData() {
-        User user = authenticationService.getAuthenticatedUser();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
         List<WordData> allWordData = wordDataRepository.findAllByPlatform(platform);
 
         return wordDataMapper.toDtoList(allWordData);
+    }
+
+    public List<Long> findAllWordDataIdByPlatform(Platform platform) {
+        return wordDataRepository.findAllWordDataIdsByPlatform(platform);
     }
 
     public List<Long> findAllWordDataIdByWordPackNameAndPlatform(String wordPackName, Platform platform) {

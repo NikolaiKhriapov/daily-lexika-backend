@@ -20,6 +20,12 @@ public interface WordDataRepository extends JpaRepository<WordData, Long> {
 
     @Query("""
                 SELECT wd.id FROM word_data wd
+                WHERE wd.platform = :platform
+            """)
+    List<Long> findAllWordDataIdsByPlatform(@Param("platform") Platform platform);
+
+    @Query("""
+                SELECT wd.id FROM word_data wd
                 JOIN wd.listOfWordPacks wp
                 WHERE wp.name = :wordPackName
                 AND wd.platform = :platform

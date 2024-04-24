@@ -15,6 +15,8 @@ import java.util.List;
 @Repository
 public interface WordRepository extends JpaRepository<Word, Long> {
 
+    List<Word> findAllByUserId(Long userId);
+
     List<Word> findByUserIdAndWordDataIdIn(Long userId, List<Long> wordDataIds);
 
     List<Word> findByUserIdAndWordDataIdInAndStatusIn(Long userId, List<Long> wordDataIds, List<Status> status, Pageable pageable);
@@ -26,6 +28,8 @@ public interface WordRepository extends JpaRepository<Word, Long> {
     List<Word> findByUserIdAndWordData_Platform(Long userId, Platform platform);
 
     List<Word> findByUserIdAndWordData_PlatformAndStatus(Long userId, Platform platform, Status status, Pageable pageable);
+
+    void deleteAllByWordData_Id(Long id);
 
     @Query("""
                 SELECT w FROM words w WHERE w.userId = :userId AND w.wordData.id IN :wordDataIds

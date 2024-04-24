@@ -181,7 +181,7 @@ public class ReviewService {
                     "exception.wordPack.noWordData", null, Locale.getDefault()));
         }
 
-        wordService.createOrUpdateWordsForUser(user.getId(), wordDataIds);
+        wordService.updateWordsForUser(user.getId(), wordDataIds);
 
         Pageable pageableNew = PageRequest.of(0, reviewDto.maxNewWordsPerDay());
         List<Word> newWords = wordService.findByUserIdAndWordDataIdInAndStatusIn(
