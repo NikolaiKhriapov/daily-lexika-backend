@@ -9,6 +9,7 @@ import my.project.models.entities.user.RoleName;
 import my.project.models.entities.user.RoleStatistics;
 import my.project.models.entities.user.User;
 import my.project.repositories.user.UserRepository;
+import my.project.services.flashcards.WordService;
 import my.project.services.notification.NotificationService;
 import my.project.config.AbstractUnitTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +50,8 @@ class AuthenticationServiceTest extends AbstractUnitTest {
     @Mock
     private RoleService roleService;
     @Mock
+    private WordService wordService;
+    @Mock
     private MessageSource messageSource;
 
     @BeforeEach
@@ -60,6 +63,7 @@ class AuthenticationServiceTest extends AbstractUnitTest {
                 notificationService,
                 passwordEncoder,
                 roleService,
+                wordService,
                 messageSource
         );
     }
