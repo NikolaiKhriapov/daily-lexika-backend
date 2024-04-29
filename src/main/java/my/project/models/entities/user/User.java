@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import my.project.models.entities.enumeration.Language;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -39,6 +40,12 @@ public class User implements UserDetails {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<RoleStatistics> roleStatistics;
+
+    @Enumerated(EnumType.STRING)
+    private Language translationLanguage;
+
+    @Enumerated(EnumType.STRING)
+    private Language interfaceLanguage;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

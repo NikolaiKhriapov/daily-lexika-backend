@@ -1,6 +1,7 @@
 package my.project.models.dtos.user;
 
 import jakarta.validation.constraints.NotEmpty;
+import my.project.models.entities.enumeration.Language;
 import my.project.models.entities.user.RoleName;
 import my.project.models.entities.user.User;
 
@@ -22,7 +23,11 @@ public record UserDto(
 
         RoleName role,
 
-        Set<RoleStatisticsDto> setOfRoleStatisticsDto
+        Set<RoleStatisticsDto> setOfRoleStatisticsDto,
+
+        Language translationLanguage,
+
+        Language interfaceLanguage
 
 ) implements Serializable {
 }

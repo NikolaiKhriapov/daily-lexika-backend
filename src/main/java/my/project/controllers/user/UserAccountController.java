@@ -24,7 +24,6 @@ public class UserAccountController {
     @PatchMapping("/info")
     public ResponseEntity<UserDto> updateUserInfo(@RequestBody @Valid UserDto userDTO) {
         return ResponseEntity.ok(userAccountService.updateUserInfo(userDTO));
-
     }
 
     @PatchMapping("/password")
