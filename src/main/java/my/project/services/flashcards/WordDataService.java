@@ -14,6 +14,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -70,5 +71,11 @@ public class WordDataService {
 
     public Long countByWordPackNameAndPlatform(String wordPackName, Platform platform) {
         return wordDataRepository.countByListOfWordPacks_NameAndPlatform(wordPackName, platform);
+    }
+
+    public Long findIdByWordOfTheDayDateAndPlatform(Platform platform) {
+        return wordDataRepository.findIdByWordOfTheDayDateAndPlatform(LocalDate.now(), platform)
+                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
+                        "exception.wordData.wordOfTheDayDate.notFound", null, Locale.getDefault())));
     }
 }

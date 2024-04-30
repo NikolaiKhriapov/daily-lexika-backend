@@ -23,4 +23,9 @@ public class WordController {
                                                              @RequestParam("size") int size) {
         return ResponseEntity.ok(wordService.getAllWordsByStatus(status, PageRequest.of(page, size)));
     }
+
+    @GetMapping("/word-of-the-day")
+    public ResponseEntity<WordDto> getWordOfTheDay() {
+        return ResponseEntity.ok(wordService.getWordOfTheDay());
+    }
 }

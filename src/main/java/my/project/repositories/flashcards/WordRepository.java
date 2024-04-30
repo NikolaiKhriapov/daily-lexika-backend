@@ -11,11 +11,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface WordRepository extends JpaRepository<Word, Long> {
 
     List<Word> findAllByUserId(Long userId);
+
+    Optional<Word> findByUserIdAndWordData_Id(Long userId, Long wordDataId);
 
     List<Word> findByUserIdAndWordDataIdIn(Long userId, List<Long> wordDataIds);
 
