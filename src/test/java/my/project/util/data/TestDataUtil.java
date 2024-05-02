@@ -137,6 +137,7 @@ public class TestDataUtil {
                 FakerUtil.generateDefinition(),
                 FakerUtil.generateExamples(),
                 wordPacks,
+                LocalDate.now().plusDays(FakerUtil.generateRandomLong(0L, 100L)),
                 platform
         );
     }
