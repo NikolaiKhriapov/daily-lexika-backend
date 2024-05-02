@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 @Component
@@ -30,6 +32,8 @@ public class ExcelDataHandler {
     private final WordDataService wordDataService;
     private final WordService wordService;
     private final MessageSource messageSource;
+
+    public static Set<LocalDate> datesCounterForValidation = new HashSet<>();
 
     @Transactional
     public void importWordPacks(String file, String fileSheet, Platform platform) {
@@ -43,6 +47,7 @@ public class ExcelDataHandler {
         List<WordData> listOfWordData = getWordsFromExcel(file, fileSheet, platform);
         saveWordsToDatabase(listOfWordData, platform);
         System.out.println("ExcelDataHandler Report: " + fileSheet + " updated!");
+        datesCounterForValidation.clear();
     }
 
     private List<WordPack> getWordPacksFromExcel(String file, String fileSheet, Platform platform) {
@@ -122,6 +127,7 @@ public class ExcelDataHandler {
                             case 5 -> wordData.setDefinition(currentCell.getStringCellValue());
                             case 6 -> wordData.setExamples(currentCell.getStringCellValue());
                             case 7 -> wordData.setListOfWordPacks(getWordPacksFromCellValue(wordData, currentCell.getStringCellValue(), "EN__"));
+                            case 8 -> wordData.setWordOfTheDayDate(currentCell.getDateCellValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                             default -> {
                             }
                         }
@@ -136,6 +142,7 @@ public class ExcelDataHandler {
                             case 5 -> wordData.setDefinition(currentCell.getStringCellValue());
                             case 6 -> wordData.setExamples(currentCell.getStringCellValue());
                             case 7 -> wordData.setListOfWordPacks(getWordPacksFromCellValue(wordData, currentCell.getStringCellValue(), "CH__"));
+                            case 8 -> wordData.setWordOfTheDayDate(currentCell.getDateCellValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                             default -> {
                             }
                         }
@@ -212,6 +219,7 @@ public class ExcelDataHandler {
                 wordDataToBeUpdated.setDefinition(wordData.getDefinition());
                 wordDataToBeUpdated.setExamples(wordData.getExamples());
                 wordDataToBeUpdated.setPlatform(wordData.getPlatform());
+                wordDataToBeUpdated.setWordOfTheDayDate(wordData.getWordOfTheDayDate());
                 wordsToBeSavedOrUpdated.add(wordDataToBeUpdated);
             }
         }
@@ -269,6 +277,11 @@ public class ExcelDataHandler {
         if (wordData.getExamples().split(System.lineSeparator()).length != 5) {
             System.out.println("!!!!! Excel data (EN_Words) validation failed (examples): " + wordData.getId());
         }
+        if (datesCounterForValidation.contains(wordData.getWordOfTheDayDate())) {
+            System.out.println("!!!!! Excel data (EN_Words) validation failed (word_of_the_day_date): " + wordData.getId());
+        } else {
+            datesCounterForValidation.add(wordData.getWordOfTheDayDate());
+        }
     }
 
     private void validateExcelWordDataChinese(WordData wordData) {
@@ -312,6 +325,11 @@ public class ExcelDataHandler {
                     }
                 });
             }
+        }
+        if (datesCounterForValidation.contains(wordData.getWordOfTheDayDate())) {
+            System.out.println("!!!!! Excel data (CH_Words) validation failed (word_of_the_day_date): " + wordData.getId());
+        } else {
+            datesCounterForValidation.add(wordData.getWordOfTheDayDate());
         }
     }
 }

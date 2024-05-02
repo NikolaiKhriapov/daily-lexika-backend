@@ -4,6 +4,7 @@ import my.project.models.entities.enumeration.Platform;
 import my.project.models.entities.flashcards.WordData;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -19,6 +20,7 @@ public record WordDataDto(
         String definition,
         List<String> examples,
         List<String> listOfWordPackNames,
+        LocalDate wordOfTheDayDate,
         Platform platform
 
 ) implements Serializable {

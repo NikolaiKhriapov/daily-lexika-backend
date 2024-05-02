@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import my.project.models.entities.enumeration.Platform;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -32,6 +33,8 @@ public class WordData {
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinTable
     private List<WordPack> listOfWordPacks;
+
+    private LocalDate wordOfTheDayDate;
 
     @Enumerated(EnumType.STRING)
     private Platform platform;

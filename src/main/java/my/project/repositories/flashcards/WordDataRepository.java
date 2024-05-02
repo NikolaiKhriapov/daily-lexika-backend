@@ -7,7 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface WordDataRepository extends JpaRepository<WordData, Long> {
@@ -17,6 +19,14 @@ public interface WordDataRepository extends JpaRepository<WordData, Long> {
     List<WordData> findAllByListOfWordPacks_NameAndPlatform(String wordPackName, Platform platform);
 
     Long countByListOfWordPacks_NameAndPlatform(String wordPackName, Platform platform);
+
+    @Query("""
+                 SELECT wd.id FROM word_data wd
+                 WHERE wd.wordOfTheDayDate = :wordOfTheDayDate
+                 AND wd.platform = :platform
+            """)
+    Optional<Long> findIdByWordOfTheDayDateAndPlatform(@Param("wordOfTheDayDate") LocalDate wordOfTheDayDate,
+                                                       @Param("platform") Platform platform);
 
     @Query("""
                 SELECT wd.id FROM word_data wd
