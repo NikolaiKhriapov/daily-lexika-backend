@@ -22,7 +22,7 @@ public class NotificationController {
     }
 
     @PatchMapping("/read/{notificationId}")
-    public ResponseEntity<Void> readNotification(@PathVariable("notificationId") Long notificationId) {
+    public ResponseEntity<Void> readNotification(@PathVariable("notificationId") Integer notificationId) {
         notificationService.readNotification(notificationId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

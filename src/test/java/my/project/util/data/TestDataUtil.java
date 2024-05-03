@@ -61,7 +61,7 @@ public class TestDataUtil {
 
     public static User generateUser(RegistrationRequest registrationRequest, RoleName roleName) {
         return User.builder()
-                .id(FakerUtil.generateId())
+                .id(FakerUtil.generateIntId())
                 .name(registrationRequest.name())
                 .email(registrationRequest.email())
                 .password(ENCODED_PASSWORD)
@@ -72,7 +72,7 @@ public class TestDataUtil {
 
     public static User generateUser(AuthenticationRequest authenticationRequest, RoleName roleName) {
         return User.builder()
-                .id(FakerUtil.generateId())
+                .id(FakerUtil.generateIntId())
                 .name(FakerUtil.generateName())
                 .email(authenticationRequest.email())
                 .password(ENCODED_PASSWORD)
@@ -83,7 +83,7 @@ public class TestDataUtil {
 
     public static User generateUser(RoleName roleName) {
         return User.builder()
-                .id(FakerUtil.generateId())
+                .id(FakerUtil.generateIntId())
                 .name(FakerUtil.generateName())
                 .email(FakerUtil.generateEmail())
                 .password(FakerUtil.generatePassword())
@@ -129,8 +129,8 @@ public class TestDataUtil {
 
     public static WordData generateWordData(List<WordPack> wordPacks, Platform platform) {
         return new WordData(
-                FakerUtil.generateId(),
-                FakerUtil.generateNameChineseSimplified(),
+                FakerUtil.generateIntId(),
+                FakerUtil.generateNameChinese(),
                 FakerUtil.generateTranscription(),
                 FakerUtil.generateNameEnglish(),
                 FakerUtil.generateNameRussian(),
@@ -144,12 +144,12 @@ public class TestDataUtil {
 
     public static Word generateWord(Platform platform, Status status) {
         List<WordPack> listOfWordPacks = List.of(generateWordPack(platform), generateWordPack(platform));
-        Word word = new Word(FakerUtil.generateId(), generateWordData(listOfWordPacks, platform));
+        Word word = new Word(FakerUtil.generateIntId(), generateWordData(listOfWordPacks, platform));
         word.setStatus(status);
         switch (status) {
-            case NEW -> word.setTotalStreak(0);
-            case IN_REVIEW -> word.setTotalStreak(FakerUtil.generateRandomInt(4));
-            case KNOWN -> word.setTotalStreak(5);
+            case NEW -> word.setTotalStreak((short) 0);
+            case IN_REVIEW -> word.setTotalStreak((short) FakerUtil.generateRandomInt(4));
+            case KNOWN -> word.setTotalStreak((short) 5);
         }
         return word;
     }
@@ -158,7 +158,7 @@ public class TestDataUtil {
 
     public static RoleStatistics generateRoleStatistics(RoleName roleName) {
         return new RoleStatistics(
-                FakerUtil.generateId(),
+                FakerUtil.generateLongId(),
                 roleName,
                 FakerUtil.generateRandomLong(100L),
                 LocalDate.now(),
@@ -168,7 +168,7 @@ public class TestDataUtil {
 
     public static ReviewStatisticsDto generateReviewStatisticsDTO(Platform platform) {
         return new ReviewStatisticsDto(
-                FakerUtil.generateId(),
+                FakerUtil.generateLongId(),
                 FakerUtil.generateWordPackName(platform),
                 FakerUtil.generateRandomInt(100),
                 FakerUtil.generateRandomInt(100),

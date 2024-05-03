@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
  */
 public record NotificationDto(
 
-        Long notificationId,
-        Long toUserId,
+        Integer notificationId,
+        Integer toUserId,
         String toUserEmail,
         String sender,
         String subject,

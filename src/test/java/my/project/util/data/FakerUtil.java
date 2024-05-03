@@ -13,8 +13,12 @@ public class FakerUtil {
 
     // Common
 
-    public static Long generateId() {
+    public static Long generateLongId() {
         return generateRandomLong(999_999L);
+    }
+
+    public static Integer generateIntId() {
+        return generateRandomInt(999_999);
     }
 
     // Authentication
@@ -70,7 +74,7 @@ public class FakerUtil {
 
     // WordData
 
-    public static String generateNameChineseSimplified() {
+    public static String generateNameChinese() {
         return generateStringCh(3);
     }
 

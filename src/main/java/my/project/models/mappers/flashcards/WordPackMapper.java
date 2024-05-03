@@ -35,7 +35,7 @@ public abstract class WordPackMapper {
 
     @Named("mapReviewId")
     protected Long mapReviewId(WordPack entity) {
-        Long userId = authenticationService.getAuthenticatedUser().getId();
+        Integer userId = authenticationService.getAuthenticatedUser().getId();
         Optional<Review> review = reviewRepository.findByUserIdAndWordPack_Name(userId, entity.getName());
         return review.map(Review::getId).orElse(null);
     }

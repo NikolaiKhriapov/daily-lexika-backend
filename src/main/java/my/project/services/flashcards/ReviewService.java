@@ -110,7 +110,7 @@ public class ReviewService {
             List<Word> listOfWords = new ArrayList<>(review.getListOfWords());
 
             Word thisWord = listOfWords.get(0);
-            thisWord.setOccurrence(thisWord.getOccurrence() + 1);
+            thisWord.setOccurrence((short) (thisWord.getOccurrence() + 1));
 
             if (isCorrect) {
                 updateWordForCorrectAnswer(thisWord, listOfWords);
@@ -137,7 +137,7 @@ public class ReviewService {
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
         Review review = getReview(reviewId);
-        List<Long> wordDataIds = wordDataService.findAllWordDataIdByWordPackNameAndPlatform(review.getWordPack().getName(), platform);
+        List<Integer> wordDataIds = wordDataService.findAllWordDataIdByWordPackNameAndPlatform(review.getWordPack().getName(), platform);
 
         Integer newWords = wordService.countByUserIdAndWordData_IdInAndStatus(user.getId(), wordDataIds, NEW);
         Integer reviewWords = wordService.countByUserIdAndWordData_IdInAndStatus(user.getId(), wordDataIds, IN_REVIEW);
@@ -174,7 +174,7 @@ public class ReviewService {
         User user = authenticationService.getAuthenticatedUser();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
-        List<Long> wordDataIds = wordDataService.findAllWordDataIdByWordPackNameAndPlatform(wordPack.getName(), platform);
+        List<Integer> wordDataIds = wordDataService.findAllWordDataIdByWordPackNameAndPlatform(wordPack.getName(), platform);
 
         if (wordDataIds.isEmpty()) {
             throw new BadRequestException(messageSource.getMessage(
@@ -204,14 +204,14 @@ public class ReviewService {
         listOfWords.addAll(reviewAndKnownWords);
 
         listOfWords.forEach(word -> {
-            word.setOccurrence(0);
-            word.setCurrentStreak(0);
+            word.setOccurrence((short) 0);
+            word.setCurrentStreak((short) 0);
         });
 
         return listOfWords;
     }
 
-    public void deleteAllByUserIdAndPlatform(Long userId, Platform platform) {
+    public void deleteAllByUserIdAndPlatform(Integer userId, Platform platform) {
         List<Review> allReviewsByUserId = reviewRepository.findByUserIdAndWordPack_Platform(userId, platform);
         reviewRepository.deleteAll(allReviewsByUserId);
     }
@@ -223,7 +223,7 @@ public class ReviewService {
     }
 
     private Review generateReview(ReviewDto reviewDto) {
-        Long userId = authenticationService.getAuthenticatedUser().getId();
+        Integer userId = authenticationService.getAuthenticatedUser().getId();
         WordPack wordPack = wordPackService.findByName(reviewDto.wordPackDto().name());
 
         List<Word> listOfWords = generateListOfWordsForReview(wordPack, reviewDto);
@@ -241,14 +241,14 @@ public class ReviewService {
     private void updateWordForCorrectAnswer(Word thisWord, List<Word> listOfWords) {
         if (thisWord.getStatus().equals(NEW) || thisWord.getStatus().equals(KNOWN)) {
             if (thisWord.getStatus().equals(NEW)) {
-                thisWord.setTotalStreak(5);
+                thisWord.setTotalStreak((short) 5);
             }
             if (thisWord.getStatus().equals(KNOWN)) {
-                thisWord.setTotalStreak(thisWord.getTotalStreak() + 1);
+                thisWord.setTotalStreak((short) (thisWord.getTotalStreak() + 1));
             }
             thisWord.setStatus(KNOWN);
-            thisWord.setCurrentStreak(0);
-            thisWord.setOccurrence(0);
+            thisWord.setCurrentStreak((short) 0);
+            thisWord.setOccurrence((short) 0);
             thisWord.setDateOfLastOccurrence(LocalDate.now());
             listOfWords.remove(thisWord);
         }
@@ -256,7 +256,7 @@ public class ReviewService {
         if (thisWord.getStatus().equals(IN_REVIEW)) {
             if ((thisWord.getCurrentStreak() > 0 && thisWord.getCurrentStreak() < 3) ||
                     (thisWord.getCurrentStreak() == 0 && thisWord.getOccurrence() > 1)) {
-                thisWord.setCurrentStreak(thisWord.getCurrentStreak() + 1);
+                thisWord.setCurrentStreak((short) (thisWord.getCurrentStreak() + 1));
                 if (thisWord.getCurrentStreak() == 1) {
                     listOfWords.remove(0);
                     listOfWords.add(Math.min(listOfWords.size(), 3), thisWord);
@@ -266,12 +266,12 @@ public class ReviewService {
             }
             if (thisWord.getCurrentStreak() == 3 ||
                     (thisWord.getCurrentStreak() == 0 && thisWord.getOccurrence() == 1)) {
-                thisWord.setTotalStreak(thisWord.getTotalStreak() + 1);
+                thisWord.setTotalStreak((short) (thisWord.getTotalStreak() + 1));
                 if (thisWord.getTotalStreak() >= 5) {
                     thisWord.setStatus(KNOWN);
                 }
-                thisWord.setCurrentStreak(0);
-                thisWord.setOccurrence(0);
+                thisWord.setCurrentStreak((short) 0);
+                thisWord.setOccurrence((short) 0);
                 thisWord.setDateOfLastOccurrence(LocalDate.now());
                 listOfWords.remove(thisWord);
             }
@@ -280,8 +280,8 @@ public class ReviewService {
 
     private void updateWordForIncorrectAnswer(Word thisWord, List<Word> listOfWords) {
         thisWord.setStatus(IN_REVIEW);
-        thisWord.setTotalStreak(0);
-        thisWord.setCurrentStreak(0);
+        thisWord.setTotalStreak((short) 0);
+        thisWord.setCurrentStreak((short) 0);
 
         listOfWords.remove(0);
         listOfWords.add(Math.min(listOfWords.size(), 3), thisWord);

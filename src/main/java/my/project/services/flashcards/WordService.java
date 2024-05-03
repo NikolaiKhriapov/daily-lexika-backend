@@ -31,7 +31,7 @@ public class WordService {
     private final MessageSource messageSource;
 
     public List<WordDto> getAllWordsByStatus(Status status, Pageable pageable) {
-        Long userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        Integer userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         RoleStatistics currentRole = roleService.getRoleStatistics();
         Platform platform = roleService.getPlatformByRoleName(currentRole.getRoleName());
         List<Word> allWordsByStatus = wordRepository.findByUserIdAndWordData_PlatformAndStatus(userId, platform, status, pageable);
@@ -39,11 +39,11 @@ public class WordService {
     }
 
     public WordDto getWordOfTheDay() {
-        Long userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        Integer userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         RoleStatistics currentRole = roleService.getRoleStatistics();
         Platform platform = roleService.getPlatformByRoleName(currentRole.getRoleName());
 
-        Long wordDataId = wordDataService.findIdByWordOfTheDayDateAndPlatform(platform);
+        Integer wordDataId = wordDataService.findIdByWordOfTheDayDateAndPlatform(platform);
         Word wordOfTheDay = wordRepository.findByUserIdAndWordData_Id(userId, wordDataId)
                 .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
                         "exception.word.notFound", null, Locale.getDefault())));
@@ -51,8 +51,8 @@ public class WordService {
         return wordMapper.toDto(wordOfTheDay);
     }
 
-    public void createAllWordsForUserAndPlatform(Long userId, Platform platform) {
-        List<Long> allWordDataIdByPlatform = wordDataService.findAllWordDataIdByPlatform(platform);
+    public void createAllWordsForUserAndPlatform(Integer userId, Platform platform) {
+        List<Integer> allWordDataIdByPlatform = wordDataService.findAllWordDataIdByPlatform(platform);
         List<Word> allExistingWordsByUser = wordRepository.findAllByUserId(userId);
 
         List<Word> wordsToBeSaved = allWordDataIdByPlatform.stream()
@@ -65,7 +65,7 @@ public class WordService {
         wordRepository.saveAll(wordsToBeSaved);
     }
 
-    public synchronized void updateWordsForUser(Long userId, List<Long> wordDataIds) {
+    public synchronized void updateWordsForUser(Integer userId, List<Integer> wordDataIds) {
         List<Word> existingWords = wordRepository.findByUserIdAndWordDataIdIn(userId, wordDataIds);
         List<Word> wordsToBeSaved = wordDataIds.stream()
                 .filter(wordDataId -> existingWords.stream()
@@ -77,27 +77,27 @@ public class WordService {
         wordRepository.saveAll(wordsToBeSaved);
     }
 
-    public Page<Word> findByUserIdAndWordDataIdIn(Long userId, List<Long> wordDataIds, Pageable pageable) {
+    public Page<Word> findByUserIdAndWordDataIdIn(Integer userId, List<Integer> wordDataIds, Pageable pageable) {
         return wordRepository.findByUserIdAndWordDataIdIn(userId, wordDataIds, pageable);
     }
 
-    public List<Word> findByUserIdAndWordDataIdInAndStatusIn(Long userId, List<Long> wordDataIds, List<Status> status, Pageable pageable) {
+    public List<Word> findByUserIdAndWordDataIdInAndStatusIn(Integer userId, List<Integer> wordDataIds, List<Status> status, Pageable pageable) {
         return wordRepository.findByUserIdAndWordDataIdInAndStatusIn(userId, wordDataIds, status, pageable);
     }
 
-    public Integer countByUserIdAndWordData_IdInAndStatus(Long userId, List<Long> wordDataIds, Status status) {
+    public Integer countByUserIdAndWordData_IdInAndStatus(Integer userId, List<Integer> wordDataIds, Status status) {
         return wordRepository.countByUserIdAndWordData_IdInAndStatus(userId, wordDataIds, status);
     }
 
-    public List<Word> findByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrdered(Long userId, List<Long> wordDataIds, List<Status> statuses, Pageable pageable) {
+    public List<Word> findByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrdered(Integer userId, List<Integer> wordDataIds, List<Status> statuses, Pageable pageable) {
         return wordRepository.findByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrdered(userId, wordDataIds, statuses, pageable);
     }
 
-    public void deleteAllByWordDataId(List<Long> wordDataIds) {
+    public void deleteAllByWordDataId(List<Integer> wordDataIds) {
         wordDataIds.forEach(wordRepository::deleteAllByWordData_Id);
     }
 
-    public void deleteAllByUserIdAndPlatform(Long userId, Platform platform) {
+    public void deleteAllByUserIdAndPlatform(Integer userId, Platform platform) {
         List<Word> allWordsByUserId = wordRepository.findByUserIdAndWordData_Platform(userId, platform);
         wordRepository.deleteAll(allWordsByUserId);
     }

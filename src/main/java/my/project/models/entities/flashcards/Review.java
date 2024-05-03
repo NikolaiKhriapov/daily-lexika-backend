@@ -19,7 +19,7 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "review_id_sequence")
     private Long id;
 
-    private Long userId;
+    private Integer userId;
 
     private Integer maxNewWordsPerDay;
 
@@ -38,7 +38,7 @@ public class Review {
 
     private LocalDate dateGenerated;
 
-    public Review(Long userId,
+    public Review(Integer userId,
                   Integer maxNewWordsPerDay,
                   Integer maxReviewWordsPerDay,
                   WordPack wordPack,

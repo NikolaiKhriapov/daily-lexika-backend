@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface WordDataRepository extends JpaRepository<WordData, Long> {
+public interface WordDataRepository extends JpaRepository<WordData, Integer> {
 
     List<WordData> findAllByPlatform(Platform platform);
 
@@ -25,14 +25,14 @@ public interface WordDataRepository extends JpaRepository<WordData, Long> {
                  WHERE wd.wordOfTheDayDate = :wordOfTheDayDate
                  AND wd.platform = :platform
             """)
-    Optional<Long> findIdByWordOfTheDayDateAndPlatform(@Param("wordOfTheDayDate") LocalDate wordOfTheDayDate,
+    Optional<Integer> findIdByWordOfTheDayDateAndPlatform(@Param("wordOfTheDayDate") LocalDate wordOfTheDayDate,
                                                        @Param("platform") Platform platform);
 
     @Query("""
                 SELECT wd.id FROM word_data wd
                 WHERE wd.platform = :platform
             """)
-    List<Long> findAllWordDataIdsByPlatform(@Param("platform") Platform platform);
+    List<Integer> findAllWordDataIdsByPlatform(@Param("platform") Platform platform);
 
     @Query("""
                 SELECT wd.id FROM word_data wd
@@ -40,6 +40,6 @@ public interface WordDataRepository extends JpaRepository<WordData, Long> {
                 WHERE wp.name = :wordPackName
                 AND wd.platform = :platform
             """)
-    List<Long> findAllWordDataIdsByWordPackNameAndPlatform(@Param("wordPackName") String wordPackName,
+    List<Integer> findAllWordDataIdsByWordPackNameAndPlatform(@Param("wordPackName") String wordPackName,
                                                            @Param("platform") Platform platform);
 }
