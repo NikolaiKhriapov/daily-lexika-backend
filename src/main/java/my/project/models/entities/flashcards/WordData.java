@@ -16,9 +16,9 @@ import java.util.List;
 public class WordData {
 
     @Id
-    private Long id;
+    private Integer id;
 
-    private String nameChineseSimplified;
+    private String nameChinese;
 
     private String transcription;
 

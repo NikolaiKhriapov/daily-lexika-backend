@@ -17,7 +17,7 @@ public class Word {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "word_id_sequence")
     private Long id;
 
-    private Long userId;
+    private Integer userId;
 
     @OneToOne
     private WordData wordData;
@@ -25,15 +25,15 @@ public class Word {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    private Integer currentStreak;
+    private Short currentStreak;
 
-    private Integer totalStreak;
+    private Short totalStreak;
 
-    private Integer occurrence;
+    private Short occurrence;
 
     private LocalDate dateOfLastOccurrence;
 
-    public Word(Long userId, WordData wordData) {
+    public Word(Integer userId, WordData wordData) {
         this.userId = userId;
         this.wordData = wordData;
         this.status = Status.NEW;

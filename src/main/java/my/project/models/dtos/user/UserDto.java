@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public record UserDto(
 
-        Long id,
+        Integer id,
 
         @NotEmpty
         String name,

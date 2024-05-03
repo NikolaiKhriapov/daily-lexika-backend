@@ -13,7 +13,7 @@ import java.util.List;
 public record WordDataDto(
 
         Long id,
-        String nameChineseSimplified,
+        String nameChinese,
         String transcription,
         String nameEnglish,
         String nameRussian,

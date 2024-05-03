@@ -14,25 +14,25 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface WordRepository extends JpaRepository<Word, Long> {
+public interface WordRepository extends JpaRepository<Word, Integer> {
 
-    List<Word> findAllByUserId(Long userId);
+    List<Word> findAllByUserId(Integer userId);
 
-    Optional<Word> findByUserIdAndWordData_Id(Long userId, Long wordDataId);
+    Optional<Word> findByUserIdAndWordData_Id(Integer userId, Integer wordDataId);
 
-    List<Word> findByUserIdAndWordDataIdIn(Long userId, List<Long> wordDataIds);
+    List<Word> findByUserIdAndWordDataIdIn(Integer userId, List<Integer> wordDataIds);
 
-    List<Word> findByUserIdAndWordDataIdInAndStatusIn(Long userId, List<Long> wordDataIds, List<Status> status, Pageable pageable);
+    List<Word> findByUserIdAndWordDataIdInAndStatusIn(Integer userId, List<Integer> wordDataIds, List<Status> status, Pageable pageable);
 
-    List<Word> findByUserIdAndStatusAndWordData_Platform(Long userId, Status status, Platform platform);
+    List<Word> findByUserIdAndStatusAndWordData_Platform(Integer userId, Status status, Platform platform);
 
-    Integer countByUserIdAndWordData_IdInAndStatus(Long userId, List<Long> wordDataIds, Status status);
+    Integer countByUserIdAndWordData_IdInAndStatus(Integer userId, List<Integer> wordDataIds, Status status);
 
-    List<Word> findByUserIdAndWordData_Platform(Long userId, Platform platform);
+    List<Word> findByUserIdAndWordData_Platform(Integer userId, Platform platform);
 
-    List<Word> findByUserIdAndWordData_PlatformAndStatus(Long userId, Platform platform, Status status, Pageable pageable);
+    List<Word> findByUserIdAndWordData_PlatformAndStatus(Integer userId, Platform platform, Status status, Pageable pageable);
 
-    void deleteAllByWordData_Id(Long id);
+    void deleteAllByWordData_Id(Integer id);
 
     @Query("""
                 SELECT w FROM words w WHERE w.userId = :userId AND w.wordData.id IN :wordDataIds
@@ -43,7 +43,7 @@ public interface WordRepository extends JpaRepository<Word, Long> {
                 ELSE 4 END ASC
             """
     )
-    Page<Word> findByUserIdAndWordDataIdIn(Long userId, List<Long> wordDataIds, Pageable pageable);
+    Page<Word> findByUserIdAndWordDataIdIn(Integer userId, List<Integer> wordDataIds, Pageable pageable);
 
     @Query("""
                 SELECT w FROM words w
@@ -53,8 +53,8 @@ public interface WordRepository extends JpaRepository<Word, Long> {
                 AND (DATE_PART('day', AGE(CURRENT_DATE, w.dateOfLastOccurrence)) >= POWER(2, w.totalStreak))
                 ORDER BY w.dateOfLastOccurrence DESC
             """)
-    List<Word> findByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrdered(@Param("userId") Long userId,
-                                                                             @Param("wordDataIds") List<Long> wordDataIds,
+    List<Word> findByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrdered(@Param("userId") Integer userId,
+                                                                             @Param("wordDataIds") List<Integer> wordDataIds,
                                                                              @Param("statuses") List<Status> statuses,
                                                                              Pageable pageable);
 }

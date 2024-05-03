@@ -46,13 +46,13 @@ public class WordPackController {
 
     @GetMapping("/{wordPackName}/add-word/{wordDataId}")
     public ResponseEntity<WordDataDto> addWordToCustomWordPack(@PathVariable("wordPackName") String wordPackName,
-                                                               @PathVariable("wordDataId") Long wordDataId) {
+                                                               @PathVariable("wordDataId") Integer wordDataId) {
         return ResponseEntity.ok(wordPackService.addWordToCustomWordPack(wordPackName, wordDataId));
     }
 
     @GetMapping("/{wordPackName}/remove-word/{wordDataId}")
     public ResponseEntity<WordDataDto> removeWordFromCustomWordPack(@PathVariable("wordPackName") String wordPackName,
-                                                                    @PathVariable("wordDataId") Long wordDataId) {
+                                                                    @PathVariable("wordDataId") Integer wordDataId) {
         return ResponseEntity.ok(wordPackService.removeWordFromCustomWordPack(wordPackName, wordDataId));
     }
 }

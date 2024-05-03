@@ -11,9 +11,9 @@ import java.util.Optional;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    Optional<Review> findByUserIdAndWordPack_Name(Long userId, String wordPackName);
+    Optional<Review> findByUserIdAndWordPack_Name(Integer userId, String wordPackName);
 
-    List<Review> findByUserIdAndWordPack_Platform(Long userId, Platform platform);
+    List<Review> findByUserIdAndWordPack_Platform(Integer userId, Platform platform);
 
-    boolean existsByUserIdAndWordPack_PlatformAndWordPack_Name(Long userId, Platform platform, String wordPackName);
+    boolean existsByUserIdAndWordPack_PlatformAndWordPack_Name(Integer userId, Platform platform, String wordPackName);
 }

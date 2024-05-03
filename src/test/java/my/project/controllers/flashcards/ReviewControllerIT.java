@@ -137,7 +137,7 @@ class ReviewControllerIT extends AbstractIntegrationTest {
 //                    .isEqualTo(reviewDTO.WordDtoList().size() - reducedBy);
 //            assertThat(response.get("reviewWordDTO"))
 //                    .isNotNull()
-//                    .asString().contains("id", "nameChineseSimplified", "nameChineseTraditional", "pinyin",
+//                    .asString().contains("id", "nameChinese", "nameChineseTraditional", "pinyin",
 //                            "nameEnglish", "nameRussian", "status", "totalStreak");
 //        }
 //    }

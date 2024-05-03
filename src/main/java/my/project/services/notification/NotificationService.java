@@ -33,7 +33,7 @@ public class NotificationService {
     }
 
     public List<NotificationDto> getAllNotifications() {
-        Long userId = getAuthenticatedUser().id();
+        Integer userId = getAuthenticatedUser().id();
         List<Notification> listOfNotifications = notificationRepository.findAllByToUserId(userId);
         return notificationMapper.toDtoList(listOfNotifications);
     }
@@ -42,8 +42,8 @@ public class NotificationService {
         notificationRepository.save(notification);
     }
 
-    public void readNotification(Long notificationId) {
-        Long userId = getAuthenticatedUser().id();
+    public void readNotification(Integer notificationId) {
+        Integer userId = getAuthenticatedUser().id();
         Notification notificationToBeUpdated = getNotificationById(notificationId);
 
         verifyNotificationIsForThisUser(notificationToBeUpdated, userId);
@@ -53,17 +53,17 @@ public class NotificationService {
         notificationRepository.save(notificationToBeUpdated);
     }
 
-    public void deleteAllByUserId(Long userId) {
+    public void deleteAllByUserId(Integer userId) {
         notificationRepository.deleteAllByToUserId(userId);
     }
 
-    private Notification getNotificationById(Long notificationId) {
+    private Notification getNotificationById(Integer notificationId) {
         return notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
                         "exception.notification.notFound", null, Locale.getDefault())));
     }
 
-    private void verifyNotificationIsForThisUser(Notification notification, Long userId) {
+    private void verifyNotificationIsForThisUser(Notification notification, Integer userId) {
         if (!Objects.equals(notification.getToUserId(), userId)) {
             throw new InternalServerErrorException(messageSource.getMessage(
                     "exception.notification.invalidUser", null, Locale.getDefault()));

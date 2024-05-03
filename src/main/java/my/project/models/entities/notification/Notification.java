@@ -16,8 +16,8 @@ public class Notification {
     @Id
     @SequenceGenerator(name = "notification_id_sequence", sequenceName = "notification_id_sequence", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "notification_id_sequence")
-    private Long notificationId;
-    private Long toUserId;
+    private Integer notificationId;
+    private Integer toUserId;
     private String toUserEmail;
     private String sender;
     private String subject;
@@ -25,7 +25,7 @@ public class Notification {
     private LocalDateTime sentAt;
     private Boolean isRead;
 
-    public Notification(Long toUserId, String toUserEmail, String subject, String message) {
+    public Notification(Integer toUserId, String toUserEmail, String subject, String message) {
         this.toUserId = toUserId;
         this.toUserEmail = toUserEmail;
         this.sender = "Daily Lexika";

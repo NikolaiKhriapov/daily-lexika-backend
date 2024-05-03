@@ -54,7 +54,7 @@ public class StatisticsService {
         Set<Character> uniqueCharacters = new HashSet<>();
 
         for (Word word : wordsKnown) {
-            char[] characters = word.getWordData().getNameChineseSimplified().toCharArray();
+            char[] characters = word.getWordData().getNameChinese().toCharArray();
             for (char character : characters) {
                 uniqueCharacters.add(character);
             }

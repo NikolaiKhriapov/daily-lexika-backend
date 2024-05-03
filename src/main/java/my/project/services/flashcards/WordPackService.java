@@ -76,7 +76,7 @@ public class WordPackService {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
-        List<Long> wordDataIds = wordDataService.findAllWordDataIdByWordPackNameAndPlatform(wordPackName, platform);
+        List<Integer> wordDataIds = wordDataService.findAllWordDataIdByWordPackNameAndPlatform(wordPackName, platform);
 
         Page<Word> wordsPage = wordService.findByUserIdAndWordDataIdIn(user.getId(), wordDataIds, pageable);
 
@@ -107,7 +107,7 @@ public class WordPackService {
         }
     }
 
-    private String decorateWordPackName(String wordPackName, Long userId, Platform platform) {
+    private String decorateWordPackName(String wordPackName, Integer userId, Platform platform) {
         String prefix = switch (platform) {
             case CHINESE -> "CH__";
             case ENGLISH -> "EN__";
@@ -134,7 +134,7 @@ public class WordPackService {
         wordPackRepository.delete(wordPack);
     }
 
-    public WordDataDto addWordToCustomWordPack(String wordPackName, Long wordDataId) {
+    public WordDataDto addWordToCustomWordPack(String wordPackName, Integer wordDataId) {
         WordPack wordPack = findByName(wordPackName);
 
         throwIfWordPackCategoryNotCustom(wordPack);
@@ -153,7 +153,7 @@ public class WordPackService {
         return wordDataMapper.toDto(wordDataService.save(wordData));
     }
 
-    public WordDataDto removeWordFromCustomWordPack(String wordPackName, Long wordDataId) {
+    public WordDataDto removeWordFromCustomWordPack(String wordPackName, Integer wordDataId) {
         WordPack wordPack = findByName(wordPackName);
 
         throwIfWordPackCategoryNotCustom(wordPack);
@@ -172,13 +172,13 @@ public class WordPackService {
         return wordDataMapper.toDto(wordDataService.save(wordData));
     }
 
-    public void deleteAllByUserIdAndPlatform(Long userId, Platform platform) {
+    public void deleteAllByUserIdAndPlatform(Integer userId, Platform platform) {
         List<WordPack> allWordPacksCustom = wordPackRepository.findAllByUserIdAndPlatformAndCategoryCustom(userId, platform);
         allWordPacksCustom.forEach(wordPack -> deleteCustomWordPack(wordPack.getName()));
     }
 
     private void throwIfReviewExistsForWordPack(String wordPackName) {
-        Long userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        Integer userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
 
         Optional<Review> review = reviewRepository.findByUserIdAndWordPack_Name(userId, wordPackName);
         review.ifPresent(reviewRepository::delete);

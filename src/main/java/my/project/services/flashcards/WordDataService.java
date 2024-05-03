@@ -26,7 +26,7 @@ public class WordDataService {
     private final RoleService roleService;
     private final MessageSource messageSource;
 
-    public WordData findById(Long wordDataId) {
+    public WordData findById(Integer wordDataId) {
         return wordDataRepository.findById(wordDataId)
                 .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
                         "exception.wordData.notFound", null, Locale.getDefault())));
@@ -61,11 +61,11 @@ public class WordDataService {
         return wordDataMapper.toDtoList(allWordData);
     }
 
-    public List<Long> findAllWordDataIdByPlatform(Platform platform) {
+    public List<Integer> findAllWordDataIdByPlatform(Platform platform) {
         return wordDataRepository.findAllWordDataIdsByPlatform(platform);
     }
 
-    public List<Long> findAllWordDataIdByWordPackNameAndPlatform(String wordPackName, Platform platform) {
+    public List<Integer> findAllWordDataIdByWordPackNameAndPlatform(String wordPackName, Platform platform) {
         return wordDataRepository.findAllWordDataIdsByWordPackNameAndPlatform(wordPackName, platform);
     }
 
@@ -73,7 +73,7 @@ public class WordDataService {
         return wordDataRepository.countByListOfWordPacks_NameAndPlatform(wordPackName, platform);
     }
 
-    public Long findIdByWordOfTheDayDateAndPlatform(Platform platform) {
+    public Integer findIdByWordOfTheDayDateAndPlatform(Platform platform) {
         return wordDataRepository.findIdByWordOfTheDayDateAndPlatform(LocalDate.now(), platform)
                 .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
                         "exception.wordData.wordOfTheDayDate.notFound", null, Locale.getDefault())));

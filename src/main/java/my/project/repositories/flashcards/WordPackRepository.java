@@ -21,5 +21,5 @@ public interface WordPackRepository extends JpaRepository<WordPack, String> {
                 AND wp.category = 'CUSTOM'
                 AND wp.name LIKE CONCAT('%__', :userId)
             """)
-    List<WordPack> findAllByUserIdAndPlatformAndCategoryCustom(@Param("userId") Long userId, @Param("platform") Platform platform);
+    List<WordPack> findAllByUserIdAndPlatformAndCategoryCustom(@Param("userId") Integer userId, @Param("platform") Platform platform);
 }
