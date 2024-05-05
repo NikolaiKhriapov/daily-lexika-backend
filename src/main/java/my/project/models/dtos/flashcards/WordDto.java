@@ -12,12 +12,12 @@ import java.time.LocalDate;
 public record WordDto(
 
         Long id,
-        Long userId,
+        Integer userId,
         WordDataDto wordDataDto,
         Status status,
-        Integer currentStreak,
-        Integer totalStreak,
-        Integer occurrence,
+        Short currentStreak,
+        Short totalStreak,
+        Short occurrence,
         LocalDate dateOfLastOccurrence
 
 ) implements Serializable {

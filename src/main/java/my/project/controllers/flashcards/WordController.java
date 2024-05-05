@@ -28,4 +28,9 @@ public class WordController {
     public ResponseEntity<WordDto> getWordOfTheDay() {
         return ResponseEntity.ok(wordService.getWordOfTheDay());
     }
+
+    @GetMapping("/by-word-data/{id}")
+    public ResponseEntity<WordDto> getWordByWordDataId(@PathVariable("id") Integer wordDataId) {
+        return ResponseEntity.ok(wordService.findByWordDataId(wordDataId));
+    }
 }
