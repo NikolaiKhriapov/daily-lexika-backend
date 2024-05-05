@@ -39,16 +39,22 @@ public class WordService {
     }
 
     public WordDto getWordOfTheDay() {
-        Integer userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         RoleStatistics currentRole = roleService.getRoleStatistics();
         Platform platform = roleService.getPlatformByRoleName(currentRole.getRoleName());
 
         Integer wordDataId = wordDataService.findIdByWordOfTheDayDateAndPlatform(platform);
-        Word wordOfTheDay = wordRepository.findByUserIdAndWordData_Id(userId, wordDataId)
+
+        return findByWordDataId(wordDataId);
+    }
+
+    public WordDto findByWordDataId(Integer wordDataId) {
+        Integer userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+
+        Word word = wordRepository.findByUserIdAndWordData_Id(userId, wordDataId)
                 .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
                         "exception.word.notFound", null, Locale.getDefault())));
 
-        return wordMapper.toDto(wordOfTheDay);
+        return wordMapper.toDto(word);
     }
 
     public void createAllWordsForUserAndPlatform(Integer userId, Platform platform) {
