@@ -62,11 +62,16 @@ public class WordPackService {
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
         List<WordPack> allWordPacksNotCustom = wordPackRepository.findAllByPlatformAndCategoryNot(platform, Category.CUSTOM);
+
         List<WordPack> allWordPacksCustom = wordPackRepository.findAllByUserIdAndPlatformAndCategoryCustom(user.getId(), platform);
+        List<WordPack> allWordPacksCustomFiltered
+                = allWordPacksCustom.stream()
+                .filter(wordPack -> wordPack.getName().endsWith("__" + user.getId()))
+                .toList();
 
         List<WordPack> allWordPacks = new ArrayList<>();
         allWordPacks.addAll(allWordPacksNotCustom);
-        allWordPacks.addAll(allWordPacksCustom);
+        allWordPacks.addAll(allWordPacksCustomFiltered);
 
         return wordPackMapper.toDtoList(allWordPacks);
     }
@@ -174,7 +179,12 @@ public class WordPackService {
 
     public void deleteAllByUserIdAndPlatform(Integer userId, Platform platform) {
         List<WordPack> allWordPacksCustom = wordPackRepository.findAllByUserIdAndPlatformAndCategoryCustom(userId, platform);
-        allWordPacksCustom.forEach(wordPack -> deleteCustomWordPack(wordPack.getName()));
+        List<WordPack> allWordPacksCustomFiltered
+                = allWordPacksCustom.stream()
+                .filter(wordPack -> wordPack.getName().endsWith("__" + userId))
+                .toList();
+
+        allWordPacksCustomFiltered.forEach(wordPack -> deleteCustomWordPack(wordPack.getName()));
     }
 
     private void throwIfReviewExistsForWordPack(String wordPackName) {
