@@ -1,11 +1,12 @@
 package my.project.models.dtos.user;
 
 import jakarta.validation.constraints.NotEmpty;
-import my.project.models.entities.enumeration.Language;
+import my.project.models.entities.enumerations.Language;
 import my.project.models.entities.user.RoleName;
 import my.project.models.entities.user.User;
 
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 import java.util.Set;
 
 /**
@@ -27,7 +28,9 @@ public record UserDto(
 
         Language translationLanguage,
 
-        Language interfaceLanguage
+        Language interfaceLanguage,
+
+        OffsetDateTime dateOfRegistration
 
 ) implements Serializable {
 }

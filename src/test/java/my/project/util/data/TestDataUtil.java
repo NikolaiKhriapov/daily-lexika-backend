@@ -1,11 +1,12 @@
 package my.project.util.data;
 
+import my.project.config.DateUtil;
 import my.project.models.dtos.flashcards.ReviewDto;
 import my.project.models.dtos.flashcards.ReviewStatisticsDto;
 import my.project.models.dtos.user.AuthenticationRequest;
 import my.project.models.dtos.user.RegistrationRequest;
-import my.project.models.entities.enumeration.Platform;
-import my.project.models.entities.enumeration.Status;
+import my.project.models.entities.enumerations.Platform;
+import my.project.models.entities.enumerations.Status;
 import my.project.models.entities.flashcards.Word;
 import my.project.models.entities.flashcards.WordData;
 import my.project.models.entities.flashcards.WordPack;
@@ -78,6 +79,7 @@ public class TestDataUtil {
                 .password(ENCODED_PASSWORD)
                 .role(roleName)
                 .roleStatistics(new HashSet<>(Set.of(new RoleStatistics(roleName))))
+                .dateOfRegistration(DateUtil.nowInUtc())
                 .build();
     }
 
@@ -161,7 +163,7 @@ public class TestDataUtil {
                 FakerUtil.generateLongId(),
                 roleName,
                 FakerUtil.generateRandomLong(100L),
-                LocalDate.now(),
+                DateUtil.nowInUtc(),
                 FakerUtil.generateRandomLong(100L, 150L)
         );
     }

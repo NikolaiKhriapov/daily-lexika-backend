@@ -5,8 +5,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static my.project.models.entities.enumeration.Platform.CHINESE;
-import static my.project.models.entities.enumeration.Platform.ENGLISH;
+import static my.project.models.entities.enumerations.Platform.CHINESE;
+import static my.project.models.entities.enumerations.Platform.ENGLISH;
 import static my.project.models.entities.user.RoleName.USER_CHINESE;
 import static my.project.models.entities.user.RoleName.USER_ENGLISH;
 import static org.junit.jupiter.params.provider.Arguments.arguments;

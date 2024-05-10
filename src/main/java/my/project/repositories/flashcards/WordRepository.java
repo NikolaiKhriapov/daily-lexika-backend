@@ -1,7 +1,7 @@
 package my.project.repositories.flashcards;
 
-import my.project.models.entities.enumeration.Platform;
-import my.project.models.entities.enumeration.Status;
+import my.project.models.entities.enumerations.Platform;
+import my.project.models.entities.enumerations.Status;
 import my.project.models.entities.flashcards.Word;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,9 +37,9 @@ public interface WordRepository extends JpaRepository<Word, Integer> {
     @Query("""
                 SELECT w FROM words w WHERE w.userId = :userId AND w.wordData.id IN :wordDataIds
                 ORDER BY CASE w.status
-                WHEN my.project.models.entities.enumeration.Status.KNOWN THEN 1
-                WHEN my.project.models.entities.enumeration.Status.IN_REVIEW THEN 2
-                WHEN my.project.models.entities.enumeration.Status.NEW THEN 3
+                WHEN my.project.models.entities.enumerations.Status.KNOWN THEN 1
+                WHEN my.project.models.entities.enumerations.Status.IN_REVIEW THEN 2
+                WHEN my.project.models.entities.enumerations.Status.NEW THEN 3
                 ELSE 4 END ASC
             """
     )

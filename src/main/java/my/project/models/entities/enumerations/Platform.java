@@ -1,4 +1,4 @@
-package my.project.models.entities.enumeration;
+package my.project.models.entities.enumerations;
 
 public enum Platform {
     CHINESE,

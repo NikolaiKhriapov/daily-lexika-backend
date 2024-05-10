@@ -2,8 +2,8 @@ package my.project.util.data;
 
 import com.github.javafaker.Faker;
 import my.project.models.dtos.flashcards.WordPackDto;
-import my.project.models.entities.enumeration.Category;
-import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.enumerations.Category;
+import my.project.models.entities.enumerations.Platform;
 
 import java.util.List;
 

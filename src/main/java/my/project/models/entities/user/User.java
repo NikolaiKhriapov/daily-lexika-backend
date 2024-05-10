@@ -5,11 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import my.project.models.entities.enumeration.Language;
+import my.project.config.DateUtil;
+import my.project.models.entities.enumerations.Language;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -46,6 +48,16 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Language interfaceLanguage;
+
+    @Column(nullable = false)
+    private OffsetDateTime dateOfRegistration;
+
+    public User(String name, String email, String password) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.dateOfRegistration = DateUtil.nowInUtc();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

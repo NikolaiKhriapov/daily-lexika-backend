@@ -1,7 +1,7 @@
 package my.project.repositories.flashcards;
 
 import my.project.models.entities.flashcards.Review;
-import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.enumerations.Platform;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

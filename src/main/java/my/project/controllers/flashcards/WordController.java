@@ -2,7 +2,7 @@ package my.project.controllers.flashcards;
 
 import lombok.RequiredArgsConstructor;
 import my.project.models.dtos.flashcards.WordDto;
-import my.project.models.entities.enumeration.Status;
+import my.project.models.entities.enumerations.Status;
 import my.project.services.flashcards.WordService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;

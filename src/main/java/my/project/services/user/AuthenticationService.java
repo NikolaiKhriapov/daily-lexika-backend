@@ -4,23 +4,18 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import my.project.models.entities.notification.Notification;
 import my.project.services.flashcards.WordService;
+import my.project.services.log.LogService;
 import my.project.services.notification.NotificationService;
 import my.project.models.dtos.user.AuthenticationRequest;
 import my.project.models.dtos.user.AuthenticationResponse;
 import my.project.models.dtos.user.RegistrationRequest;
 import my.project.models.entities.user.User;
-import my.project.repositories.user.UserRepository;
 import my.project.models.entities.user.RoleName;
 import my.project.config.security.jwt.JwtService;
-import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -28,26 +23,26 @@ public class AuthenticationService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-    private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
     private final WordService wordService;
-    private final MessageSource messageSource;
+    private final UserService userService;
+    private final LogService logService;
 
     @Transactional
     public AuthenticationResponse register(RegistrationRequest registrationRequest) {
-        boolean isEmailAlreadyExists = userRepository.existsByEmail(registrationRequest.email().toLowerCase());
+        boolean isEmailAlreadyExists = userService.existsByEmail(registrationRequest.email());
 
         RoleName roleName = roleService.getRoleNameByPlatform(registrationRequest.platform());
 
         User user;
         if (!isEmailAlreadyExists) {
-            user = User.builder()
-                    .name(registrationRequest.name())
-                    .email(registrationRequest.email().toLowerCase())
-                    .password(passwordEncoder.encode(registrationRequest.password()))
-                    .build();
+            user = new User(
+                    registrationRequest.name(),
+                    registrationRequest.email().toLowerCase(),
+                    passwordEncoder.encode(registrationRequest.password())
+            );
         } else {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -55,13 +50,15 @@ public class AuthenticationService {
                             registrationRequest.password()
                     )
             );
-            user = getUserByEmail(registrationRequest.email());
+            user = userService.getUserByEmail(registrationRequest.email());
         }
 
         roleService.addRoleToUserRoles(user, roleName);
         user.setRole(roleName);
 
-        userRepository.save(user);
+        userService.save(user);
+        logService.logAccountRegistration(user, registrationRequest.platform());
+
         wordService.createAllWordsForUserAndPlatform(user.getId(), registrationRequest.platform());
 
         if (!isEmailAlreadyExists) {
@@ -80,7 +77,7 @@ public class AuthenticationService {
                         authenticationRequest.password()
                 )
         );
-        User user = getUserByEmail(authenticationRequest.email());
+        User user = userService.getUserByEmail(authenticationRequest.email());
 
         RoleName roleName = roleService.getRoleNameByPlatform(authenticationRequest.platform());
 
@@ -91,10 +88,6 @@ public class AuthenticationService {
         String token = jwtService.generateToken(user);
 
         return new AuthenticationResponse(token);
-    }
-
-    public User getAuthenticatedUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     private void sendWelcomeNotificationToUser(User user) {
@@ -120,11 +113,5 @@ public class AuthenticationService {
                                 + "The Daily Lexika Team"
                 )
         );
-    }
-
-    private User getUserByEmail(String email) {
-        return userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage(
-                        "exception.authentication.usernameNotFound", null, Locale.getDefault())));
     }
 }

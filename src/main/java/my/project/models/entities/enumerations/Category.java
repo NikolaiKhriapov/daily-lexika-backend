@@ -1,4 +1,4 @@
-package my.project.models.entities.enumeration;
+package my.project.models.entities.enumerations;
 
 public enum Category {
     HSK, // HSK 1, HSK 2, HSK 3, HSK 4, HSK 5, HSK 6, HSK 7-9

@@ -3,8 +3,8 @@ package my.project.models.dtos.flashcards;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import my.project.models.entities.enumeration.Category;
-import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.enumerations.Category;
+import my.project.models.entities.enumerations.Platform;
 import my.project.models.entities.flashcards.WordPack;
 
 import java.io.Serializable;

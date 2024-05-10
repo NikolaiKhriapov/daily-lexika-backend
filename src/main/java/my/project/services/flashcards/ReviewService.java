@@ -1,20 +1,20 @@
 package my.project.services.flashcards;
 
 import lombok.RequiredArgsConstructor;
+import my.project.config.DateUtil;
 import my.project.exception.BadRequestException;
 import my.project.exception.InternalServerErrorException;
 import my.project.exception.ResourceAlreadyExistsException;
 import my.project.exception.ResourceNotFoundException;
 import my.project.models.dtos.flashcards.ReviewDto;
 import my.project.models.dtos.flashcards.ReviewStatisticsDto;
-import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.enumerations.Platform;
 import my.project.models.entities.user.RoleStatistics;
 import my.project.models.entities.user.User;
 import my.project.models.mappers.flashcards.ReviewMapper;
 import my.project.models.entities.flashcards.*;
 import my.project.repositories.flashcards.ReviewRepository;
 import my.project.repositories.user.UserRepository;
-import my.project.services.user.AuthenticationService;
 import my.project.services.user.RoleService;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
@@ -23,11 +23,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
-import java.time.LocalDate;
 import java.util.*;
 
 import static java.time.temporal.ChronoUnit.DAYS;
-import static my.project.models.entities.enumeration.Status.*;
+import static my.project.models.entities.enumerations.Status.*;
 
 @Service
 @RequiredArgsConstructor
@@ -39,20 +38,19 @@ public class ReviewService {
     private final WordService wordService;
     private final WordDataService wordDataService;
     private final WordPackService wordPackService;
-    private final AuthenticationService authenticationService;
     private final RoleService roleService;
     private final MessageSource messageSource;
 
     @Transactional
     public List<ReviewDto> getAllReviews() {
-        User user = authenticationService.getAuthenticatedUser();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
         List<Review> allReviews = reviewRepository.findByUserIdAndWordPack_Platform(user.getId(), platform);
 
         List<ReviewDto> allReviewDtos = new ArrayList<>();
         for (Review oneReview : allReviews) {
-            if (!Objects.equals(oneReview.getDateGenerated(), LocalDate.now())) {
+            if (!Objects.equals(oneReview.getDateGenerated().toLocalDate(), DateUtil.nowInUtc().toLocalDate())) {
                 reviewRepository.delete(oneReview);
                 reviewRepository.save(generateReview(reviewMapper.toDto(oneReview)));
             }
@@ -122,7 +120,7 @@ public class ReviewService {
             review.setListOfWords(listOfWords);
 
             if (review.getListOfWords().isEmpty()) {
-                review.setDateLastCompleted(LocalDate.now());
+                review.setDateLastCompleted(DateUtil.nowInUtc());
                 updateUserStreak();
             }
 
@@ -133,7 +131,7 @@ public class ReviewService {
     }
 
     public ReviewStatisticsDto getReviewStatistics(Long reviewId) {
-        User user = authenticationService.getAuthenticatedUser();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
         Review review = getReview(reviewId);
@@ -171,7 +169,7 @@ public class ReviewService {
      * KNOWN -> if dateOfLastOccurrence >= totalStreak
      **/
     public List<Word> generateListOfWordsForReview(WordPack wordPack, ReviewDto reviewDto) {
-        User user = authenticationService.getAuthenticatedUser();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
         List<Integer> wordDataIds = wordDataService.findAllWordDataIdByWordPackNameAndPlatform(wordPack.getName(), platform);
@@ -223,7 +221,7 @@ public class ReviewService {
     }
 
     private Review generateReview(ReviewDto reviewDto) {
-        Integer userId = authenticationService.getAuthenticatedUser().getId();
+        Integer userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         WordPack wordPack = wordPackService.findByName(reviewDto.wordPackDto().name());
 
         List<Word> listOfWords = generateListOfWordsForReview(wordPack, reviewDto);
@@ -249,7 +247,7 @@ public class ReviewService {
             thisWord.setStatus(KNOWN);
             thisWord.setCurrentStreak((short) 0);
             thisWord.setOccurrence((short) 0);
-            thisWord.setDateOfLastOccurrence(LocalDate.now());
+            thisWord.setDateOfLastOccurrence(DateUtil.nowInUtc());
             listOfWords.remove(thisWord);
         }
 
@@ -272,7 +270,7 @@ public class ReviewService {
                 }
                 thisWord.setCurrentStreak((short) 0);
                 thisWord.setOccurrence((short) 0);
-                thisWord.setDateOfLastOccurrence(LocalDate.now());
+                thisWord.setDateOfLastOccurrence(DateUtil.nowInUtc());
                 listOfWords.remove(thisWord);
             }
         }
@@ -288,7 +286,7 @@ public class ReviewService {
     }
 
     private void throwIfReviewAlreadyExistsByWordPackName(String wordPackName) {
-        User user = authenticationService.getAuthenticatedUser();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
         boolean existsReviewByWordPackName = reviewRepository.existsByUserIdAndWordPack_PlatformAndWordPack_Name(user.getId(), platform, wordPackName);
@@ -303,12 +301,12 @@ public class ReviewService {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         RoleStatistics roleStatistics = roleService.getRoleStatistics();
 
-        Long daysFromLastStreak = DAYS.between(roleStatistics.getDateOfLastStreak(), LocalDate.now());
+        Long daysFromLastStreak = DAYS.between(roleStatistics.getDateOfLastStreak(), DateUtil.nowInUtc());
         Long differenceBetweenRecordStreakAndCurrentStreak = roleStatistics.getRecordStreak() - roleStatistics.getCurrentStreak();
 
         updateCurrentStreak(roleStatistics, daysFromLastStreak);
         updateRecordStreak(roleStatistics, differenceBetweenRecordStreakAndCurrentStreak, daysFromLastStreak);
-        roleStatistics.setDateOfLastStreak(LocalDate.now());
+        roleStatistics.setDateOfLastStreak(DateUtil.nowInUtc());
 
         userRepository.save(user);
     }

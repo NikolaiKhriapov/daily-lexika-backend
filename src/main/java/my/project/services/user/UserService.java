@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import my.project.models.dtos.user.PasswordUpdateRequest;
 import my.project.models.dtos.user.UserDto;
-import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.enumerations.Platform;
 import my.project.models.entities.user.RoleStatistics;
 import my.project.models.entities.user.User;
 import my.project.models.mappers.user.UserMapper;
@@ -12,14 +12,19 @@ import my.project.repositories.user.UserRepository;
 import my.project.services.flashcards.ReviewService;
 import my.project.services.flashcards.WordPackService;
 import my.project.services.flashcards.WordService;
+import my.project.services.log.LogService;
 import my.project.services.notification.NotificationService;
+import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
+
 @Service
 @RequiredArgsConstructor
-public class UserAccountService {
+public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -29,6 +34,22 @@ public class UserAccountService {
     private final WordPackService wordPackService;
     private final RoleService roleService;
     private final NotificationService notificationService;
+    private final LogService logService;
+    private final MessageSource messageSource;
+
+    public void save(User user) {
+        userRepository.save(user);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email.toLowerCase());
+    }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findUserByEmail(email.toLowerCase())
+                .orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage(
+                        "exception.authentication.usernameNotFound", null, Locale.getDefault())));
+    }
 
     public UserDto getUserInfo() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -74,6 +95,8 @@ public class UserAccountService {
         } else {
             userRepository.save(user);
         }
+
+        logService.logAccountDeletion(user, platform);
     }
 
     private void deleteFlashcardsForUserByPlatform(User user, Platform platform) {
@@ -82,75 +105,3 @@ public class UserAccountService {
         wordPackService.deleteAllByUserIdAndPlatform(user.getId(), platform);
     }
 }
-
-//    public byte[] getProfilePhoto() {
-//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//
-//        if (StringUtils.isBlank(user.getProfilePhoto())) {
-//            return new byte[]{};
-//        }
-//
-//        GetPhotoResponse getPhotoResponse = fileStorageClient.getPhoto(new GetPhotoRequest(user.getProfilePhoto()));
-//        return getPhotoResponse.photo();
-//    }
-
-//    @Transactional
-//    public void updateProfilePhoto(MultipartFile file) {
-//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//
-//        validatePhoto(file);
-//
-//        try {
-//            deleteProfilePhoto();
-//
-//            PutProfilePhotoResponse putProfilePhotoResponse = fileStorageClient.putProfilePhoto(
-//                    new PutProfilePhotoRequest(user.getId(), file.getBytes(), file.getOriginalFilename()));
-//            String profilePhotoPath = putProfilePhotoResponse.profilePhotoDirectoryAndName();
-//
-//            user.setProfilePhoto(profilePhotoPath);
-//        } catch (IOException e) {
-//            throw new RuntimeException(messageSource.getMessage(
-//                    "exception.userAccount.updateProfilePhoto.notUploaded", null, Locale.getDefault()));
-//        }
-//
-//        userRepository.save(user);
-//    }
-
-//    @Transactional
-//    public void deleteProfilePhoto() {
-//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//
-//        fileStorageClient.deletePhoto(new DeletePhotoRequest(user.getProfilePhoto()));
-//
-//        user.setProfilePhoto(null);
-//
-//        userRepository.save(user);
-//    }
-
-//    private void validatePhoto(MultipartFile file) {
-//        if (file.isEmpty()) {
-//            throw new IllegalArgumentException(messageSource.getMessage(
-//                    "exception.userAccount.validatePhoto.emptyFile", null, Locale.getDefault()));
-//        }
-//
-//        long maxSize = 5 * 1024 * 1024; // 5 MB
-//        if (file.getSize() > maxSize) {
-//            throw new MaxUploadSizeExceededException(maxSize);
-//        }
-//
-//        Set<String> supportedExtensions = new HashSet<>(
-//                List.of(messageSource.getMessage("profilePhoto.supportedExtensions", null, Locale.getDefault()).split(","))
-//        );
-//        boolean isAllowedExtension = false;
-//        for (String extension : supportedExtensions) {
-//            if (Objects.requireNonNull(file.getOriginalFilename()).toLowerCase().endsWith(extension)) {
-//                isAllowedExtension = true;
-//                break;
-//            }
-//        }
-//        if (!isAllowedExtension) {
-//            String message = messageSource.getMessage(
-//                    "exception.userAccount.validatePhoto.invalidExtension", null, Locale.getDefault());
-//            throw new IllegalArgumentException(message + " " + supportedExtensions);
-//        }
-//    }
