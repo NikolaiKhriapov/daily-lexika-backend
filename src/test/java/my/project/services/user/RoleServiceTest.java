@@ -2,7 +2,7 @@ package my.project.services.user;
 
 import my.project.exception.ResourceAlreadyExistsException;
 import my.project.exception.ResourceNotFoundException;
-import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.enumerations.Platform;
 import my.project.models.entities.user.RoleName;
 import my.project.models.entities.user.RoleStatistics;
 import my.project.models.entities.user.User;

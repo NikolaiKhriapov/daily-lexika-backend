@@ -3,7 +3,7 @@ package my.project.models.dtos.notification;
 import my.project.models.entities.notification.Notification;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * DTO for {@link Notification}
@@ -16,7 +16,7 @@ public record NotificationDto(
         String sender,
         String subject,
         String message,
-        LocalDateTime sentAt,
+        OffsetDateTime sentAt,
         Boolean isRead
 
 ) implements Serializable {

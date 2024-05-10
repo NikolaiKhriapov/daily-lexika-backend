@@ -12,7 +12,7 @@ import org.springframework.security.test.context.support.WithUserDetails;
 
 import java.util.List;
 
-import static my.project.models.entities.enumeration.Platform.CHINESE;
+import static my.project.models.entities.enumerations.Platform.CHINESE;
 import static my.project.util.CommonConstants.TEST_EMAIL_CHINESE;
 import static my.project.util.CommonConstants.URI_REVIEWS;
 import static my.project.util.data.TestDataUtil.*;

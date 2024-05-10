@@ -4,37 +4,37 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import my.project.models.dtos.user.PasswordUpdateRequest;
 import my.project.models.dtos.user.UserDto;
-import my.project.services.user.UserAccountService;
+import my.project.services.user.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/user/account")
+@RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
-public class UserAccountController {
+public class UserController {
 
-    private final UserAccountService userAccountService;
+    private final UserService userService;
 
     @GetMapping("/info")
     public ResponseEntity<UserDto> getUserInfo() {
-        return ResponseEntity.ok(userAccountService.getUserInfo());
+        return ResponseEntity.ok(userService.getUserInfo());
     }
 
     @PatchMapping("/info")
     public ResponseEntity<UserDto> updateUserInfo(@RequestBody @Valid UserDto userDTO) {
-        return ResponseEntity.ok(userAccountService.updateUserInfo(userDTO));
+        return ResponseEntity.ok(userService.updateUserInfo(userDTO));
     }
 
     @PatchMapping("/password")
     public ResponseEntity<Void> updatePassword(@RequestBody @Valid PasswordUpdateRequest passwordUpdateRequest) {
-        userAccountService.updatePassword(passwordUpdateRequest);
+        userService.updatePassword(passwordUpdateRequest);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping
     public ResponseEntity<Void> deleteAccount() {
-        userAccountService.deleteAccount();
+        userService.deleteAccount();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

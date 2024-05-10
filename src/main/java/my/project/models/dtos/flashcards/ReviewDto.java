@@ -3,7 +3,7 @@ package my.project.models.dtos.flashcards;
 import my.project.models.entities.flashcards.Review;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 /**
@@ -18,8 +18,8 @@ public record ReviewDto(
         WordPackDto wordPackDto,
         List<WordDto> listOfWordDto,
         Integer actualSize,
-        LocalDate dateLastCompleted,
-        LocalDate dateGenerated
+        OffsetDateTime dateLastCompleted,
+        OffsetDateTime dateGenerated
 
 ) implements Serializable {
 }

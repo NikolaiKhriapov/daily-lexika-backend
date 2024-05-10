@@ -15,8 +15,8 @@ import org.mockito.Mock;
 
 import java.util.List;
 
-import static my.project.models.entities.enumeration.Platform.CHINESE;
-import static my.project.models.entities.enumeration.Status.KNOWN;
+import static my.project.models.entities.enumerations.Platform.CHINESE;
+import static my.project.models.entities.enumerations.Status.KNOWN;
 import static my.project.models.entities.user.RoleName.USER_CHINESE;
 import static my.project.util.data.TestDataUtil.*;
 import static my.project.util.data.TestDataUtil.generateReviewStatisticsDTO;

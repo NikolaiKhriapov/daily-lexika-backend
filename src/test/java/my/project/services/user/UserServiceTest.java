@@ -6,14 +6,16 @@ import my.project.repositories.user.UserRepository;
 import my.project.services.flashcards.ReviewService;
 import my.project.services.flashcards.WordPackService;
 import my.project.services.flashcards.WordService;
+import my.project.services.log.LogService;
 import my.project.services.notification.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
+import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-class UserAccountServiceTest extends AbstractUnitTest {
+class UserServiceTest extends AbstractUnitTest {
 
-    private UserAccountService underTest;
+    private UserService underTest;
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -30,10 +32,14 @@ class UserAccountServiceTest extends AbstractUnitTest {
     private RoleService roleService;
     @Mock
     private NotificationService notificationService;
+    @Mock
+    private LogService logService;
+    @Mock
+    private MessageSource messageSource;
 
     @BeforeEach
     void setUp() {
-        underTest = new UserAccountService(
+        underTest = new UserService(
                 userRepository,
                 userMapper,
                 passwordEncoder,
@@ -41,7 +47,9 @@ class UserAccountServiceTest extends AbstractUnitTest {
                 wordService,
                 wordPackService,
                 roleService,
-                notificationService
+                notificationService,
+                logService,
+                messageSource
         );
     }
 

@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import my.project.models.entities.enumeration.Category;
-import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.enumerations.Category;
+import my.project.models.entities.enumerations.Platform;
 
 @Data
 @NoArgsConstructor

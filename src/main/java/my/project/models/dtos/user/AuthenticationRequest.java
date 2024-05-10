@@ -2,7 +2,7 @@ package my.project.models.dtos.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.enumerations.Platform;
 
 public record AuthenticationRequest(
 

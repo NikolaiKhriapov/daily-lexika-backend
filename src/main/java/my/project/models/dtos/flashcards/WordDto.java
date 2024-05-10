@@ -1,10 +1,10 @@
 package my.project.models.dtos.flashcards;
 
-import my.project.models.entities.enumeration.Status;
+import my.project.models.entities.enumerations.Status;
 import my.project.models.entities.flashcards.Word;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 /**
  * DTO for {@link Word}
@@ -18,7 +18,7 @@ public record WordDto(
         Short currentStreak,
         Short totalStreak,
         Short occurrence,
-        LocalDate dateOfLastOccurrence
+        OffsetDateTime dateOfLastOccurrence
 
 ) implements Serializable {
 }

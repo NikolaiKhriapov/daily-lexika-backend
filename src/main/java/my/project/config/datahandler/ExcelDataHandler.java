@@ -1,10 +1,11 @@
 package my.project.config.datahandler;
 
 import lombok.RequiredArgsConstructor;
+import my.project.config.DateUtil;
 import my.project.exception.InternalServerErrorException;
 import my.project.models.entities.flashcards.WordData;
-import my.project.models.entities.enumeration.Platform;
-import my.project.models.entities.enumeration.Category;
+import my.project.models.entities.enumerations.Platform;
+import my.project.models.entities.enumerations.Category;
 import my.project.models.entities.flashcards.WordPack;
 import my.project.services.flashcards.WordDataService;
 import my.project.services.flashcards.WordPackService;
@@ -21,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 
 @Component
@@ -127,7 +127,7 @@ public class ExcelDataHandler {
                             case 5 -> wordData.setDefinition(currentCell.getStringCellValue());
                             case 6 -> wordData.setExamples(currentCell.getStringCellValue());
                             case 7 -> wordData.setListOfWordPacks(getWordPacksFromCellValue(wordData, currentCell.getStringCellValue(), "EN__"));
-                            case 8 -> wordData.setWordOfTheDayDate(currentCell.getDateCellValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                            case 8 -> wordData.setWordOfTheDayDate(DateUtil.convertDateToLocalDate(currentCell.getDateCellValue()));
                             default -> {
                             }
                         }
@@ -142,7 +142,7 @@ public class ExcelDataHandler {
                             case 5 -> wordData.setDefinition(currentCell.getStringCellValue());
                             case 6 -> wordData.setExamples(currentCell.getStringCellValue());
                             case 7 -> wordData.setListOfWordPacks(getWordPacksFromCellValue(wordData, currentCell.getStringCellValue(), "CH__"));
-                            case 8 -> wordData.setWordOfTheDayDate(currentCell.getDateCellValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                            case 8 -> wordData.setWordOfTheDayDate(DateUtil.convertDateToLocalDate(currentCell.getDateCellValue()));
                             default -> {
                             }
                         }

@@ -3,9 +3,10 @@ package my.project.models.entities.flashcards;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import my.project.models.entities.enumeration.Status;
+import my.project.config.DateUtil;
+import my.project.models.entities.enumerations.Status;
 
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 @Data
 @NoArgsConstructor
@@ -31,7 +32,7 @@ public class Word {
 
     private Short occurrence;
 
-    private LocalDate dateOfLastOccurrence;
+    private OffsetDateTime dateOfLastOccurrence;
 
     public Word(Integer userId, WordData wordData) {
         this.userId = userId;
@@ -40,6 +41,6 @@ public class Word {
         this.currentStreak = 0;
         this.totalStreak = 0;
         this.occurrence = 0;
-        this.dateOfLastOccurrence = LocalDate.now().minusDays(1);
+        this.dateOfLastOccurrence = DateUtil.nowInUtc().minusDays(1);
     }
 }

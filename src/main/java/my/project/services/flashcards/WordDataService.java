@@ -1,9 +1,10 @@
 package my.project.services.flashcards;
 
 import lombok.RequiredArgsConstructor;
+import my.project.config.DateUtil;
 import my.project.exception.ResourceNotFoundException;
 import my.project.models.dtos.flashcards.WordDataDto;
-import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.enumerations.Platform;
 import my.project.models.entities.flashcards.WordData;
 import my.project.models.entities.flashcards.WordPack;
 import my.project.models.entities.user.User;
@@ -14,7 +15,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -74,7 +74,7 @@ public class WordDataService {
     }
 
     public Integer findIdByWordOfTheDayDateAndPlatform(Platform platform) {
-        return wordDataRepository.findIdByWordOfTheDayDateAndPlatform(LocalDate.now(), platform)
+        return wordDataRepository.findIdByWordOfTheDayDateAndPlatform(DateUtil.nowInUtc().toLocalDate(), platform)
                 .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
                         "exception.wordData.wordOfTheDayDate.notFound", null, Locale.getDefault())));
     }

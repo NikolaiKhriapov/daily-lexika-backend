@@ -4,7 +4,7 @@ import my.project.models.entities.user.RoleName;
 import my.project.models.entities.user.RoleStatistics;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 /**
  * DTO for {@link RoleStatistics}
@@ -14,7 +14,7 @@ public record RoleStatisticsDto(
         Long id,
         RoleName roleName,
         Long currentStreak,
-        LocalDate dateOfLastStreak,
+        OffsetDateTime dateOfLastStreak,
         Long recordStreak
 
 ) implements Serializable {

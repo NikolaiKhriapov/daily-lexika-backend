@@ -4,8 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import my.project.config.DateUtil;
 
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Data
@@ -34,9 +35,9 @@ public class Review {
 
     private Integer actualSize;
 
-    private LocalDate dateLastCompleted;
+    private OffsetDateTime dateLastCompleted;
 
-    private LocalDate dateGenerated;
+    private OffsetDateTime dateGenerated;
 
     public Review(Integer userId,
                   Integer maxNewWordsPerDay,
@@ -50,6 +51,6 @@ public class Review {
         this.wordPack = wordPack;
         this.listOfWords = listOfWords;
         this.actualSize = actualSize;
-        this.dateGenerated = LocalDate.now();
+        this.dateGenerated = DateUtil.nowInUtc();
     }
 }

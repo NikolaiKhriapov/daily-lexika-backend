@@ -2,8 +2,9 @@ package my.project.models.entities.user;
 
 import jakarta.persistence.*;
 import lombok.*;
+import my.project.config.DateUtil;
 
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 @Data
 @AllArgsConstructor
@@ -21,14 +22,14 @@ public class RoleStatistics {
 
     private Long currentStreak;
 
-    private LocalDate dateOfLastStreak;
+    private OffsetDateTime dateOfLastStreak;
 
     private Long recordStreak;
 
     public RoleStatistics(RoleName roleName) {
         this.roleName = roleName;
         this.currentStreak = 0L;
-        this.dateOfLastStreak = LocalDate.now().minusDays(1);
+        this.dateOfLastStreak = DateUtil.nowInUtc().minusDays(1);
         this.recordStreak = 0L;
     }
 }

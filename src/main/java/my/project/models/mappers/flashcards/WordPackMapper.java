@@ -1,16 +1,16 @@
 package my.project.models.mappers.flashcards;
 
 import my.project.models.dtos.flashcards.WordPackDto;
-import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.enumerations.Platform;
 import my.project.models.entities.flashcards.Review;
 import my.project.models.entities.flashcards.WordPack;
 import my.project.models.entities.user.User;
 import my.project.repositories.flashcards.ReviewRepository;
 import my.project.services.flashcards.WordDataService;
-import my.project.services.user.AuthenticationService;
 import my.project.services.user.RoleService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +20,6 @@ public abstract class WordPackMapper {
 
     @Autowired
     protected WordDataService wordDataService;
-    @Autowired
-    protected AuthenticationService authenticationService;
     @Autowired
     protected RoleService roleService;
     @Autowired
@@ -35,14 +33,14 @@ public abstract class WordPackMapper {
 
     @Named("mapReviewId")
     protected Long mapReviewId(WordPack entity) {
-        Integer userId = authenticationService.getAuthenticatedUser().getId();
+        Integer userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         Optional<Review> review = reviewRepository.findByUserIdAndWordPack_Name(userId, entity.getName());
         return review.map(Review::getId).orElse(null);
     }
 
     @Named("mapTotalWords")
     protected Long mapTotalWords(WordPack entity) {
-        User user = authenticationService.getAuthenticatedUser();
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
         return wordDataService.countByWordPackNameAndPlatform(entity.getName(), platform);

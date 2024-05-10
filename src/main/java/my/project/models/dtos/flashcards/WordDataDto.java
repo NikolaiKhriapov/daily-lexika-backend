@@ -1,6 +1,6 @@
 package my.project.models.dtos.flashcards;
 
-import my.project.models.entities.enumeration.Platform;
+import my.project.models.entities.enumerations.Platform;
 import my.project.models.entities.flashcards.WordData;
 
 import java.io.Serializable;

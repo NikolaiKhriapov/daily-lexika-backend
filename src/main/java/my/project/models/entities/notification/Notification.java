@@ -4,8 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import my.project.config.DateUtil;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Data
 @AllArgsConstructor
@@ -22,7 +23,7 @@ public class Notification {
     private String sender;
     private String subject;
     private String message;
-    private LocalDateTime sentAt;
+    private OffsetDateTime sentAt;
     private Boolean isRead;
 
     public Notification(Integer toUserId, String toUserEmail, String subject, String message) {
@@ -31,7 +32,7 @@ public class Notification {
         this.sender = "Daily Lexika";
         this.subject = subject;
         this.message = message;
-        this.sentAt = LocalDateTime.now();
+        this.sentAt = DateUtil.nowInUtc();
         this.isRead = false;
     }
 }
