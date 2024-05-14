@@ -262,13 +262,13 @@ public class ExcelDataHandler {
     }
 
     private void validateExcelWordDataEnglish(WordData wordData) {
-        if (wordData.getNameEnglish().length() > 250) {
+        if (wordData.getNameEnglish().length() > 100) {
             System.out.println("!!!!! Excel data (EN_Words) validation failed (name_english): " + wordData.getId());
         }
         if (!wordData.getTranscription().startsWith("/") || !wordData.getTranscription().endsWith("/") || wordData.getTranscription().contains("/ /")) {
             System.out.println("!!!!! Excel data (EN_Words) validation failed (transcription): " + wordData.getId());
         }
-        if (wordData.getNameRussian().length() > 250) {
+        if (wordData.getNameRussian().length() > 100) {
             System.out.println("!!!!! Excel data (EN_Words) validation failed (name_russian): " + wordData.getId());
         }
         if (wordData.getNameChinese().length() > 19 || wordData.getNameChinese().contains(",") || wordData.getNameChinese().contains(";") || wordData.getNameChinese().contains("；") || wordData.getNameChinese().contains(" ")) {
@@ -300,12 +300,12 @@ public class ExcelDataHandler {
             }
         }
         if (!wordData.getNameEnglish().equals("[TODO]")) {
-            if (wordData.getNameEnglish().length() > 250 || wordData.getNameEnglish().contains(";") || wordData.getNameEnglish().contains("  ")) {
+            if (wordData.getNameEnglish().length() > 100 || wordData.getNameEnglish().contains(";") || wordData.getNameEnglish().contains("  ")) {
                 System.out.println("!!!!! Excel data (CH_Words) validation failed (name_english): " + wordData.getId());
             }
         }
         if (!wordData.getNameRussian().equals("[TODO]")) {
-            if (wordData.getNameRussian().length() > 250 || wordData.getNameRussian().contains(";") || wordData.getNameRussian().contains("  ")) {
+            if (wordData.getNameRussian().length() > 100 || wordData.getNameRussian().contains(";") || wordData.getNameRussian().contains("  ")) {
                 System.out.println("!!!!! Excel data (CH_Words) validation failed (name_russian): " + wordData.getId());
             }
         }
