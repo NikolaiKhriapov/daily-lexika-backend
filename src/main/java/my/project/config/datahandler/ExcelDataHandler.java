@@ -288,15 +288,13 @@ public class ExcelDataHandler {
         if (wordData.getNameChinese().length() > 19) {
             System.out.println("!!!!! Excel data (CH_Words) validation failed (name_chinese): " + wordData.getId());
         }
-        if (!wordData.getTranscription().equals("[TODO]")) {
-            if (wordData.getTranscription().split(" ").length != wordData.getNameChinese().length()) {
-                if (wordData.getTranscription().endsWith("r")) {
-                    if (wordData.getTranscription().split(" ").length != (wordData.getNameChinese().length() - 1)) {
-                        System.out.println("!!!!! Excel data (CH_Words) validation failed (transcription0): " + wordData.getId() + " " + wordData.getTranscription() + " " + wordData.getTranscription().split(" ").length + " ::: " + (wordData.getNameChinese().length()));
-                    }
-                } else {
-                    System.out.println("!!!!! Excel data (CH_Words) validation failed (transcription): " + wordData.getId() + " " + wordData.getTranscription() + " " + wordData.getTranscription().split(" ").length + " ::: " + wordData.getNameChinese().length());
+        if (wordData.getTranscription().split(" ").length != wordData.getNameChinese().length()) {
+            if (wordData.getTranscription().endsWith("r")) {
+                if (wordData.getTranscription().split(" ").length != (wordData.getNameChinese().length() - 1)) {
+                    System.out.println("!!!!! Excel data (CH_Words) validation failed (transcription): " + wordData.getId() + " " + wordData.getTranscription() + " " + wordData.getTranscription().split(" ").length + " ::: " + (wordData.getNameChinese().length()));
                 }
+            } else {
+                System.out.println("!!!!! Excel data (CH_Words) validation failed (transcription): " + wordData.getId() + " " + wordData.getTranscription() + " " + wordData.getTranscription().split(" ").length + " ::: " + wordData.getNameChinese().length());
             }
         }
         if (!wordData.getNameEnglish().equals("[TODO]")) {
