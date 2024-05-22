@@ -68,7 +68,7 @@ public class DefaultExceptionHandler {
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST,
                 LocalDateTime.now(),
-                "Invalid username or password.",
+                "Invalid email or password.",
                 Arrays.toString(e.getStackTrace())
         );
 
