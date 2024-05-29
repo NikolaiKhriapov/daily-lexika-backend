@@ -2,6 +2,7 @@ package my.project.config.datahandler;
 
 import lombok.RequiredArgsConstructor;
 import my.project.config.DateUtil;
+import my.project.config.i18n.I18nUtil;
 import my.project.exception.InternalServerErrorException;
 import my.project.models.entities.flashcards.WordData;
 import my.project.models.entities.enumerations.Platform;
@@ -15,7 +16,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +31,6 @@ public class ExcelDataHandler {
     private final WordPackService wordPackService;
     private final WordDataService wordDataService;
     private final WordService wordService;
-    private final MessageSource messageSource;
 
     public static Set<LocalDate> datesCounterForValidation = new HashSet<>();
 
@@ -167,8 +166,7 @@ public class ExcelDataHandler {
             workbook.close();
             return listOfWordData;
         } catch (IOException e) {
-            throw new InternalServerErrorException(messageSource.getMessage("exception.excel.parse", null, Locale.getDefault())
-                    .formatted(e.getMessage()));
+            throw new InternalServerErrorException(I18nUtil.getMessage("exceptions.excel.parse", e.getMessage()));
         }
     }
 

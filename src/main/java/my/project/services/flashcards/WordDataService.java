@@ -2,6 +2,7 @@ package my.project.services.flashcards;
 
 import lombok.RequiredArgsConstructor;
 import my.project.config.DateUtil;
+import my.project.config.i18n.I18nUtil;
 import my.project.exception.ResourceNotFoundException;
 import my.project.models.dtos.flashcards.WordDataDto;
 import my.project.models.entities.enumerations.Platform;
@@ -11,7 +12,6 @@ import my.project.models.entities.user.User;
 import my.project.models.mappers.flashcards.WordDataMapper;
 import my.project.repositories.flashcards.WordDataRepository;
 import my.project.services.user.RoleService;
-import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -24,12 +24,10 @@ public class WordDataService {
     private final WordDataRepository wordDataRepository;
     private final WordDataMapper wordDataMapper;
     private final RoleService roleService;
-    private final MessageSource messageSource;
 
     public WordData findById(Integer wordDataId) {
         return wordDataRepository.findById(wordDataId)
-                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
-                        "exception.wordData.notFound", null, Locale.getDefault())));
+                .orElseThrow(() -> new ResourceNotFoundException(I18nUtil.getMessage("exceptions.wordData.notFound")));
     }
 
     public List<WordData> findAllByPlatform(Platform platform) {
@@ -75,7 +73,6 @@ public class WordDataService {
 
     public Integer findIdByWordOfTheDayDateAndPlatform(Platform platform) {
         return wordDataRepository.findIdByWordOfTheDayDateAndPlatform(DateUtil.nowInUtc().toLocalDate(), platform)
-                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
-                        "exception.wordData.wordOfTheDayDate.notFound", null, Locale.getDefault())));
+                .orElseThrow(() -> new ResourceNotFoundException(I18nUtil.getMessage("exceptions.wordData.wordOfTheDayDate.notFound")));
     }
 }

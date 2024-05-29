@@ -2,6 +2,7 @@ package my.project.services.flashcards;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import my.project.config.i18n.I18nUtil;
 import my.project.exception.BadRequestException;
 import my.project.exception.ResourceAlreadyExistsException;
 import my.project.exception.ResourceNotFoundException;
@@ -18,7 +19,6 @@ import my.project.models.mappers.flashcards.WordPackMapper;
 import my.project.repositories.flashcards.ReviewRepository;
 import my.project.repositories.flashcards.WordPackRepository;
 import my.project.services.user.RoleService;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -40,13 +39,11 @@ public class WordPackService {
     private final WordDataService wordDataService;
     private final WordDataMapper wordDataMapper;
     private final RoleService roleService;
-    private final MessageSource messageSource;
     private final ReviewRepository reviewRepository;
 
     public WordPack findByName(String wordPackName) {
         return wordPackRepository.findById(wordPackName)
-                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
-                        "exception.wordPack.notFound", null, Locale.getDefault())));
+                .orElseThrow(() -> new ResourceNotFoundException(I18nUtil.getMessage("exceptions.wordPack.notFound")));
     }
 
     public List<WordPack> findAll() {
@@ -94,7 +91,7 @@ public class WordPackService {
         String wordPackName = wordPackDTO.name().trim();
 
         if (wordPackName.contains(";") || wordPackName.isBlank()) {
-            throw new BadRequestException(messageSource.getMessage("exception.wordPack.invalidName", null, Locale.getDefault()));
+            throw new BadRequestException(I18nUtil.getMessage("exceptions.wordPack.invalidName"));
         }
 
         String wordPackNameDecorated = decorateWordPackName(wordPackName, user.getId(), platform);
@@ -107,8 +104,7 @@ public class WordPackService {
                     platform
             ));
         } else {
-            throw new ResourceAlreadyExistsException(messageSource.getMessage("exception.wordPack.alreadyExists", null, Locale.getDefault())
-                    .formatted(wordPackDTO.name()));
+            throw new ResourceAlreadyExistsException(I18nUtil.getMessage("exceptions.wordPack.alreadyExists", wordPackDTO.name()));
         }
     }
 
@@ -150,8 +146,7 @@ public class WordPackService {
         if (!listOfWordPacks.contains(wordPack)) {
             listOfWordPacks.add(wordPack);
         } else {
-            throw new BadRequestException(messageSource.getMessage("exception.wordPack.wordDataAlreadyAddedToWordPack", null, Locale.getDefault())
-                    .formatted(wordData.getId(), wordPackName));
+            throw new BadRequestException(I18nUtil.getMessage("exceptions.wordPack.wordDataAlreadyAddedToWordPack", wordData.getId(), wordPackName));
         }
         wordData.setListOfWordPacks(listOfWordPacks);
 
@@ -169,8 +164,7 @@ public class WordPackService {
         if (listOfWordPacks.contains(wordPack)) {
             listOfWordPacks.remove(wordPack);
         } else {
-            throw new BadRequestException(messageSource.getMessage("exception.wordPack.wordDataNotInWordPack", null, Locale.getDefault())
-                    .formatted(wordData.getId(), wordPackName));
+            throw new BadRequestException(I18nUtil.getMessage("exceptions.wordPack.wordDataNotInWordPack", wordData.getId(), wordPackName));
         }
         wordData.setListOfWordPacks(listOfWordPacks);
 
@@ -196,7 +190,7 @@ public class WordPackService {
 
     private void throwIfWordPackCategoryNotCustom(WordPack wordPack) {
         if (!wordPack.getCategory().equals(Category.CUSTOM)) {
-            throw new BadRequestException(messageSource.getMessage("exception.wordPack.categoryNotCustom", null, Locale.getDefault()));
+            throw new BadRequestException(I18nUtil.getMessage("exceptions.wordPack.categoryNotCustom"));
         }
     }
 }

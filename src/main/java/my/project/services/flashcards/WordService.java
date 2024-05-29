@@ -1,6 +1,7 @@
 package my.project.services.flashcards;
 
 import lombok.RequiredArgsConstructor;
+import my.project.config.i18n.I18nUtil;
 import my.project.exception.ResourceNotFoundException;
 import my.project.models.dtos.flashcards.WordDto;
 import my.project.models.entities.enumerations.Platform;
@@ -11,14 +12,12 @@ import my.project.models.entities.user.User;
 import my.project.models.mappers.flashcards.WordMapper;
 import my.project.repositories.flashcards.WordRepository;
 import my.project.services.user.RoleService;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +27,6 @@ public class WordService {
     private final WordMapper wordMapper;
     private final WordDataService wordDataService;
     private final RoleService roleService;
-    private final MessageSource messageSource;
 
     public List<WordDto> getAllWordsByStatus(Status status, Pageable pageable) {
         Integer userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
@@ -51,8 +49,7 @@ public class WordService {
         Integer userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
 
         Word word = wordRepository.findByUserIdAndWordData_Id(userId, wordDataId)
-                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
-                        "exception.word.notFound", null, Locale.getDefault())));
+                .orElseThrow(() -> new ResourceNotFoundException(I18nUtil.getMessage("exceptions.word.notFound")));
 
         return wordMapper.toDto(word);
     }
