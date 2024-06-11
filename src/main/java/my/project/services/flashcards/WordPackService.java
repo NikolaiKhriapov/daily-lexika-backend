@@ -125,7 +125,7 @@ public class WordPackService {
         throwIfReviewExistsForWordPack(wordPackName);
         throwIfWordPackCategoryNotCustom(wordPack);
 
-        List<WordData> listOfWordData = wordDataService.findAllByWordPackAndPlatform(wordPack, platform);
+        List<WordData> listOfWordData = wordDataService.findAllByWordPackNameAndPlatform(wordPack.getName(), platform);
         listOfWordData.forEach(wordData -> {
             List<WordPack> listOfWordPacks = wordData.getListOfWordPacks();
             listOfWordPacks.remove(wordPack);
@@ -151,6 +151,29 @@ public class WordPackService {
         wordData.setListOfWordPacks(listOfWordPacks);
 
         return wordDataMapper.toDto(wordDataService.save(wordData));
+    }
+
+    public void addAllWordsFromWordPackToCustomWordPack(String wordPackNameTo, String wordPackNameFrom) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Platform platform = roleService.getPlatformByRoleName(user.getRole());
+
+        WordPack wordPackToBeUpdated = findByName(wordPackNameTo);
+
+        throwIfWordPackCategoryNotCustom(wordPackToBeUpdated);
+
+        List<WordData> listOfWordData = wordDataService.findAllByWordPackNameAndPlatform(wordPackNameFrom, platform);
+
+        List<WordData> listOfWordDataToBeUpdated = new ArrayList<>();
+        for (WordData wordData : listOfWordData) {
+            List<WordPack> listOfWordPacks = wordData.getListOfWordPacks();
+            if (!listOfWordPacks.contains(wordPackToBeUpdated)) {
+                listOfWordPacks.add(wordPackToBeUpdated);
+            }
+            wordData.setListOfWordPacks(listOfWordPacks);
+            listOfWordDataToBeUpdated.add(wordData);
+        }
+
+        wordDataService.saveAll(listOfWordDataToBeUpdated);
     }
 
     public WordDataDto removeWordFromCustomWordPack(String wordPackName, Integer wordDataId) {
