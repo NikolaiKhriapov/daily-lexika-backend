@@ -2,6 +2,7 @@ package my.project.services.user;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import my.project.config.i18n.I18nUtil;
 import my.project.models.dtos.user.PasswordUpdateRequest;
 import my.project.models.dtos.user.UserDto;
 import my.project.models.entities.enumerations.Platform;
@@ -14,13 +15,10 @@ import my.project.services.flashcards.WordPackService;
 import my.project.services.flashcards.WordService;
 import my.project.services.log.LogService;
 import my.project.services.notification.NotificationService;
-import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +33,6 @@ public class UserService {
     private final RoleService roleService;
     private final NotificationService notificationService;
     private final LogService logService;
-    private final MessageSource messageSource;
 
     public void save(User user) {
         userRepository.save(user);
@@ -47,8 +44,7 @@ public class UserService {
 
     public User getUserByEmail(String email) {
         return userRepository.findUserByEmail(email.toLowerCase())
-                .orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage(
-                        "exception.authentication.usernameNotFound", null, Locale.getDefault())));
+                .orElseThrow(() -> new UsernameNotFoundException(I18nUtil.getMessage("exceptions.authentication.usernameNotFound")));
     }
 
     public UserDto getUserInfo() {

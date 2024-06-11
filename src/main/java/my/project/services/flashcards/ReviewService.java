@@ -2,6 +2,7 @@ package my.project.services.flashcards;
 
 import lombok.RequiredArgsConstructor;
 import my.project.config.DateUtil;
+import my.project.config.i18n.I18nUtil;
 import my.project.exception.BadRequestException;
 import my.project.exception.InternalServerErrorException;
 import my.project.exception.ResourceAlreadyExistsException;
@@ -16,7 +17,6 @@ import my.project.models.entities.flashcards.*;
 import my.project.repositories.flashcards.ReviewRepository;
 import my.project.repositories.user.UserRepository;
 import my.project.services.user.RoleService;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,7 +39,6 @@ public class ReviewService {
     private final WordDataService wordDataService;
     private final WordPackService wordPackService;
     private final RoleService roleService;
-    private final MessageSource messageSource;
 
     @Transactional
     public List<ReviewDto> getAllReviews() {
@@ -175,8 +174,7 @@ public class ReviewService {
         List<Integer> wordDataIds = wordDataService.findAllWordDataIdByWordPackNameAndPlatform(wordPack.getName(), platform);
 
         if (wordDataIds.isEmpty()) {
-            throw new BadRequestException(messageSource.getMessage(
-                    "exception.wordPack.noWordData", null, Locale.getDefault()));
+            throw new BadRequestException(I18nUtil.getMessage("exceptions.wordPack.noWordData"));
         }
 
         wordService.updateWordsForUser(user.getId(), wordDataIds);
@@ -216,8 +214,7 @@ public class ReviewService {
 
     private Review getReview(Long reviewId) {
         return reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
-                        "exception.review.notFound", null, Locale.getDefault())));
+                .orElseThrow(() -> new ResourceNotFoundException(I18nUtil.getMessage("exceptions.review.notFound")));
     }
 
     private Review generateReview(ReviewDto reviewDto) {
@@ -291,8 +288,7 @@ public class ReviewService {
 
         boolean existsReviewByWordPackName = reviewRepository.existsByUserIdAndWordPack_PlatformAndWordPack_Name(user.getId(), platform, wordPackName);
         if (existsReviewByWordPackName) {
-            throw new ResourceAlreadyExistsException(messageSource.getMessage("exception.review.alreadyExists", null, Locale.getDefault())
-                    .formatted(wordPackName));
+            throw new ResourceAlreadyExistsException(I18nUtil.getMessage("exceptions.review.alreadyExists", wordPackName));
         }
     }
 
@@ -317,8 +313,7 @@ public class ReviewService {
         } else if (daysFromLastStreak > 1) {
             roleStatistics.setCurrentStreak(1L);
         } else if (daysFromLastStreak < 0) {
-            throw new InternalServerErrorException(messageSource.getMessage(
-                    "exception.statistics.updateUserStreak.erroneousCurrentStreak", null, Locale.getDefault()));
+            throw new InternalServerErrorException(I18nUtil.getMessage("exceptions.statistics.updateUserStreak.erroneousCurrentStreak"));
         }
     }
 
@@ -326,8 +321,7 @@ public class ReviewService {
         if (differenceBetweenRecordStreakAndCurrentStreak == 0 && daysFromLastStreak > 0) {
             roleStatistics.setRecordStreak(roleStatistics.getRecordStreak() + 1);
         } else if (differenceBetweenRecordStreakAndCurrentStreak < 0) {
-            throw new InternalServerErrorException(messageSource.getMessage(
-                    "exception.statistics.updateUserStreak.erroneousCurrentStreak", null, Locale.getDefault()));
+            throw new InternalServerErrorException(I18nUtil.getMessage("exceptions.statistics.updateUserStreak.erroneousCurrentStreak"));
         }
     }
 }

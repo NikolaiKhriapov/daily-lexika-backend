@@ -10,7 +10,6 @@ import my.project.services.log.LogService;
 import my.project.services.notification.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
-import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 class UserServiceTest extends AbstractUnitTest {
@@ -34,8 +33,6 @@ class UserServiceTest extends AbstractUnitTest {
     private NotificationService notificationService;
     @Mock
     private LogService logService;
-    @Mock
-    private MessageSource messageSource;
 
     @BeforeEach
     void setUp() {
@@ -48,8 +45,7 @@ class UserServiceTest extends AbstractUnitTest {
                 wordPackService,
                 roleService,
                 notificationService,
-                logService,
-                messageSource
+                logService
         );
     }
 

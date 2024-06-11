@@ -1,6 +1,7 @@
 package my.project.services.notification;
 
 import lombok.RequiredArgsConstructor;
+import my.project.config.i18n.I18nUtil;
 import my.project.exception.InternalServerErrorException;
 import my.project.exception.ResourceNotFoundException;
 import my.project.models.dtos.notification.NotificationDto;
@@ -10,12 +11,10 @@ import my.project.models.entities.notification.Notification;
 import my.project.models.dtos.user.UserDto;
 import my.project.models.entities.user.User;
 import my.project.models.mappers.user.UserMapper;
-import org.springframework.context.MessageSource;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 @Service
@@ -25,7 +24,6 @@ public class NotificationService {
     private final UserMapper userMapper;
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
-    private final MessageSource messageSource;
 
     private UserDto getAuthenticatedUser() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -59,14 +57,12 @@ public class NotificationService {
 
     private Notification getNotificationById(Integer notificationId) {
         return notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
-                        "exception.notification.notFound", null, Locale.getDefault())));
+                .orElseThrow(() -> new ResourceNotFoundException(I18nUtil.getMessage("exceptions.notification.notFound")));
     }
 
     private void verifyNotificationIsForThisUser(Notification notification, Integer userId) {
         if (!Objects.equals(notification.getToUserId(), userId)) {
-            throw new InternalServerErrorException(messageSource.getMessage(
-                    "exception.notification.invalidUser", null, Locale.getDefault()));
+            throw new InternalServerErrorException(I18nUtil.getMessage("exceptions.notification.invalidUser"));
         }
     }
 }

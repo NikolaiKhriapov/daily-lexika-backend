@@ -14,7 +14,6 @@ import my.project.models.entities.user.RoleName;
 import my.project.models.entities.user.RoleStatistics;
 import my.project.models.entities.user.User;
 import org.mockito.Mockito;
-import org.springframework.context.MessageSource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,11 +35,6 @@ public class TestDataUtil {
         SecurityContextHolder.setContext(securityContext);
         given(securityContext.getAuthentication()).willReturn(authentication);
         given(authentication.getPrincipal()).willReturn(user);
-    }
-
-    public static void mockExceptionMessage(MessageSource messageSource, String key) {
-        given(messageSource.getMessage(key, null, Locale.getDefault()))
-                .willReturn("Test exception message");
     }
 
     public static RegistrationRequest generateRegistrationRequest(Platform platform) {
