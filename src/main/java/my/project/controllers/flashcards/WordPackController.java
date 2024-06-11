@@ -50,6 +50,13 @@ public class WordPackController {
         return ResponseEntity.ok(wordPackService.addWordToCustomWordPack(wordPackName, wordDataId));
     }
 
+    @GetMapping("/{wordPackNameTo}/add-words-from-wordpack/{wordPackNameFrom}")
+    public ResponseEntity<Void> addWordToCustomWordPack(@PathVariable("wordPackNameTo") String wordPackNameTo,
+                                                        @PathVariable("wordPackNameFrom") String wordPackNameFrom) {
+        wordPackService.addAllWordsFromWordPackToCustomWordPack(wordPackNameTo, wordPackNameFrom);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/{wordPackName}/remove-word/{wordDataId}")
     public ResponseEntity<WordDataDto> removeWordFromCustomWordPack(@PathVariable("wordPackName") String wordPackName,
                                                                     @PathVariable("wordDataId") Integer wordDataId) {

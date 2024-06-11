@@ -7,7 +7,6 @@ import my.project.exception.ResourceNotFoundException;
 import my.project.models.dtos.flashcards.WordDataDto;
 import my.project.models.entities.enumerations.Platform;
 import my.project.models.entities.flashcards.WordData;
-import my.project.models.entities.flashcards.WordPack;
 import my.project.models.entities.user.User;
 import my.project.models.mappers.flashcards.WordDataMapper;
 import my.project.repositories.flashcards.WordDataRepository;
@@ -34,8 +33,8 @@ public class WordDataService {
         return wordDataRepository.findAllByPlatform(platform);
     }
 
-    public List<WordData> findAllByWordPackAndPlatform(WordPack wordPack, Platform platform) {
-        return wordDataRepository.findAllByListOfWordPacks_NameAndPlatform(wordPack.getName(), platform);
+    public List<WordData> findAllByWordPackNameAndPlatform(String wordPackName, Platform platform) {
+        return wordDataRepository.findAllByListOfWordPacks_NameAndPlatform(wordPackName, platform);
     }
 
     public WordData save(WordData wordData) {
