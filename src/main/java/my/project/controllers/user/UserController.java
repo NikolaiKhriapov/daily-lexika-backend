@@ -2,6 +2,7 @@ package my.project.controllers.user;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import my.project.models.dtos.user.AccountDeletionRequest;
 import my.project.models.dtos.user.PasswordUpdateRequest;
 import my.project.models.dtos.user.UserDto;
 import my.project.services.user.UserService;
@@ -33,8 +34,8 @@ public class UserController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteAccount() {
-        userService.deleteAccount();
+    public ResponseEntity<Void> deleteAccount(@RequestBody @Valid AccountDeletionRequest accountDeletionRequest) {
+        userService.deleteAccount(accountDeletionRequest);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

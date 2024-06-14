@@ -53,8 +53,7 @@ public class RoleService {
 
     public void throwIfUserNotRegisteredOnPlatform(User user, RoleName roleName) {
         if (!isUserRolesContainsRole(user, roleName)) {
-            throw new ResourceNotFoundException(I18nUtil.getMessage("exceptions.authentication.userNotRegisteredOnPlatform", user.getEmail(), getPlatformByRoleName(roleName))
-            );
+            throw new ResourceNotFoundException(I18nUtil.getMessage("exceptions.authentication.userNotRegisteredOnPlatform", user.getEmail(), getPlatformByRoleName(roleName)));
         }
     }
 

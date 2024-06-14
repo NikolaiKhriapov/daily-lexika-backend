@@ -3,6 +3,7 @@ package my.project.services.user;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import my.project.config.i18n.I18nUtil;
+import my.project.models.dtos.user.AccountDeletionRequest;
 import my.project.models.dtos.user.PasswordUpdateRequest;
 import my.project.models.dtos.user.UserDto;
 import my.project.models.entities.enumerations.Platform;
@@ -65,19 +66,17 @@ public class UserService {
     public void updatePassword(PasswordUpdateRequest request) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        boolean passwordsMatch = passwordEncoder.matches(request.passwordCurrent(), user.getPassword());
+        throwIfPasswordIncorrect(user, request.passwordCurrent());
 
-        if (passwordsMatch) {
-            user.setPassword(passwordEncoder.encode(request.passwordNew()));
-            userRepository.save(user);
-        } else {
-            throw new IllegalStateException("Incorrect password");
-        }
+        user.setPassword(passwordEncoder.encode(request.passwordNew()));
+        userRepository.save(user);
     }
 
     @Transactional
-    public void deleteAccount() {
+    public void deleteAccount(AccountDeletionRequest request) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        throwIfPasswordIncorrect(user, request.passwordCurrent());
 
         RoleStatistics currentRole = roleService.getRoleStatistics();
         Platform platform = roleService.getPlatformByRoleName(currentRole.getRoleName());
@@ -93,6 +92,13 @@ public class UserService {
         }
 
         logService.logAccountDeletion(user, platform);
+    }
+
+    private void throwIfPasswordIncorrect(User user, String passwordFromRequest) {
+        boolean passwordsMatch = passwordEncoder.matches(passwordFromRequest, user.getPassword());
+        if (!passwordsMatch) {
+            throw new IllegalStateException("Incorrect password");
+        }
     }
 
     private void deleteFlashcardsForUserByPlatform(User user, Platform platform) {

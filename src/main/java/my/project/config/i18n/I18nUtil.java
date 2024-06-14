@@ -15,20 +15,24 @@ public class I18nUtil {
     public static final String RESOURCE_BUNDLES_DIRECTORY = "resourcebundles/";
 
     public static String getMessage(String propertyKey, Object... args) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Language interfaceLanguage = user.getInterfaceLanguage();
+        try {
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Language interfaceLanguage = user.getInterfaceLanguage();
 
-        Locale locale = DEFAULT_LOCALE;
-        if (interfaceLanguage != null) {
-            switch (interfaceLanguage) {
-                case ENGLISH -> locale = new Locale("EN");
-                case RUSSIAN -> locale = new Locale("RU");
-                case CHINESE -> locale = new Locale("CH");
-                default -> locale = new Locale("EN");
+            Locale locale = DEFAULT_LOCALE;
+            if (interfaceLanguage != null) {
+                switch (interfaceLanguage) {
+                    case ENGLISH -> locale = new Locale("EN");
+                    case RUSSIAN -> locale = new Locale("RU");
+                    case CHINESE -> locale = new Locale("CH");
+                    default -> locale = new Locale("EN");
+                }
             }
-        }
 
-        return getResourceBundleMessage(locale, propertyKey, args);
+            return getResourceBundleMessage(locale, propertyKey, args);
+        } catch (ClassCastException e) {
+            return getResourceBundleMessage(new Locale("EN"), propertyKey, args);
+        }
     }
 
     public static String getMessage(Locale locale, String propertyKey, Object... args) {
