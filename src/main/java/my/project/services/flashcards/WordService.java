@@ -88,6 +88,14 @@ public class WordService {
         return wordRepository.findByUserIdAndWordDataIdInAndStatusIn(userId, wordDataIds, status, pageable);
     }
 
+    public Long countByWordPackNameAndStatusForUser(String wordPackName, Status status) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Platform platform = roleService.getPlatformByRoleName(user.getRole());
+
+        List<Integer> listOfWordDataId = wordDataService.findAllWordDataIdByWordPackNameAndPlatform(wordPackName, platform);
+        return (long) countByUserIdAndWordData_IdInAndStatus(user.getId(), listOfWordDataId, status);
+    }
+
     public Integer countByUserIdAndWordData_IdInAndStatus(Integer userId, List<Integer> wordDataIds, Status status) {
         return wordRepository.countByUserIdAndWordData_IdInAndStatus(userId, wordDataIds, status);
     }

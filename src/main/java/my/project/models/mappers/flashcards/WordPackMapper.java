@@ -2,11 +2,13 @@ package my.project.models.mappers.flashcards;
 
 import my.project.models.dtos.flashcards.WordPackDto;
 import my.project.models.entities.enumerations.Platform;
+import my.project.models.entities.enumerations.Status;
 import my.project.models.entities.flashcards.Review;
 import my.project.models.entities.flashcards.WordPack;
 import my.project.models.entities.user.User;
 import my.project.repositories.flashcards.ReviewRepository;
 import my.project.services.flashcards.WordDataService;
+import my.project.services.flashcards.WordService;
 import my.project.services.user.RoleService;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +23,14 @@ public abstract class WordPackMapper {
     @Autowired
     protected WordDataService wordDataService;
     @Autowired
+    protected WordService wordService;
+    @Autowired
     protected RoleService roleService;
     @Autowired
     protected ReviewRepository reviewRepository;
 
-    @Mapping(target = "totalWords", source = "entity", qualifiedByName = "mapTotalWords")
+    @Mapping(target = "wordsTotal", source = "entity", qualifiedByName = "mapWordsTotal")
+    @Mapping(target = "wordsNew", source = "entity", qualifiedByName = "mapWordsNew")
     @Mapping(target = "reviewId", source = "entity", qualifiedByName = "mapReviewId")
     public abstract WordPackDto toDto(WordPack entity);
 
@@ -38,11 +43,16 @@ public abstract class WordPackMapper {
         return review.map(Review::getId).orElse(null);
     }
 
-    @Named("mapTotalWords")
-    protected Long mapTotalWords(WordPack entity) {
+    @Named("mapWordsTotal")
+    protected Long mapWordsTotal(WordPack entity) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
         return wordDataService.countByWordPackNameAndPlatform(entity.getName(), platform);
+    }
+
+    @Named("mapWordsNew")
+    protected Long mapWordsNew(WordPack entity) {
+        return wordService.countByWordPackNameAndStatusForUser(entity.getName(), Status.NEW);
     }
 }

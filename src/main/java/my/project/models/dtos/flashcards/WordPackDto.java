@@ -26,8 +26,11 @@ public record WordPackDto(
 
         Platform platform,
 
-        @PositiveOrZero(message = "Field 'platform' must not be positive or zero")
-        Long totalWords,
+        @PositiveOrZero(message = "Field 'wordsTotal' must not be positive or zero")
+        Long wordsTotal,
+
+        @PositiveOrZero(message = "Field 'wordsNew' must not be positive or zero")
+        Long wordsNew,
 
         @PositiveOrZero(message = "Field 'reviewId' must not be positive or zero")
         Long reviewId
