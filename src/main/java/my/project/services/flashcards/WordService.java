@@ -13,6 +13,7 @@ import my.project.models.mappers.flashcards.WordMapper;
 import my.project.repositories.flashcards.WordRepository;
 import my.project.services.user.RoleService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -28,12 +29,15 @@ public class WordService {
     private final WordDataService wordDataService;
     private final RoleService roleService;
 
-    public List<WordDto> getAllWordsByStatus(Status status, Pageable pageable) {
+    public Page<WordDto> getPageOfWordsByStatus(Status status, Pageable pageable) {
         Integer userId = ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         RoleStatistics currentRole = roleService.getRoleStatistics();
         Platform platform = roleService.getPlatformByRoleName(currentRole.getRoleName());
-        List<Word> allWordsByStatus = wordRepository.findByUserIdAndWordData_PlatformAndStatus(userId, platform, status, pageable);
-        return wordMapper.toDtoList(allWordsByStatus);
+
+        Page<Word> pageOfWords = wordRepository.findByUserIdAndWordData_PlatformAndStatus(userId, platform, status, pageable);
+        List<WordDto> listOfWordDto = wordMapper.toDtoList(pageOfWords.getContent());
+
+        return new PageImpl<>(listOfWordDto, pageable, pageOfWords.getTotalElements());
     }
 
     public WordDto getWordOfTheDay() {

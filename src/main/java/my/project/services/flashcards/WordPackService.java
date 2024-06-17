@@ -20,6 +20,7 @@ import my.project.repositories.flashcards.ReviewRepository;
 import my.project.repositories.flashcards.WordPackRepository;
 import my.project.services.user.RoleService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -74,15 +75,16 @@ public class WordPackService {
     }
 
     @Transactional
-    public List<WordDto> getAllWordsForWordPack(String wordPackName, Pageable pageable) {
+    public Page<WordDto> getPageOfWordsForWordPack(String wordPackName, Pageable pageable) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Platform platform = roleService.getPlatformByRoleName(user.getRole());
 
         List<Integer> wordDataIds = wordDataService.findAllWordDataIdByWordPackNameAndPlatform(wordPackName, platform);
 
-        Page<Word> wordsPage = wordService.findByUserIdAndWordDataIdIn(user.getId(), wordDataIds, pageable);
+        Page<Word> pageOfWords = wordService.findByUserIdAndWordDataIdIn(user.getId(), wordDataIds, pageable);
+        List<WordDto> listOfWordDto = wordMapper.toDtoList(pageOfWords.getContent());
 
-        return new ArrayList<>(wordMapper.toDtoList(wordsPage.getContent()));
+        return new PageImpl<>(listOfWordDto, pageable, pageOfWords.getTotalElements());
     }
 
     public void createCustomWordPack(WordPackDto wordPackDTO) {

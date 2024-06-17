@@ -30,7 +30,7 @@ public interface WordRepository extends JpaRepository<Word, Integer> {
 
     List<Word> findByUserIdAndWordData_Platform(Integer userId, Platform platform);
 
-    List<Word> findByUserIdAndWordData_PlatformAndStatus(Integer userId, Platform platform, Status status, Pageable pageable);
+    Page<Word> findByUserIdAndWordData_PlatformAndStatus(Integer userId, Platform platform, Status status, Pageable pageable);
 
     void deleteAllByWordData_Id(Integer id);
 

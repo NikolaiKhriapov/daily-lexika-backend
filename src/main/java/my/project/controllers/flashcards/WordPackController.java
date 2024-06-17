@@ -6,6 +6,7 @@ import my.project.models.dtos.flashcards.WordDto;
 import my.project.models.dtos.flashcards.WordDataDto;
 import my.project.models.dtos.flashcards.WordPackDto;
 import my.project.services.flashcards.WordPackService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,10 +27,10 @@ public class WordPackController {
     }
 
     @GetMapping("/{wordPackName}/words")
-    public ResponseEntity<List<WordDto>> getAllWordsForWordPack(@PathVariable("wordPackName") String wordPackName,
-                                                                @RequestParam("page") int page,
-                                                                @RequestParam("size") int size) {
-        return ResponseEntity.ok(wordPackService.getAllWordsForWordPack(wordPackName, PageRequest.of(page, size)));
+    public ResponseEntity<Page<WordDto>> getPageOfWordsForWordPack(@PathVariable("wordPackName") String wordPackName,
+                                                                   @RequestParam("page") int page,
+                                                                   @RequestParam("size") int size) {
+        return ResponseEntity.ok(wordPackService.getPageOfWordsForWordPack(wordPackName, PageRequest.of(page, size)));
     }
 
     @PostMapping
