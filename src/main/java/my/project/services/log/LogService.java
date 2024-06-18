@@ -35,4 +35,16 @@ public class LogService {
                 )
         );
     }
+
+    public void logEmailUpdate(User user, Platform platform, String newEmail) {
+        logRepository.save(
+                new Log(
+                        user.getId(),
+                        user.getEmail(),
+                        LogAction.EMAIL_UPDATE,
+                        platform,
+                        user.getEmail() + " -> " + newEmail
+                )
+        );
+    }
 }

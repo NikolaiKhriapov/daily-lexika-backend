@@ -21,6 +21,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -57,8 +59,14 @@ public class UserService {
     public UserDto updateUserInfo(UserDto userDTO) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        User updatedUser = userMapper.partialUpdate(userDTO, user);
+        if (!Objects.equals(user.getEmail(), userDTO.email())) {
+            RoleStatistics currentRole = roleService.getRoleStatistics();
+            Platform platform = roleService.getPlatformByRoleName(currentRole.getRoleName());
 
+            logService.logEmailUpdate(user, platform, userDTO.email());
+        }
+
+        User updatedUser = userMapper.partialUpdate(userDTO, user);
         return userMapper.toDTO(userRepository.save(updatedUser));
     }
 

@@ -31,11 +31,22 @@ public class Log {
 
     private OffsetDateTime timestamp;
 
+    private String comment;
+
     public Log(Integer userId, String userEmail, LogAction action, Platform platform) {
         this.userId = userId;
         this.userEmail = userEmail;
         this.action = action;
         this.platform = platform;
         this.timestamp = DateUtil.nowInUtc();
+    }
+
+    public Log(Integer userId, String userEmail, LogAction action, Platform platform, String comment) {
+        this.userId = userId;
+        this.userEmail = userEmail;
+        this.action = action;
+        this.platform = platform;
+        this.timestamp = DateUtil.nowInUtc();
+        this.comment = comment;
     }
 }
