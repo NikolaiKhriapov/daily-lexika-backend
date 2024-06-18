@@ -44,6 +44,7 @@ public class FakerUtil {
                 generateWordPackCategory(platform),
                 platform,
                 100L,
+                10L,
                 null
         );
     }
