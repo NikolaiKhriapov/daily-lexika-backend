@@ -50,7 +50,7 @@ public interface WordRepository extends JpaRepository<Word, Integer> {
                 WHERE w.userId = :userId
                 AND w.wordData.id IN :wordDataIds
                 AND w.status IN :statuses
-                AND (DATE_PART('day', AGE(CURRENT_DATE, w.dateOfLastOccurrence)) >= POWER(2, w.totalStreak))
+                AND (DATE(now()) - DATE(w.dateOfLastOccurrence)) >= POWER(2, w.totalStreak)
                 ORDER BY w.dateOfLastOccurrence DESC
             """)
     List<Word> findByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrdered(@Param("userId") Integer userId,
