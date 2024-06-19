@@ -17,8 +17,6 @@ import my.project.models.entities.flashcards.*;
 import my.project.repositories.flashcards.ReviewRepository;
 import my.project.repositories.user.UserRepository;
 import my.project.services.user.RoleService;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
@@ -179,20 +177,18 @@ public class ReviewService {
 
         wordService.updateWordsForUser(user.getId(), wordDataIds);
 
-        Pageable pageableNew = PageRequest.of(0, reviewDto.maxNewWordsPerDay());
-        List<Word> newWords = wordService.findByUserIdAndWordDataIdInAndStatusIn(
+        List<Word> newWords = wordService.findAllByUserIdAndWordDataIdInAndStatusInRandomLimited(
                 user.getId(),
                 wordDataIds,
                 new ArrayList<>(List.of(NEW)),
-                pageableNew
+                reviewDto.maxNewWordsPerDay()
         );
 
-        Pageable pageableReviewAndKnown = PageRequest.of(0, reviewDto.maxReviewWordsPerDay());
-        List<Word> reviewAndKnownWords = wordService.findByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrdered(
+        List<Word> reviewAndKnownWords = wordService.findAllByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrderedLimited(
                 user.getId(),
                 wordDataIds,
                 new ArrayList<>(List.of(IN_REVIEW, KNOWN)),
-                pageableReviewAndKnown
+                reviewDto.maxReviewWordsPerDay()
         );
 
         List<Word> listOfWords = new ArrayList<>();

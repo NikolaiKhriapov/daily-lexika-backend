@@ -22,8 +22,6 @@ public interface WordRepository extends JpaRepository<Word, Integer> {
 
     List<Word> findByUserIdAndWordDataIdIn(Integer userId, List<Integer> wordDataIds);
 
-    List<Word> findByUserIdAndWordDataIdInAndStatusIn(Integer userId, List<Integer> wordDataIds, List<Status> status, Pageable pageable);
-
     List<Word> findByUserIdAndStatusAndWordData_Platform(Integer userId, Status status, Platform platform);
 
     Integer countByUserIdAndWordData_IdInAndStatus(Integer userId, List<Integer> wordDataIds, Status status);
@@ -43,7 +41,22 @@ public interface WordRepository extends JpaRepository<Word, Integer> {
                 ELSE 4 END ASC
             """
     )
-    Page<Word> findByUserIdAndWordDataIdIn(Integer userId, List<Integer> wordDataIds, Pageable pageable);
+    Page<Word> findByUserIdAndWordDataIdIn(@Param("userId") Integer userId,
+                                           @Param("wordDataIds") List<Integer> wordDataIds,
+                                           Pageable pageable);
+
+    @Query("""
+                 SELECT w FROM words w
+                 WHERE w.userId = :userId
+                 AND w.wordData.id IN :wordDataIds
+                 AND w.status IN :statuses
+                 ORDER BY RANDOM()
+                 LIMIT :limit
+            """)
+    List<Word> findAllByUserIdAndWordDataIdInAndStatusInRandomLimited(@Param("userId") Integer userId,
+                                                                      @Param("wordDataIds") List<Integer> wordDataIds,
+                                                                      @Param("statuses") List<Status> statuses,
+                                                                      @Param("limit") Integer limit);
 
     @Query("""
                 SELECT w FROM words w
@@ -52,9 +65,10 @@ public interface WordRepository extends JpaRepository<Word, Integer> {
                 AND w.status IN :statuses
                 AND (DATE(now()) - DATE(w.dateOfLastOccurrence)) >= POWER(2, w.totalStreak)
                 ORDER BY w.dateOfLastOccurrence DESC
+                LIMIT :limit
             """)
-    List<Word> findByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrdered(@Param("userId") Integer userId,
-                                                                             @Param("wordDataIds") List<Integer> wordDataIds,
-                                                                             @Param("statuses") List<Status> statuses,
-                                                                             Pageable pageable);
+    List<Word> findAllByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrderedLimited(@Param("userId") Integer userId,
+                                                                                       @Param("wordDataIds") List<Integer> wordDataIds,
+                                                                                       @Param("statuses") List<Status> statuses,
+                                                                                       @Param("limit") Integer limit);
 }

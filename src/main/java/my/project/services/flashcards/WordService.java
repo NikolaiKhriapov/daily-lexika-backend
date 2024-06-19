@@ -88,8 +88,8 @@ public class WordService {
         return wordRepository.findByUserIdAndWordDataIdIn(userId, wordDataIds, pageable);
     }
 
-    public List<Word> findByUserIdAndWordDataIdInAndStatusIn(Integer userId, List<Integer> wordDataIds, List<Status> status, Pageable pageable) {
-        return wordRepository.findByUserIdAndWordDataIdInAndStatusIn(userId, wordDataIds, status, pageable);
+    public List<Word> findAllByUserIdAndWordDataIdInAndStatusInRandomLimited(Integer userId, List<Integer> wordDataIds, List<Status> statuses, Integer limit) {
+        return wordRepository.findAllByUserIdAndWordDataIdInAndStatusInRandomLimited(userId, wordDataIds, statuses, limit);
     }
 
     public Long countByWordPackNameAndStatusForUser(String wordPackName, Status status) {
@@ -104,8 +104,8 @@ public class WordService {
         return wordRepository.countByUserIdAndWordData_IdInAndStatus(userId, wordDataIds, status);
     }
 
-    public List<Word> findByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrdered(Integer userId, List<Integer> wordDataIds, List<Status> statuses, Pageable pageable) {
-        return wordRepository.findByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrdered(userId, wordDataIds, statuses, pageable);
+    public List<Word> findAllByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrderedLimited(Integer userId, List<Integer> wordDataIds, List<Status> statuses, Integer limit) {
+        return wordRepository.findAllByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrderedLimited(userId, wordDataIds, statuses, limit);
     }
 
     public void deleteAllByWordDataId(List<Integer> wordDataIds) {
