@@ -40,3 +40,4 @@ build/
 /frontend/.env
 /frontend/.idea
 /frontend/.nvmrc
+/.env
