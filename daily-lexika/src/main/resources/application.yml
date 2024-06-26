@@ -1,0 +1,35 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: daily-lexika-backend
+  datasource:
+    url: jdbc:postgresql://localhost:5432/daily_lexika
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    properties:
+      hibernate:
+        format_sql: 'true'
+        show-sql: 'true'
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    locations: "classpath:db/migration"
+
+cors:
+  allowed-origins: "*"
+  allowed-methods: "*"
+  allowed-headers: "*"
+  exposed-headers: "*"
+
+file-location:
+  data-excel: "static/data/Data.xlsx"
+
+logging:
+  level:
+    org:
+      springframework:
+        web: debug
+    root: info

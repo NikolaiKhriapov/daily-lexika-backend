@@ -1,0 +1,34 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: admin-backend
+  datasource:
+    url: jdbc:postgresql://localhost:5432/admin
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    properties:
+      hibernate:
+        format_sql: 'true'
+        show-sql: 'true'
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    locations: "classpath:db/migration"
+  profiles:
+    include: urls
+
+cors:
+  allowed-origins: "*"
+  allowed-methods: "*"
+  allowed-headers: "*"
+  exposed-headers: "*"
+
+logging:
+  level:
+    org:
+      springframework:
+        web: debug
+    root: info
