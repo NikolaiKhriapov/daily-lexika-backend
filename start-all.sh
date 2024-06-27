@@ -78,7 +78,7 @@ start_app() {
 # Start all applications
 load_env_variables
 
-./mvnw clean install || { echo "Build failed"; exit 1; }
+./mvnw clean install -DskipTests || { echo "Build failed"; exit 1; }
 
 set_app_config 8000 "daily-lexika"
 start_app "$APPLICATION_NAME"
