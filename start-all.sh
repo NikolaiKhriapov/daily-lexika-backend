@@ -43,18 +43,20 @@ start_app() {
     APP_PID=$!
     echo "Starting $APPLICATION_NAME with PID $APP_PID"
 
-    # Wait for the application to bind to the port
-    for i in {1..30}; do
-        echo "$i: $APPLICATION_NAME - $APPLICATION_PORT"
-        if lsof -t "-i:$APPLICATION_PORT" -sTCP:LISTEN &> /dev/null; then
-            echo "$APPLICATION_NAME STARTED"
-            echo "Monitor application output with: tail -500 '$LOGS_FILE_NAME'"
-            echo "$APP_PID" > "../$PID_FILE_NAME" || echo "Save PID $APP_PID in '../$PID_FILE_NAME' file operation error."
-            cd ".."
-            return 0
-        fi
-        sleep 1
-    done
+    cd ".."
+
+#    # Wait for the application to bind to the port
+#    for i in {1..30}; do
+#        echo "$i: $APPLICATION_NAME - $APPLICATION_PORT"
+#        if lsof -t "-i:$APPLICATION_PORT" -sTCP:LISTEN &> /dev/null; then
+#            echo "$APPLICATION_NAME STARTED"
+#            echo "Monitor application output with: tail -500 '$LOGS_FILE_NAME'"
+#            echo "$APP_PID" > "../$PID_FILE_NAME" || echo "Save PID $APP_PID in '../$PID_FILE_NAME' file operation error."
+#            cd ".."
+#            return 0
+#        fi
+#        sleep 1
+#    done
 
 #    # If the application failed to start
 #    echo "$APPLICATION_NAME failed to start on port $APPLICATION_PORT"
