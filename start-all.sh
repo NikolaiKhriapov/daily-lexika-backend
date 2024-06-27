@@ -56,24 +56,24 @@ start_app() {
         sleep 1
     done
 
-    # If the application failed to start
-    echo "$APPLICATION_NAME failed to start on port $APPLICATION_PORT"
-    if [ -f "$PID_FILE_NAME" ]; then
-        APP_PID=$(cat "$PID_FILE_NAME")
-        if ps -p $APP_PID > /dev/null; then
-            echo "Stopping $APPLICATION_NAME with PID $APP_PID"
-            kill "$APP_PID"
+#    # If the application failed to start
+#    echo "$APPLICATION_NAME failed to start on port $APPLICATION_PORT"
+#    if [ -f "$PID_FILE_NAME" ]; then
+#        APP_PID=$(cat "$PID_FILE_NAME")
+#        if ps -p $APP_PID > /dev/null; then
+#            echo "Stopping $APPLICATION_NAME with PID $APP_PID"
+#            kill "$APP_PID"
 #            rm "$PID_FILE_NAME"
-        else
-            echo "$APPLICATION_NAME with PID $APP_PID is not running"
-            rm "$PID_FILE_NAME"
-        fi
-    else
-        echo "No PID file found at $PID_FILE_NAME"
-    fi
-
-    kill "$APP_PID" 2>/dev/null || echo "Failed to kill PID $APP_PID"
-    exit 1
+#        else
+#            echo "$APPLICATION_NAME with PID $APP_PID is not running"
+#            rm "$PID_FILE_NAME"
+#        fi
+#    else
+#        echo "No PID file found at $PID_FILE_NAME"
+#    fi
+#
+#    kill "$APP_PID" 2>/dev/null || echo "Failed to kill PID $APP_PID"
+#    exit 1
 }
 
 # Start all applications
@@ -84,5 +84,5 @@ load_env_variables
 set_app_config 8000 "daily-lexika"
 start_app "$APPLICATION_NAME"
 
-#set_app_config 8080 "admin"
-#start_app "$APPLICATION_NAME"
+set_app_config 8080 "admin"
+start_app "$APPLICATION_NAME"
