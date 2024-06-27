@@ -45,6 +45,7 @@ start_app() {
 
     # Wait for the application to bind to the port
     for i in {1..30}; do
+        echo "$i: $APPLICATION_NAME - $APPLICATION_PORT"
         if lsof -t "-i:$APPLICATION_PORT" -sTCP:LISTEN &> /dev/null; then
             echo "$APPLICATION_NAME STARTED"
             echo "Monitor application output with: tail -500 '$LOGS_FILE_NAME'"
