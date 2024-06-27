@@ -83,5 +83,5 @@ load_env_variables
 set_app_config 8000 "daily-lexika"
 start_app "$APPLICATION_NAME"
 
-set_app_config 8080 "admin"
-start_app "$APPLICATION_NAME"
+#set_app_config 8080 "admin"
+#start_app "$APPLICATION_NAME"
