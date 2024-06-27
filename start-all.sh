@@ -13,8 +13,8 @@ set_app_config() {
     APPLICATION_NAME="$2"
     APPLICATION_VERSION=1.0.0
     APPLICATION_PATH="target/$APPLICATION_NAME-$APPLICATION_VERSION.jar"
-    PID_FILE_NAME="$APPLICATION_NAME.pid"
-    LOGS_FILE_NAME="$APPLICATION_NAME.log"
+    PID_FILE_NAME="var/log/$APPLICATION_NAME.pid"
+    LOGS_FILE_NAME="var/log/$APPLICATION_NAME.log"
 }
 
 # Function to start the application
@@ -39,7 +39,7 @@ start_app() {
     fi
 
     # Start the application
-    nohup ../mvnw spring-boot:run -Dspring-boot.run.profiles=prod -Dserver.port="$APPLICATION_PORT" >> "../$LOGS_FILE_NAME" 2>&1 &
+    nohup ../mvnw spring-boot:run -Dspring-boot.run.profiles=prod -Dserver.port="$APPLICATION_PORT" >> "$LOGS_FILE_NAME" 2>&1 &
     APP_PID=$!
     echo "Starting $APPLICATION_NAME with PID $APP_PID"
 
@@ -48,7 +48,7 @@ start_app() {
         if lsof -t "-i:$APPLICATION_PORT" -sTCP:LISTEN &> /dev/null; then
             echo "$APPLICATION_NAME STARTED"
             echo "Monitor application output with: tail -500 '$LOGS_FILE_NAME'"
-            echo "$APP_PID" > "../$PID_FILE_NAME" || echo "Save PID $APP_PID in '../$PID_FILE_NAME' file operation error."
+            echo "$APP_PID" > "$PID_FILE_NAME" || echo "Save PID $APP_PID in '$PID_FILE_NAME' file operation error."
             cd ".."
             return 0
         fi
