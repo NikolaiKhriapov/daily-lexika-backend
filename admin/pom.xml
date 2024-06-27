@@ -7,7 +7,7 @@
     <parent>
         <artifactId>daily-lexika-backend</artifactId>
         <groupId>my.project</groupId>
-        <version>${revision}</version>
+        <version>1.0.0</version>
     </parent>
 
     <artifactId>admin</artifactId>
