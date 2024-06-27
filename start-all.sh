@@ -53,7 +53,7 @@ start_app() {
             cd ".."
             return 0
         fi
-        sleep 1
+        sleep 10
     done
 
     # If the application failed to start
