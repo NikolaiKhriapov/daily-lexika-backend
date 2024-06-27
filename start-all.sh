@@ -49,7 +49,7 @@ start_app() {
         if lsof -t "-i:$APPLICATION_PORT" -sTCP:LISTEN &> /dev/null; then
             echo "$APPLICATION_NAME STARTED"
             echo "Monitor application output with: tail -500 '$LOGS_FILE_NAME'"
-            echo "$APP_PID" > "$PID_FILE_NAME" || echo "Save PID $APP_PID in '$PID_FILE_NAME' file operation error."
+            echo "$APP_PID" > "../$PID_FILE_NAME" || echo "Save PID $APP_PID in '../$PID_FILE_NAME' file operation error."
             cd ".."
             return 0
         fi
@@ -63,7 +63,7 @@ start_app() {
         if ps -p $APP_PID > /dev/null; then
             echo "Stopping $APPLICATION_NAME with PID $APP_PID"
             kill "$APP_PID"
-            rm "$PID_FILE_NAME"
+#            rm "$PID_FILE_NAME"
         else
             echo "$APPLICATION_NAME with PID $APP_PID is not running"
             rm "$PID_FILE_NAME"
