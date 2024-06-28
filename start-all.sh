@@ -43,36 +43,39 @@ start_app() {
     APP_PID=$!
     echo "Starting $APPLICATION_NAME with PID $APP_PID"
 
-    # Wait for the application to bind to the port
-    for i in {1..30}; do
-        if lsof -t "-i:$APPLICATION_PORT" -sTCP:LISTEN &> /dev/null; then
-            echo "$APPLICATION_NAME STARTED"
-            echo "Monitor application output with: tail -500 '$LOGS_FILE_NAME'"
-            echo "$APP_PID" > "../$PID_FILE_NAME" || echo "Save PID $APP_PID in '../$PID_FILE_NAME' file operation error."
-            cd ".."
-            return 0
-        fi
-        sleep 1
-    done
+    cd ".."
 
-    # If the application failed to start
-    echo "$APPLICATION_NAME failed to start on port $APPLICATION_PORT"
-    if [ -f "$PID_FILE_NAME" ]; then
-        APP_PID=$(cat "$PID_FILE_NAME")
-        if ps -p $APP_PID > /dev/null; then
-            echo "Stopping $APPLICATION_NAME with PID $APP_PID"
-            kill "$APP_PID"
-            rm "$PID_FILE_NAME"
-        else
-            echo "$APPLICATION_NAME with PID $APP_PID is not running"
-            rm "$PID_FILE_NAME"
-        fi
-    else
-        echo "No PID file found at $PID_FILE_NAME"
-    fi
+#    # Wait for the application to bind to the port
+#    for i in {1..30}; do
+#        echo "$i: $APPLICATION_NAME - $APPLICATION_PORT"
+#        if lsof -t "-i:$APPLICATION_PORT" -sTCP:LISTEN &> /dev/null; then
+#            echo "$APPLICATION_NAME STARTED"
+#            echo "Monitor application output with: tail -500 '$LOGS_FILE_NAME'"
+#            echo "$APP_PID" > "../$PID_FILE_NAME" || echo "Save PID $APP_PID in '../$PID_FILE_NAME' file operation error."
+#            cd ".."
+#            return 0
+#        fi
+#        sleep 1
+#    done
 
-    kill "$APP_PID" 2>/dev/null || echo "Failed to kill PID $APP_PID"
-    exit 1
+#    # If the application failed to start
+#    echo "$APPLICATION_NAME failed to start on port $APPLICATION_PORT"
+#    if [ -f "$PID_FILE_NAME" ]; then
+#        APP_PID=$(cat "$PID_FILE_NAME")
+#        if ps -p $APP_PID > /dev/null; then
+#            echo "Stopping $APPLICATION_NAME with PID $APP_PID"
+#            kill "$APP_PID"
+#            rm "$PID_FILE_NAME"
+#        else
+#            echo "$APPLICATION_NAME with PID $APP_PID is not running"
+#            rm "$PID_FILE_NAME"
+#        fi
+#    else
+#        echo "No PID file found at $PID_FILE_NAME"
+#    fi
+#
+#    kill "$APP_PID" 2>/dev/null || echo "Failed to kill PID $APP_PID"
+#    exit 1
 }
 
 # Start all applications

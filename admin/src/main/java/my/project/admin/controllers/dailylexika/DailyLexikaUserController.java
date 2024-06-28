@@ -1,8 +1,8 @@
-package my.project.admin.controllers.dailylexika.user;
+package my.project.admin.controllers.dailylexika;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import my.project.admin.services.user.dailylexika.user.DailyLexikaUserService;
+import my.project.admin.services.dailylexika.DailyLexikaUserService;
 import my.project.library.dailylexika.dtos.user.UserDto;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;

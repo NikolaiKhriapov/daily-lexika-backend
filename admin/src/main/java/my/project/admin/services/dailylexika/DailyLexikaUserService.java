@@ -1,4 +1,4 @@
-package my.project.admin.services.user.dailylexika.user;
+package my.project.admin.services.dailylexika;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
