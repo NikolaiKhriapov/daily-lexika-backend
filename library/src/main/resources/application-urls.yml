@@ -1,3 +1,4 @@
 urls:
   dailyLexika: ${DAILY_LEXIKA_BASE_URL}
+  dailyBudget: ${DAILY_BUDGET_BASE_URL}
   admin: ${ADMIN_BASE_URL}

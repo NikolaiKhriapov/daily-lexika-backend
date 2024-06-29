@@ -1,4 +1,4 @@
-package my.project.admin.config.serialization;
+package my.project.library.util.serialization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

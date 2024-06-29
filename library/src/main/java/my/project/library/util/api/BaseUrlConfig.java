@@ -12,4 +12,6 @@ import org.springframework.context.annotation.Configuration;
 public class BaseUrlConfig {
 
     private String dailyLexika;
+    private String dailyBudget;
+    private String admin;
 }

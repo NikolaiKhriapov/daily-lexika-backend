@@ -1,4 +1,4 @@
-package my.project.dailylexika.config.i18n;
+package my.project.library.util.i18n;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;

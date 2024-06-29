@@ -64,8 +64,7 @@ public class RoleService {
 
     private void throwIfUserAlreadyHasThisRole(User user, RoleName roleName) {
         if (isUserRolesContainsRole(user, roleName)) {
-            throw new ResourceAlreadyExistsException(I18nUtil.getMessage("dailylexika-exceptions.authentication.userAlreadyRegisteredOnPlatform", user.getEmail(), getPlatformByRoleName(roleName))
-            );
+            throw new ResourceAlreadyExistsException(I18nUtil.getMessage("dailylexika-exceptions.authentication.userAlreadyRegisteredOnPlatform", user.getEmail(), getPlatformByRoleName(roleName)));
         }
     }
 }

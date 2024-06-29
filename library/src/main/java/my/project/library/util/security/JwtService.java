@@ -40,6 +40,10 @@ public class JwtService {
         return extractAllClaims(token).get("role", String.class);
     }
 
+    public String generateToken(String username) {
+        return generateToken(username, "USER");
+    }
+
     public String generateToken(String username, String roleName) {
         Map<String, Object> extraClaims = Map.of("role", roleName);
         return generateToken(extraClaims, username);
