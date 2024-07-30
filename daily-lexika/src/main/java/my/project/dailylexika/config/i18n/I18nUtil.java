@@ -25,13 +25,12 @@ public class I18nUtil {
                     case ENGLISH -> locale = new Locale("EN");
                     case RUSSIAN -> locale = new Locale("RU");
                     case CHINESE -> locale = new Locale("CH");
-                    default -> locale = new Locale("EN");
                 }
             }
 
             return getResourceBundleMessage(locale, propertyKey, args);
         } catch (RuntimeException e) {
-            return getResourceBundleMessage(new Locale("EN"), propertyKey, args);
+            return getResourceBundleMessage(DEFAULT_LOCALE, propertyKey, args);
         }
     }
 

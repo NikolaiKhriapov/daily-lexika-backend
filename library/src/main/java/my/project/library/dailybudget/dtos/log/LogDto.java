@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 public record LogDto(
 
     Long id,
-    Integer userId,
+    Long userId,
     String userEmail,
     LogAction action,
     OffsetDateTime timestamp,

@@ -179,23 +179,26 @@ public class ReviewService {
 
         wordService.updateWordsForUser(user.getId(), wordDataIds);
 
-        List<Word> newWords = wordService.findAllByUserIdAndWordDataIdInAndStatusInRandomLimited(
+        List<Word> newWords = wordService.findAllByUserIdAndWordDataIdInAndStatusNewRandomLimited(
                 user.getId(),
                 wordDataIds,
-                new ArrayList<>(List.of(NEW)),
                 reviewDto.maxNewWordsPerDay()
         );
-
-        List<Word> reviewAndKnownWords = wordService.findAllByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrderedLimited(
+        List<Word> reviewWords = wordService.findAllByUserIdAndWordDataIdInAndStatusInReviewAndPeriodBetweenOrderedDescLimited(
                 user.getId(),
                 wordDataIds,
-                new ArrayList<>(List.of(IN_REVIEW, KNOWN)),
                 reviewDto.maxReviewWordsPerDay()
+        );
+        List<Word> knownWords = wordService.findAllByUserIdAndWordDataIdInAndStatusKnownAndPeriodBetweenOrderedAscLimited(
+                user.getId(),
+                wordDataIds,
+                reviewDto.maxReviewWordsPerDay() - reviewWords.size()
         );
 
         List<Word> listOfWords = new ArrayList<>();
         listOfWords.addAll(newWords);
-        listOfWords.addAll(reviewAndKnownWords);
+        listOfWords.addAll(reviewWords);
+        listOfWords.addAll(knownWords);
 
         listOfWords.forEach(word -> {
             word.setOccurrence((short) 0);
@@ -237,7 +240,9 @@ public class ReviewService {
                 thisWord.setTotalStreak((short) 5);
             }
             if (thisWord.getStatus().equals(KNOWN)) {
-                thisWord.setTotalStreak((short) (thisWord.getTotalStreak() + 1));
+                if (thisWord.getTotalStreak() < 7) {
+                    thisWord.setTotalStreak((short) (thisWord.getTotalStreak() + 1));
+                }
             }
             thisWord.setStatus(KNOWN);
             thisWord.setCurrentStreak((short) 0);

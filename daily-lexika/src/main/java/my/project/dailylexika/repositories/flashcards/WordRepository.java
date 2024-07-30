@@ -49,26 +49,29 @@ public interface WordRepository extends JpaRepository<Word, Integer> {
                  SELECT w FROM words w
                  WHERE w.userId = :userId
                  AND w.wordData.id IN :wordDataIds
-                 AND w.status IN :statuses
+                 AND w.status = my.project.library.dailylexika.enumerations.Status.NEW
                  ORDER BY RANDOM()
                  LIMIT :limit
             """)
-    List<Word> findAllByUserIdAndWordDataIdInAndStatusInRandomLimited(@Param("userId") Integer userId,
-                                                                      @Param("wordDataIds") List<Integer> wordDataIds,
-                                                                      @Param("statuses") List<Status> statuses,
-                                                                      @Param("limit") Integer limit);
+    List<Word> findAllByUserIdAndWordDataIdInAndStatusNewRandomLimited(@Param("userId") Integer userId,
+                                                                       @Param("wordDataIds") List<Integer> wordDataIds,
+                                                                       @Param("limit") Integer limit);
 
     @Query("""
                 SELECT w FROM words w
                 WHERE w.userId = :userId
                 AND w.wordData.id IN :wordDataIds
-                AND w.status IN :statuses
-                AND (current_date() - w.dateOfLastOccurrence) >= POWER(2, w.totalStreak)
-                ORDER BY w.dateOfLastOccurrence DESC
-                LIMIT :limit
+                AND w.status = my.project.library.dailylexika.enumerations.Status.IN_REVIEW
             """)
-    List<Word> findAllByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrderedLimited(@Param("userId") Integer userId,
-                                                                                       @Param("wordDataIds") List<Integer> wordDataIds,
-                                                                                       @Param("statuses") List<Status> statuses,
-                                                                                       @Param("limit") Integer limit);
+    List<Word> findAllByUserIdAndWordDataIdInAndStatusInReviewAndPeriodBetweenOrderedDescLimited(@Param("userId") Integer userId,
+                                                                                                 @Param("wordDataIds") List<Integer> wordDataIds);
+
+    @Query("""
+                SELECT w FROM words w
+                WHERE w.userId = :userId
+                AND w.wordData.id IN :wordDataIds
+                AND w.status = my.project.library.dailylexika.enumerations.Status.KNOWN
+            """)
+    List<Word> findAllByUserIdAndWordDataIdInAndStatusKnownAndPeriodBetweenOrderedAscLimited(@Param("userId") Integer userId,
+                                                                                             @Param("wordDataIds") List<Integer> wordDataIds);
 }

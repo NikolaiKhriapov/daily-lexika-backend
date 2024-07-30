@@ -8,7 +8,7 @@ import java.time.OffsetDateTime;
 
 public record UserDto(
 
-        Integer id,
+        Long id,
 
         @NotEmpty
         String email,

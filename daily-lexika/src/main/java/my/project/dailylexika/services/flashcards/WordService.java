@@ -11,6 +11,7 @@ import my.project.dailylexika.entities.user.User;
 import my.project.dailylexika.mappers.flashcards.WordMapper;
 import my.project.dailylexika.repositories.flashcards.WordRepository;
 import my.project.dailylexika.services.user.RoleService;
+import my.project.library.util.datetime.DateUtil;
 import my.project.library.util.exception.ResourceNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -88,8 +90,8 @@ public class WordService {
         return wordRepository.findByUserIdAndWordDataIdIn(userId, wordDataIds, pageable);
     }
 
-    public List<Word> findAllByUserIdAndWordDataIdInAndStatusInRandomLimited(Integer userId, List<Integer> wordDataIds, List<Status> statuses, Integer limit) {
-        return wordRepository.findAllByUserIdAndWordDataIdInAndStatusInRandomLimited(userId, wordDataIds, statuses, limit);
+    public List<Word> findAllByUserIdAndWordDataIdInAndStatusNewRandomLimited(Integer userId, List<Integer> wordDataIds, Integer limit) {
+        return wordRepository.findAllByUserIdAndWordDataIdInAndStatusNewRandomLimited(userId, wordDataIds, limit);
     }
 
     public Long countByWordPackNameAndStatusForUser(String wordPackName, Status status) {
@@ -104,8 +106,24 @@ public class WordService {
         return wordRepository.countByUserIdAndWordData_IdInAndStatus(userId, wordDataIds, status);
     }
 
-    public List<Word> findAllByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrderedLimited(Integer userId, List<Integer> wordDataIds, List<Status> statuses, Integer limit) {
-        return wordRepository.findAllByUserIdAndWordDataIdInAndStatusInAndPeriodBetweenOrderedLimited(userId, wordDataIds, statuses, limit);
+    public List<Word> findAllByUserIdAndWordDataIdInAndStatusInReviewAndPeriodBetweenOrderedDescLimited(Integer userId, List<Integer> wordDataIds, Integer limit) {
+        List<Word> allReviewWords = wordRepository.findAllByUserIdAndWordDataIdInAndStatusInReviewAndPeriodBetweenOrderedDescLimited(userId, wordDataIds);
+        return allReviewWords.stream()
+                .filter(w -> ChronoUnit.DAYS.between(w.getDateOfLastOccurrence(), DateUtil.nowInUtc()) >= Math.pow(2, w.getTotalStreak()))
+                .sorted((w1, w2) -> w2.getDateOfLastOccurrence().compareTo(w1.getDateOfLastOccurrence()))
+                .limit(limit)
+                .toList();
+
+    }
+
+    public List<Word> findAllByUserIdAndWordDataIdInAndStatusKnownAndPeriodBetweenOrderedAscLimited(Integer userId, List<Integer> wordDataIds, Integer limit) {
+        List<Word> allKnownWords = wordRepository.findAllByUserIdAndWordDataIdInAndStatusKnownAndPeriodBetweenOrderedAscLimited(userId, wordDataIds);
+        return  allKnownWords.stream()
+                .filter(w -> ChronoUnit.DAYS.between(w.getDateOfLastOccurrence(), DateUtil.nowInUtc()) >= Math.pow(2, w.getTotalStreak()))
+                .sorted((w1, w2) -> w1.getDateOfLastOccurrence().compareTo(w2.getDateOfLastOccurrence()))
+                .limit(limit)
+                .toList();
+
     }
 
     public void deleteAllByWordDataId(List<Integer> wordDataIds) {

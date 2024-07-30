@@ -18,7 +18,7 @@ public class Log {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "log_id_sequence")
     private Long id;
 
-    private Integer userId;
+    private Long userId;
 
     private String userEmail;
 
@@ -29,14 +29,14 @@ public class Log {
 
     private String comment;
 
-    public Log(Integer userId, String userEmail, LogAction action) {
+    public Log(Long userId, String userEmail, LogAction action) {
         this.userId = userId;
         this.userEmail = userEmail;
         this.action = action;
         this.timestamp = DateUtil.nowInUtc();
     }
 
-    public Log(Integer userId, String userEmail, LogAction action, String comment) {
+    public Log(Long userId, String userEmail, LogAction action, String comment) {
         this.userId = userId;
         this.userEmail = userEmail;
         this.action = action;

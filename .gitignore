@@ -11,3 +11,6 @@ target/
 /.idea/
 /.env
 /.gitignore
+**/*.iml
+/daily-lexika-backend.iml
+/docker-compose.yaml
