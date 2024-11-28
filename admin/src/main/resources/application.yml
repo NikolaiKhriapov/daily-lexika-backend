@@ -3,9 +3,9 @@ server:
 
 spring:
   application:
-    name: admin-backend
+    name: nikolai-backend-admin
   datasource:
-    url: jdbc:postgresql://localhost:5432/admin
+    url: jdbc:postgresql://${DB_HOST}:5432/admin
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   jpa:

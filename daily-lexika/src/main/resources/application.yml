@@ -3,9 +3,9 @@ server:
 
 spring:
   application:
-    name: daily-lexika-backend
+    name: nikolai-backend-daily-lexika
   datasource:
-    url: jdbc:postgresql://localhost:5432/daily_lexika
+    url: jdbc:postgresql://${DB_HOST}:5432/daily_lexika
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   jpa:

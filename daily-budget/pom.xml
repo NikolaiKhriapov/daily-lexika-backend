@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>daily-lexika-backend</artifactId>
+        <artifactId>nikolai-backend</artifactId>
         <groupId>my.project</groupId>
         <version>1.0.0</version>
     </parent>
@@ -127,7 +127,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot-maven-plugin.version}</version>
                 <configuration>
-                    <mainClass>my.project.dailylexika.DailyLexikaApp</mainClass>
+                    <mainClass>my.project.dailybudget.DailyBudgetApp</mainClass>
                 </configuration>
                 <executions>
                     <execution>

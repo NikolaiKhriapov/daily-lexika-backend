@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>daily-lexika-backend</artifactId>
+        <artifactId>nikolai-backend</artifactId>
         <groupId>my.project</groupId>
         <version>1.0.0</version>
     </parent>
@@ -147,6 +147,13 @@
                 <version>${spring-boot-maven-plugin.version}</version>
                 <configuration>
                     <mainClass>my.project.dailylexika.DailyLexikaApp</mainClass>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                    <excludeDockerCompose>false</excludeDockerCompose>
                 </configuration>
                 <executions>
                     <execution>
@@ -195,6 +202,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven-failsafe-plugin.version}</version>
+                <configuration>
+                    <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

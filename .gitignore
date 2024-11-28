@@ -12,5 +12,4 @@ target/
 /.env
 /.gitignore
 **/*.iml
-/daily-lexika-backend.iml
-/docker-compose.yaml
+/*.iml
