@@ -2,6 +2,7 @@ package my.project.dailylexika.repositories.flashcards;
 
 import my.project.library.dailylexika.enumerations.Platform;
 import my.project.dailylexika.entities.flashcards.WordData;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +15,7 @@ import java.util.Optional;
 @Repository
 public interface WordDataRepository extends JpaRepository<WordData, Integer> {
 
+    @Cacheable(value = "wordDataCache", key = "#platform.name()")
     List<WordData> findAllByPlatform(Platform platform);
 
     List<WordData> findAllByListOfWordPacks_NameAndPlatform(String wordPackName, Platform platform);

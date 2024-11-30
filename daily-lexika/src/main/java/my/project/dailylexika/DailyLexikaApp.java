@@ -2,6 +2,7 @@ package my.project.dailylexika;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication(
         scanBasePackages = "my.project.dailylexika",
@@ -12,6 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
                 my.project.library.util.serialization.SerializationConfig.class,
         }
 )
+@EnableCaching
 public class DailyLexikaApp {
     public static void main(String[] args) {
         SpringApplication.run(DailyLexikaApp.class, args);
