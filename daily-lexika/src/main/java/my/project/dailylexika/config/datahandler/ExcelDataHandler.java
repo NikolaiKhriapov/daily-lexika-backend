@@ -1,6 +1,7 @@
 package my.project.dailylexika.config.datahandler;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import my.project.library.util.datetime.DateUtil;
 import my.project.dailylexika.config.i18n.I18nUtil;
 import my.project.dailylexika.entities.flashcards.WordData;
@@ -18,9 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDate;
 import java.util.*;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ExcelDataHandler {
@@ -29,21 +30,18 @@ public class ExcelDataHandler {
     private final WordDataService wordDataService;
     private final WordService wordService;
 
-    public static Set<LocalDate> datesCounterForValidation = new HashSet<>();
-
     @Transactional
     public void importWordPacks(String fileClasspath, String fileSheet, Platform platform) {
         List<WordPack> listOfWordPacks = getWordPacksFromExcel(fileClasspath, fileSheet, platform);
         saveWordPacksToDatabase(listOfWordPacks);
-        System.out.println("ExcelDataHandler Report: " + fileSheet + " updated!");
+        log.info("ExcelDataHandler Report: {} updated!", fileSheet);
     }
 
     @Transactional
     public void importWords(String fileClasspath, String fileSheet, Platform platform) {
         List<WordData> listOfWordData = getWordsFromExcel(fileClasspath, fileSheet, platform);
         saveWordsToDatabase(listOfWordData, platform);
-        System.out.println("ExcelDataHandler Report: " + fileSheet + " updated!");
-        datesCounterForValidation.clear();
+        log.info("ExcelDataHandler Report: {} updated!", fileSheet);
     }
 
     private List<WordPack> getWordPacksFromExcel(String fileClasspath, String fileSheet, Platform platform) {
@@ -149,7 +147,7 @@ public class ExcelDataHandler {
 
                 wordData.setPlatform(platform);
 
-                validateExcelWordData(wordData);
+//                validateExcelWordData(wordData);
 
                 if (wordData.getNameEnglish().length() > 250) {
                     wordData.setNameEnglish(wordData.getNameEnglish().substring(0, 250) + "...");
@@ -249,80 +247,8 @@ public class ExcelDataHandler {
 
     private void validateExcelWordData(WordData wordData) {
         switch (wordData.getPlatform()) {
-            //TODO::: add validation for characters language
-            //TODO::: 'definitions' must not end with '.'
-//            case ENGLISH -> validateExcelWordDataEnglish(wordData);
-//            case CHINESE -> validateExcelWordDataChinese(wordData);
-        }
-    }
-
-    private void validateExcelWordDataEnglish(WordData wordData) {
-        if (wordData.getNameEnglish().length() > 100) {
-            System.out.println("!!!!! Excel data (EN_Words) validation failed (name_english): " + wordData.getId());
-        }
-        if (!wordData.getTranscription().startsWith("/") || !wordData.getTranscription().endsWith("/") || wordData.getTranscription().contains("/ /")) {
-            System.out.println("!!!!! Excel data (EN_Words) validation failed (transcription): " + wordData.getId());
-        }
-        if (wordData.getNameRussian().length() > 100) {
-            System.out.println("!!!!! Excel data (EN_Words) validation failed (name_russian): " + wordData.getId());
-        }
-        if (wordData.getNameChinese().length() > 19 || wordData.getNameChinese().contains(",") || wordData.getNameChinese().contains(";") || wordData.getNameChinese().contains("；") || wordData.getNameChinese().contains(" ")) {
-            System.out.println("!!!!! Excel data (EN_Words) validation failed (name_chinese): " + wordData.getId());
-        }
-        if (wordData.getExamples().split(System.lineSeparator()).length != 5) {
-            System.out.println("!!!!! Excel data (EN_Words) validation failed (examples): " + wordData.getId());
-        }
-        if (datesCounterForValidation.contains(wordData.getWordOfTheDayDate())) {
-            System.out.println("!!!!! Excel data (EN_Words) validation failed (word_of_the_day_date): " + wordData.getId());
-        } else {
-            datesCounterForValidation.add(wordData.getWordOfTheDayDate());
-        }
-    }
-
-    private void validateExcelWordDataChinese(WordData wordData) {
-        if (wordData.getNameChinese().length() > 19) {
-            System.out.println("!!!!! Excel data (CH_Words) validation failed (name_chinese): " + wordData.getId());
-        }
-        if (wordData.getTranscription().split(" ").length != wordData.getNameChinese().length()) {
-            if (wordData.getTranscription().endsWith("r")) {
-                if (wordData.getTranscription().split(" ").length != (wordData.getNameChinese().length() - 1)) {
-                    System.out.println("!!!!! Excel data (CH_Words) validation failed (transcription): " + wordData.getId() + " " + wordData.getTranscription() + " " + wordData.getTranscription().split(" ").length + " ::: " + (wordData.getNameChinese().length()));
-                }
-            } else {
-                System.out.println("!!!!! Excel data (CH_Words) validation failed (transcription): " + wordData.getId() + " " + wordData.getTranscription() + " " + wordData.getTranscription().split(" ").length + " ::: " + wordData.getNameChinese().length());
-            }
-        }
-        if (!wordData.getNameEnglish().equals("[TODO]")) {
-            if (wordData.getNameEnglish().length() > 100 || wordData.getNameEnglish().contains(";") || wordData.getNameEnglish().contains("  ")) {
-                System.out.println("!!!!! Excel data (CH_Words) validation failed (name_english): " + wordData.getId());
-            }
-        }
-        if (!wordData.getNameRussian().equals("[TODO]")) {
-            if (wordData.getNameRussian().length() > 100 || wordData.getNameRussian().contains(";") || wordData.getNameRussian().contains("  ")) {
-                System.out.println("!!!!! Excel data (CH_Words) validation failed (name_russian): " + wordData.getId());
-            }
-        }
-        if (!wordData.getDefinition().equals("[TODO]")) {
-            if (wordData.getDefinition().endsWith(".") && !wordData.getDefinition().endsWith("etc.")) {
-                System.out.println("!!!!! Excel data (CH_Words) validation failed (definition): " + wordData.getId());
-            }
-        }
-        if (!wordData.getExamples().equals("[TODO]")) {
-            String[] examplesArray = wordData.getExamples().split(System.lineSeparator() + System.lineSeparator());
-            if (examplesArray.length != 5) {
-                System.out.println("!!!!! Excel data (CH_Words) validation failed (examples): " + wordData.getId());
-            } else {
-                Arrays.stream(examplesArray).forEach(oneExample -> {
-                    if (oneExample.split(System.lineSeparator()).length != 4) {
-                        System.out.println("!!!!! Excel data (CH_Words) validation failed (examples): " + wordData.getId());
-                    }
-                });
-            }
-        }
-        if (datesCounterForValidation.contains(wordData.getWordOfTheDayDate())) {
-            System.out.println("!!!!! Excel data (CH_Words) validation failed (word_of_the_day_date): " + wordData.getId());
-        } else {
-            datesCounterForValidation.add(wordData.getWordOfTheDayDate());
+            case ENGLISH -> ExcelDataValidationUtil.validateExcelWordDataEnglish(wordData);
+            case CHINESE -> ExcelDataValidationUtil.validateExcelWordDataChinese(wordData);
         }
     }
 }

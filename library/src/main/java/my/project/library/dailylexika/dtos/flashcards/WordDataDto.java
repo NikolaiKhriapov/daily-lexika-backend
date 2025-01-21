@@ -5,6 +5,7 @@ import my.project.library.dailylexika.enumerations.Platform;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public record WordDataDto(
 
@@ -14,7 +15,7 @@ public record WordDataDto(
         String nameEnglish,
         String nameRussian,
         String definition,
-        List<String> examples,
+        List<Map<String, String>> examples,
         List<String> listOfWordPackNames,
         LocalDate wordOfTheDayDate,
         Platform platform
