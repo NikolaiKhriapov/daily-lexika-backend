@@ -27,7 +27,7 @@ public interface WordDataMapper {
         try {
             return new ObjectMapper().readValue(examples, List.class);
         } catch (Exception e) {
-            throw new InternalServerErrorException(I18nUtil.getMessage("dailylexika-exceptions.excel.parse"));
+            throw new InternalServerErrorException(I18nUtil.getMessage("dailylexika-exceptions.excel.parse", examples));
         }
     }
 
