@@ -47,7 +47,7 @@ public class WordPackService {
 
     public WordPack findByName(String wordPackName) {
         return wordPackRepository.findById(wordPackName)
-                .orElseThrow(() -> new ResourceNotFoundException(I18nUtil.getMessage("dailylexika-exceptions.wordPack.notFound")));
+                .orElseThrow(() -> new ResourceNotFoundException(I18nUtil.getMessage("dailylexika-exceptions.wordPack.notFound", wordPackName)));
     }
 
     public List<WordPack> findAll() {

@@ -147,7 +147,7 @@ public class ExcelDataHandler {
 
                 wordData.setPlatform(platform);
 
-//                validateExcelWordData(wordData);
+                validateExcelWordData(wordData);
 
                 if (wordData.getNameEnglish().length() > 250) {
                     wordData.setNameEnglish(wordData.getNameEnglish().substring(0, 250) + "...");
@@ -226,6 +226,7 @@ public class ExcelDataHandler {
         List<WordPack> listOfWordPacks = new ArrayList<>();
 
         List<String> wordPackNames = Arrays.stream(stringCellValue.split(";"))
+                .filter(wordPackName -> !Objects.equals(wordPackName, "[NONE]"))
                 .map(wordPackName -> prefix + wordPackName)
                 .toList();
         wordPackNames.forEach(wordPackName -> {
@@ -247,8 +248,8 @@ public class ExcelDataHandler {
 
     private void validateExcelWordData(WordData wordData) {
         switch (wordData.getPlatform()) {
-            case ENGLISH -> ExcelDataValidationUtil.validateExcelWordDataEnglish(wordData);
-            case CHINESE -> ExcelDataValidationUtil.validateExcelWordDataChinese(wordData);
+//            case ENGLISH -> ExcelDataValidationUtil.validateExcelWordDataEnglish(wordData);
+//            case CHINESE -> ExcelDataValidationUtil.validateExcelWordDataChinese(wordData);
         }
     }
 }

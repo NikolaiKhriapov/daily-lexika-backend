@@ -11,10 +11,13 @@ import java.util.regex.Pattern;
 @Slf4j
 public class ExcelDataValidationUtil {
 
-    private static final String REGEX_CH = "^[\\u4e00-\\u9fa5CD0-9\\s“”《》，、。？！；：%—/（）【】$]+$";
-    private static final String REGEX_CH_PINYIN = "^[a-zA-ZĀāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ0-9\\s“”,.?!;:’—$]+$";
+    private static final String REGEX_CH = "^[\\u4e00-\\u9fa5CDT0-9\\s“”《》，、。？！；：%—/（）【】$]+$";
+    private static final String REGEX_CH_PINYIN = "^[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ0-9\\s“”,.?!;:’—$]+$";
     private static final String REGEX_EN = "^[a-zA-Zé0-9\\s“”,.?!;:+%’/()$—–-]+$";
     private static final String REGEX_RU = "^[а-яА-ЯёЁ0-9\\s№«»,.?!;:%/()$—–-]+$";
+
+    private static final List<Integer> CHINESE_EXCEPTION_PINYIN = List.of(2000555);
+    private static final List<Integer> CHINESE_EXCEPTION_EXAMPLES_PINYIN = List.of(2000110, 2000275, 2000555, 2011144);
 
     public static void validateExcelWordDataEnglish(WordData wordData) {
         validateEnglishNameEnglish(wordData);
@@ -27,7 +30,7 @@ public class ExcelDataValidationUtil {
 
     public static void validateExcelWordDataChinese(WordData wordData) {
         validateChineseNameChinese(wordData);
-//        validateChineseTranscription(wordData);
+        validateChineseTranscription(wordData);
         validateChineseNameEnglish(wordData);
         validateChineseNameRussian(wordData);
         validateChineseDefinition(wordData);
@@ -107,7 +110,8 @@ public class ExcelDataValidationUtil {
     }
 
     private static void validateChineseTranscription(WordData wordData) {
-        if (wordData.getTranscription().split(" ").length != wordData.getNameChinese().length()) {
+        if ((wordData.getTranscription().split(" ").length != wordData.getNameChinese().length() || !Pattern.compile(REGEX_CH_PINYIN).matcher(wordData.getTranscription()).matches()) &&
+                !CHINESE_EXCEPTION_PINYIN.contains(wordData.getId())) {
             if (wordData.getTranscription().endsWith("r")) {
                 if (wordData.getTranscription().split(" ").length != (wordData.getNameChinese().length() - 1)) {
                     log.error("Excel (CH_Words): Validation failed (transcription): {}: {}: {} ::: {}", wordData.getId(), wordData.getTranscription(), wordData.getTranscription().split(" ").length, wordData.getNameChinese().length());
@@ -159,7 +163,9 @@ public class ExcelDataValidationUtil {
                     log.error("Excel (CH_Words): Validation failed (examples: Chinese): {}: {}: {}", wordData.getId(), wordData.getNameChinese(), exampleCh);
                 }
                 String examplePinyin = element.get("pinyin");
-                if (!Pattern.compile(REGEX_CH_PINYIN).matcher(examplePinyin).matches() || !examplePinyin.replaceAll(" ", "").contains(wordData.getTranscription().replaceAll(" ", ""))) {
+                if ((!Pattern.compile(REGEX_CH_PINYIN).matcher(examplePinyin).matches() ||
+                        !examplePinyin.replaceAll(" ", "").contains(wordData.getTranscription().replaceAll(" ", ""))) &&
+                            !CHINESE_EXCEPTION_EXAMPLES_PINYIN.contains(wordData.getId())) {
                     log.error("Excel (CH_Words): Validation failed (examples: Pinyin): {}: {}: {}", wordData.getId(), wordData.getTranscription(), examplePinyin);
                 }
                 String exampleEn = element.get("en");
