@@ -17,7 +17,7 @@ public class ExcelDataValidationUtil {
     private static final String REGEX_RU = "^[а-яА-ЯёЁ0-9\\s№«»,.?!;:%/()$—–-]+$";
 
     private static final List<Integer> CHINESE_EXCEPTION_PINYIN = List.of(2000555);
-    private static final List<Integer> CHINESE_EXCEPTION_EXAMPLES_PINYIN = List.of(2000110, 2000275, 2000555, 2011144);
+    private static final List<Integer> CHINESE_EXCEPTION_EXAMPLES_PINYIN = List.of(2000110, 2000275, 2000555, 2000816, 2011144);
 
     public static void validateExcelWordDataEnglish(WordData wordData) {
         validateEnglishNameEnglish(wordData);
