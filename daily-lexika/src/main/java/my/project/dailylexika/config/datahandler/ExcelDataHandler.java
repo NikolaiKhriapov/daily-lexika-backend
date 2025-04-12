@@ -225,10 +225,17 @@ public class ExcelDataHandler {
     private List<WordPack> getWordPacksFromCellValue(WordData wordData, String stringCellValue, String prefix) {
         List<WordPack> listOfWordPacks = new ArrayList<>();
 
-        List<String> wordPackNames = Arrays.stream(stringCellValue.split(";"))
-                .filter(wordPackName -> !Objects.equals(wordPackName, "[NONE]"))
+        String trimmed = stringCellValue.trim();
+        if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+            trimmed = trimmed.substring(1, trimmed.length() - 1);
+        }
+
+        List<String> wordPackNames = Arrays.stream(trimmed.split(","))
+                .map(String::trim)
+                .filter(wordPackName -> !wordPackName.isEmpty())
                 .map(wordPackName -> prefix + wordPackName)
                 .toList();
+
         wordPackNames.forEach(wordPackName -> {
             WordPack wordPack = wordPackService.findByName(wordPackName);
             listOfWordPacks.add(wordPack);
@@ -248,8 +255,8 @@ public class ExcelDataHandler {
 
     private void validateExcelWordData(WordData wordData) {
         switch (wordData.getPlatform()) {
-//            case ENGLISH -> ExcelDataValidationUtil.validateExcelWordDataEnglish(wordData);
-//            case CHINESE -> ExcelDataValidationUtil.validateExcelWordDataChinese(wordData);
+            case ENGLISH -> ExcelDataValidationUtil.validateExcelWordDataEnglish(wordData);
+            case CHINESE -> ExcelDataValidationUtil.validateExcelWordDataChinese(wordData);
         }
     }
 }
