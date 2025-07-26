@@ -1,7 +1,7 @@
-package my.project.dailylexika.security.service;
+package my.project.admin.security.service;
 
 import lombok.RequiredArgsConstructor;
-import my.project.dailylexika.user._public.PublicUserService;
+import my.project.admin.user._public.PublicUserService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

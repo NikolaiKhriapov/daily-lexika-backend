@@ -60,7 +60,7 @@ public class UserServiceImpl implements PublicUserService, UserService {
     @Override
     public UserDto getUser() {
         User user = getAuthenticatedUser();
-        return userMapper.toDTO(user);
+        return userMapper.toDto(user);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class UserServiceImpl implements PublicUserService, UserService {
         }
 
         User updatedUser = userMapper.partialUpdate(userDto, user);
-        return userMapper.toDTO(userRepository.save(updatedUser));
+        return userMapper.toDto(userRepository.save(updatedUser));
     }
 
     @Override

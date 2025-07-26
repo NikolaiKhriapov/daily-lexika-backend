@@ -10,7 +10,7 @@ import java.util.List;
 public interface UserMapper {
 
     @Mapping(target = "setOfRoleStatisticsDto", source = "roleStatistics")
-    UserDto toDTO(User entity);
+    UserDto toDto(User entity);
 
     List<UserDto> toDtoList(List<User> entityList);
 

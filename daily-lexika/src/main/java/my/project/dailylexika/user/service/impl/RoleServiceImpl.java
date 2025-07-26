@@ -25,15 +25,6 @@ public class RoleServiceImpl implements RoleService, PublicRoleService {
     private final RoleStatisticsMapper roleStatisticsMapper;
 
     @Override
-    public void addRoleToUserRoles(User user, RoleName roleName) {
-        if (user.getRoleStatistics() == null) {
-            user.setRoleStatistics(new HashSet<>());
-        }
-        throwIfUserAlreadyHasThisRole(user, roleName);
-        user.getRoleStatistics().add(new RoleStatistics(roleName));
-    }
-
-    @Override
     public Platform getPlatformByRoleName(RoleName roleName) {
         return switch (roleName) {
             case USER_ENGLISH -> Platform.ENGLISH;
@@ -47,6 +38,15 @@ public class RoleServiceImpl implements RoleService, PublicRoleService {
             case ENGLISH -> RoleName.USER_ENGLISH;
             case CHINESE -> RoleName.USER_CHINESE;
         };
+    }
+
+    @Override
+    public void addRoleToUserRoles(User user, RoleName roleName) {
+        if (user.getRoleStatistics() == null) {
+            user.setRoleStatistics(new HashSet<>());
+        }
+        throwIfUserAlreadyHasThisRole(user, roleName);
+        user.getRoleStatistics().add(new RoleStatistics(roleName));
     }
 
     @Override

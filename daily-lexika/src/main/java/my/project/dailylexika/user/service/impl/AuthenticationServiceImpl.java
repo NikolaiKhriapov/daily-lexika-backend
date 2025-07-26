@@ -74,16 +74,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 )
         );
         User user = userService.getUserByEmail(authenticationRequest.email());
-
         RoleName roleName = roleService.getRoleNameByPlatform(authenticationRequest.platform());
 
         roleService.throwIfUserNotRegisteredOnPlatform(user, roleName);
 
         user.setRole(roleName);
 
-        String token = jwtService.generateToken(user.getUsername(), user.getRole().name());
-
-        return new AuthenticationResponse(token);
+        String jwtToken = jwtService.generateToken(user.getUsername(), user.getRole().name());
+        return new AuthenticationResponse(jwtToken);
     }
 
     private void publishAccountRegisteredEvent(User user, Platform platform, boolean isUserAlreadyExists) {
