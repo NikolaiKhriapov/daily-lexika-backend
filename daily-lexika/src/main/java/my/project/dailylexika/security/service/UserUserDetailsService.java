@@ -1,7 +1,8 @@
-package my.project.dailylexika.security;
+package my.project.dailylexika.security.service;
 
 import lombok.RequiredArgsConstructor;
-import my.project.dailylexika.config.i18n.I18nUtil;
+import my.project.dailylexika.config.I18nUtil;
+import my.project.dailylexika.user._public.PublicUserService;
 import my.project.dailylexika.user.persistence.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,11 +13,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final PublicUserService userService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findUserByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException(I18nUtil.getMessage("dailylexika-exceptions.authentication.usernameNotFound")));
+        return userService.getUserEntityByEmail(username);
     }
 }

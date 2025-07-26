@@ -1,9 +1,9 @@
 package my.project.dailylexika.flashcard.api;
 
 import lombok.RequiredArgsConstructor;
+import my.project.dailylexika.flashcard.service.WordService;
 import my.project.library.dailylexika.dtos.flashcards.WordDto;
 import my.project.library.dailylexika.enumerations.Status;
-import my.project.dailylexika.flashcard.service.WordService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;

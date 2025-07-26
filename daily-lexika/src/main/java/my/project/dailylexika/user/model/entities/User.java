@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import my.project.library.dailylexika.interfaces.user.HasInterfaceLanguage;
 import my.project.library.util.datetime.DateUtil;
 import my.project.library.dailylexika.enumerations.Language;
 import my.project.library.dailylexika.enumerations.RoleName;
@@ -22,7 +23,7 @@ import java.util.Set;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity(name = "users")
-public class User implements UserDetails {
+public class User implements UserDetails, HasInterfaceLanguage {
 
     @Id
     @SequenceGenerator(name = "user_id_sequence", sequenceName = "user_id_sequence", allocationSize = 1)

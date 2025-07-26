@@ -6,10 +6,7 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(
-        componentModel = MappingConstants.ComponentModel.SPRING,
-        uses = WordDataMapper.class
-)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = WordDataMapper.class)
 public interface WordMapper {
 
     @Mapping(target = "wordDataDto", source = "wordData")

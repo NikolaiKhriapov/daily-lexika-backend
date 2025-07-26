@@ -1,4 +1,4 @@
-package my.project.dailylexika.config.datahandler;
+package my.project.dailylexika.flashcard.service.datahandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;

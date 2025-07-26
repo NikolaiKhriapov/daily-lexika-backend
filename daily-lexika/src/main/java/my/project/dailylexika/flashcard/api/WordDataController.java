@@ -1,8 +1,8 @@
 package my.project.dailylexika.flashcard.api;
 
 import lombok.RequiredArgsConstructor;
-import my.project.library.dailylexika.dtos.flashcards.WordDataDto;
 import my.project.dailylexika.flashcard.service.WordDataService;
+import my.project.library.dailylexika.dtos.flashcards.WordDataDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

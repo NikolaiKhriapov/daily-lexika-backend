@@ -11,6 +11,5 @@ import java.util.List;
 public interface LogMapper {
 
     LogDto toDto(Log entity);
-
     List<LogDto> toDtoList(List<Log> entity);
 }

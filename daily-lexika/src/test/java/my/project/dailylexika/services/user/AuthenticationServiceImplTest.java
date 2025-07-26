@@ -1,8 +1,8 @@
 package my.project.dailylexika.services.user;
 
-import my.project.dailylexika.user.service.AuthenticationService;
 import my.project.dailylexika.user.service.RoleService;
 import my.project.dailylexika.user.service.UserService;
+import my.project.dailylexika.user.service.impl.AuthenticationServiceImpl;
 import my.project.library.util.security.JwtService;
 import my.project.library.dailylexika.dtos.user.AuthenticationRequest;
 import my.project.library.dailylexika.dtos.user.AuthenticationResponse;
@@ -11,15 +11,13 @@ import my.project.library.dailylexika.enumerations.Platform;
 import my.project.library.dailylexika.enumerations.RoleName;
 import my.project.dailylexika.user.model.entities.RoleStatistics;
 import my.project.dailylexika.user.model.entities.User;
-import my.project.dailylexika.flashcard.service.WordService;
-import my.project.dailylexika.log.service.LogService;
-import my.project.dailylexika.notification.service.NotificationService;
 import my.project.dailylexika.config.AbstractUnitTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -28,37 +26,31 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 
-class AuthenticationServiceTest extends AbstractUnitTest {
+class AuthenticationServiceImplTest extends AbstractUnitTest {
 
-    private AuthenticationService underTest;
+    private AuthenticationServiceImpl underTest;
     @Mock
     private AuthenticationManager authenticationManager;
     @Mock
     private JwtService jwtService;
     @Mock
-    private NotificationService notificationService;
-    @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
     private RoleService roleService;
     @Mock
-    private WordService wordService;
-    @Mock
     private UserService userService;
     @Mock
-    private LogService logService;
+    private ApplicationEventPublisher eventPublisher;
 
     @BeforeEach
     void setUp() {
-        underTest = new AuthenticationService(
-                authenticationManager,
-                jwtService,
-                notificationService,
-                passwordEncoder,
-                roleService,
-                wordService,
+        underTest = new AuthenticationServiceImpl(
                 userService,
-                logService
+                roleService,
+                jwtService,
+                authenticationManager,
+                passwordEncoder,
+                eventPublisher
         );
     }
 
@@ -99,19 +91,23 @@ class AuthenticationServiceTest extends AbstractUnitTest {
     void register_existingUserNewPlatform(Platform platform, RoleName existingRoleName, RoleName newRoleName) {
         // Given
         RegistrationRequest registrationRequest = generateRegistrationRequest(platform);
-
         User existingUser = generateUser(registrationRequest, existingRoleName);
 
         given(userService.existsByEmail(any())).willReturn(true);
         given(userService.getUserByEmail(any())).willReturn(existingUser);
-        willCallRealMethod().given(roleService).getRoleNameByPlatform(any());
+        given(roleService.getRoleNameByPlatform(any())).willReturn(newRoleName);
+        doAnswer(inv -> {
+            User user      = inv.getArgument(0, User.class);
+            RoleName role  = inv.getArgument(1, RoleName.class);
+            user.setRole(role);
+            user.getRoleStatistics().add(new RoleStatistics(role));
+            return null;
+        }).when(roleService).addRoleToUserRoles(any(), any());
 
         // When
         AuthenticationResponse authenticationResponse = underTest.register(registrationRequest);
 
         // Then
-        then(notificationService).shouldHaveNoInteractions();
-
         ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.forClass(User.class);
         then(userService).should().save(userArgumentCaptor.capture());
         User actualUser = userArgumentCaptor.getValue();
@@ -135,12 +131,11 @@ class AuthenticationServiceTest extends AbstractUnitTest {
     void login(Platform platform, RoleName roleName) {
         // Given
         AuthenticationRequest authenticationRequest = generateAuthenticationRequest(platform);
-
         User existingUser = generateUser(authenticationRequest, roleName);
 
         given(userService.getUserByEmail(any())).willReturn(existingUser);
-        willCallRealMethod().given(roleService).getRoleNameByPlatform(any());
-        willCallRealMethod().given(roleService).throwIfUserNotRegisteredOnPlatform(any(), any());
+        given(roleService.getRoleNameByPlatform(any())).willReturn(roleName);
+        willDoNothing().given(roleService).throwIfUserNotRegisteredOnPlatform(any(), any());
 
         // When
         AuthenticationResponse authenticationResponse = underTest.login(authenticationRequest);

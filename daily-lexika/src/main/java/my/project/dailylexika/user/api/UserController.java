@@ -2,10 +2,11 @@ package my.project.dailylexika.user.api;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import my.project.dailylexika.user._public.PublicUserService;
+import my.project.dailylexika.user.service.UserService;
 import my.project.library.dailylexika.dtos.user.AccountDeletionRequest;
 import my.project.library.dailylexika.dtos.user.PasswordUpdateRequest;
 import my.project.library.dailylexika.dtos.user.UserDto;
-import my.project.dailylexika.user.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -20,10 +21,11 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final PublicUserService publicUserService;
 
     @GetMapping("/info")
     public ResponseEntity<UserDto> getUser() {
-        return ResponseEntity.ok(userService.getUser());
+        return ResponseEntity.ok(publicUserService.getUser());
     }
 
     @PatchMapping("/info")

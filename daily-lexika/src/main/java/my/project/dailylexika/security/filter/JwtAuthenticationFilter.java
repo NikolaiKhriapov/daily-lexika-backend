@@ -1,4 +1,4 @@
-package my.project.dailylexika.security.jwt;
+package my.project.dailylexika.security.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

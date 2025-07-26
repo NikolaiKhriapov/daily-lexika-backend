@@ -6,10 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
-@Mapper(
-        componentModel = MappingConstants.ComponentModel.SPRING,
-        uses = {WordMapper.class, WordPackMapper.class}
-)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {WordMapper.class, WordPackMapper.class})
 public interface ReviewMapper {
 
     @Mapping(target = "wordPackDto", source = "wordPack")

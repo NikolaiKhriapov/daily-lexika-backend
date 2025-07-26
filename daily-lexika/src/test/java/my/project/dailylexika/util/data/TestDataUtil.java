@@ -1,5 +1,6 @@
 package my.project.dailylexika.util.data;
 
+import my.project.library.dailylexika.dtos.user.RoleStatisticsDto;
 import my.project.library.util.datetime.DateUtil;
 import my.project.library.dailylexika.dtos.flashcards.ReviewDto;
 import my.project.library.dailylexika.dtos.flashcards.ReviewStatisticsDto;
@@ -152,8 +153,8 @@ public class TestDataUtil {
 
     // Statistics
 
-    public static RoleStatistics generateRoleStatistics(RoleName roleName) {
-        return new RoleStatistics(
+    public static RoleStatisticsDto generateRoleStatistics(RoleName roleName) {
+        return new RoleStatisticsDto(
                 FakerUtil.generateLongId(),
                 roleName,
                 FakerUtil.generateRandomLong(100L),

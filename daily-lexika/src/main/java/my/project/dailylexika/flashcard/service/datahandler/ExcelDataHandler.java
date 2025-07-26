@@ -1,16 +1,16 @@
-package my.project.dailylexika.config.datahandler;
+package my.project.dailylexika.flashcard.service.datahandler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import my.project.dailylexika.flashcard.service.WordDataService;
+import my.project.dailylexika.flashcard.service.WordPackService;
+import my.project.dailylexika.flashcard.service.WordService;
 import my.project.library.util.datetime.DateUtil;
-import my.project.dailylexika.config.i18n.I18nUtil;
+import my.project.dailylexika.config.I18nUtil;
 import my.project.dailylexika.flashcard.model.entities.WordData;
 import my.project.library.dailylexika.enumerations.Platform;
 import my.project.library.dailylexika.enumerations.Category;
 import my.project.dailylexika.flashcard.model.entities.WordPack;
-import my.project.dailylexika.flashcard.service.WordDataService;
-import my.project.dailylexika.flashcard.service.WordPackService;
-import my.project.dailylexika.flashcard.service.WordService;
 import my.project.library.util.exception.InternalServerErrorException;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.core.io.ClassPathResource;
@@ -203,7 +203,7 @@ public class ExcelDataHandler {
             if (!allExistingWordDataIds.contains(wordData.getId())) {
                 wordsToBeSavedOrUpdated.add(wordData);
             } else {
-                WordData wordDataToBeUpdated = wordDataService.findById(wordData.getId());
+                WordData wordDataToBeUpdated = wordDataService.findEntityById(wordData.getId());
                 wordDataToBeUpdated.setNameChinese(wordData.getNameChinese());
                 wordDataToBeUpdated.setTranscription(wordData.getTranscription());
                 wordDataToBeUpdated.setNameEnglish(wordData.getNameEnglish());
@@ -242,7 +242,7 @@ public class ExcelDataHandler {
         });
 
         try {
-            WordData wordDataExisting = wordDataService.findById(wordData.getId());
+            WordData wordDataExisting = wordDataService.findEntityById(wordData.getId());
             for (WordPack wordPack : wordDataExisting.getListOfWordPacks()) {
                 if (wordPack.getCategory() == Category.CUSTOM) {
                     listOfWordPacks.add(wordPack);

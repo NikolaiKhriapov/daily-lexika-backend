@@ -6,10 +6,7 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(
-        componentModel = MappingConstants.ComponentModel.SPRING,
-        uses = RoleStatisticsMapper.class
-)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = RoleStatisticsMapper.class)
 public interface UserMapper {
 
     @Mapping(target = "setOfRoleStatisticsDto", source = "roleStatistics")
@@ -18,5 +15,5 @@ public interface UserMapper {
     List<UserDto> toDtoList(List<User> entityList);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    User partialUpdate(UserDto userDTO, @MappingTarget User user);
+    User partialUpdate(UserDto dto, @MappingTarget User entity);
 }

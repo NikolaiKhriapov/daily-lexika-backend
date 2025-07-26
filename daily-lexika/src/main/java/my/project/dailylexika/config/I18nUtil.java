@@ -1,7 +1,7 @@
-package my.project.dailylexika.config.i18n;
+package my.project.dailylexika.config;
 
+import my.project.library.dailylexika.interfaces.user.HasInterfaceLanguage;
 import my.project.library.dailylexika.enumerations.Language;
-import my.project.dailylexika.user.model.entities.User;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Locale;
@@ -16,18 +16,18 @@ public class I18nUtil {
 
     public static String getMessage(String propertyKey, Object... args) {
         try {
-            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            Language interfaceLanguage = user.getInterfaceLanguage();
-
+            Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             Locale locale = DEFAULT_LOCALE;
-            if (interfaceLanguage != null) {
-                switch (interfaceLanguage) {
-                    case ENGLISH -> locale = new Locale("EN");
-                    case RUSSIAN -> locale = new Locale("RU");
-                    case CHINESE -> locale = new Locale("CH");
+            if (principal instanceof HasInterfaceLanguage langProvider) {
+                Language interfaceLanguage = langProvider.getInterfaceLanguage();
+                if (interfaceLanguage != null) {
+                    locale = switch (interfaceLanguage) {
+                        case ENGLISH -> new Locale("EN");
+                        case RUSSIAN -> new Locale("RU");
+                        case CHINESE -> new Locale("CH");
+                    };
                 }
             }
-
             return getResourceBundleMessage(locale, propertyKey, args);
         } catch (RuntimeException e) {
             return getResourceBundleMessage(DEFAULT_LOCALE, propertyKey, args);

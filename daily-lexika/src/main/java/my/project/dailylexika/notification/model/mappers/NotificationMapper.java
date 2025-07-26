@@ -11,6 +11,5 @@ import java.util.List;
 public interface NotificationMapper {
 
     NotificationDto toDto(Notification entity);
-
     List<NotificationDto> toDtoList(List<Notification> entity);
 }

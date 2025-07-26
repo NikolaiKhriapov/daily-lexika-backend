@@ -1,4 +1,4 @@
-package my.project.dailylexika.config.exception;
+package my.project.dailylexika.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import my.project.library.util.exception.ApiErrorDTO;

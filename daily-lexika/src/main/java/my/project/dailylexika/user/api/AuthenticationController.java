@@ -2,9 +2,9 @@ package my.project.dailylexika.user.api;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import my.project.dailylexika.user.service.AuthenticationService;
 import my.project.library.dailylexika.dtos.user.AuthenticationRequest;
 import my.project.library.dailylexika.dtos.user.AuthenticationResponse;
-import my.project.dailylexika.user.service.AuthenticationService;
 import my.project.library.dailylexika.dtos.user.RegistrationRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

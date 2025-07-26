@@ -1,8 +1,8 @@
 package my.project.dailylexika.notification.api;
 
 import lombok.AllArgsConstructor;
-import my.project.library.dailylexika.dtos.notification.NotificationDto;
 import my.project.dailylexika.notification.service.NotificationService;
+import my.project.library.dailylexika.dtos.notification.NotificationDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

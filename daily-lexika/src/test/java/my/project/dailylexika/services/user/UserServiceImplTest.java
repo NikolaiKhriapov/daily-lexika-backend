@@ -1,53 +1,41 @@
 package my.project.dailylexika.services.user;
 
 import my.project.dailylexika.config.AbstractUnitTest;
+import my.project.dailylexika.user._public.PublicRoleService;
 import my.project.dailylexika.user.model.mappers.UserMapper;
 import my.project.dailylexika.user.persistence.UserRepository;
-import my.project.dailylexika.flashcard.service.ReviewService;
-import my.project.dailylexika.flashcard.service.WordPackService;
-import my.project.dailylexika.flashcard.service.WordService;
-import my.project.dailylexika.log.service.LogService;
-import my.project.dailylexika.notification.service.NotificationService;
 import my.project.dailylexika.user.service.RoleService;
-import my.project.dailylexika.user.service.UserService;
+import my.project.dailylexika.user.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-class UserServiceTest extends AbstractUnitTest {
+class UserServiceImplTest extends AbstractUnitTest {
 
-    private UserService underTest;
+    private UserServiceImpl underTest;
     @Mock
     private UserRepository userRepository;
     @Mock
     private UserMapper userMapper;
     @Mock
-    private PasswordEncoder passwordEncoder;
-    @Mock
-    private ReviewService reviewService;
-    @Mock
-    private WordService wordService;
-    @Mock
-    private WordPackService wordPackService;
-    @Mock
     private RoleService roleService;
     @Mock
-    private NotificationService notificationService;
+    private PublicRoleService publicRoleService;
     @Mock
-    private LogService logService;
+    private PasswordEncoder passwordEncoder;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @BeforeEach
     void setUp() {
-        underTest = new UserService(
+        underTest = new UserServiceImpl(
                 userRepository,
                 userMapper,
-                passwordEncoder,
-                reviewService,
-                wordService,
-                wordPackService,
                 roleService,
-                notificationService,
-                logService
+                publicRoleService,
+                passwordEncoder,
+                eventPublisher
         );
     }
 

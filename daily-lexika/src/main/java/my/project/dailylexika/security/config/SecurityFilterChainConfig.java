@@ -1,7 +1,7 @@
 package my.project.dailylexika.security.config;
 
 import lombok.RequiredArgsConstructor;
-import my.project.dailylexika.security.jwt.JwtAuthenticationFilter;
+import my.project.dailylexika.security.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
