@@ -14,6 +14,7 @@ import my.project.library.util.exception.ResourceAlreadyExistsException;
 import my.project.library.util.exception.ResourceNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +26,7 @@ public class RoleServiceImpl implements RoleService, PublicRoleService {
     private final RoleStatisticsMapper roleStatisticsMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public Platform getPlatformByRoleName(RoleName roleName) {
         return switch (roleName) {
             case USER_ENGLISH -> Platform.ENGLISH;
@@ -33,6 +35,7 @@ public class RoleServiceImpl implements RoleService, PublicRoleService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RoleName getRoleNameByPlatform(Platform platform) {
         return switch (platform) {
             case ENGLISH -> RoleName.USER_ENGLISH;
@@ -41,6 +44,7 @@ public class RoleServiceImpl implements RoleService, PublicRoleService {
     }
 
     @Override
+    @Transactional
     public void addRoleToUserRoles(User user, RoleName roleName) {
         if (user.getRoleStatistics() == null) {
             user.setRoleStatistics(new HashSet<>());
@@ -50,15 +54,16 @@ public class RoleServiceImpl implements RoleService, PublicRoleService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RoleStatisticsDto getRoleStatistics() {
         RoleStatistics roleStatistics = getRoleStatisticsEntity();
         return roleStatisticsMapper.toDto(roleStatistics);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RoleStatistics getRoleStatisticsEntity() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         return user.getRoleStatistics().stream()
                 .filter(role -> role.getRoleName().equals(user.getRole()))
                 .findFirst()
@@ -66,6 +71,7 @@ public class RoleServiceImpl implements RoleService, PublicRoleService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public void throwIfUserNotRegisteredOnPlatform(User user, RoleName roleName) {
         if (!isUserRolesContainsRole(user, roleName)) {
             throw new ResourceNotFoundException(I18nUtil.getMessage("dailylexika-exceptions.authentication.userNotRegisteredOnPlatform", user.getEmail(), getPlatformByRoleName(roleName)));

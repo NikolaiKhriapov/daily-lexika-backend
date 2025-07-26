@@ -7,8 +7,6 @@ import my.project.dailylexika.flashcard.service.WordPackService;
 import my.project.dailylexika.flashcard.service.WordService;
 import my.project.dailylexika.user._public.PublicRoleService;
 import my.project.dailylexika.user._public.PublicUserService;
-import my.project.dailylexika.user.service.RoleService;
-import my.project.dailylexika.user.service.UserService;
 import my.project.library.dailylexika.dtos.user.RoleStatisticsDto;
 import my.project.library.dailylexika.dtos.user.UserDto;
 import my.project.library.util.datetime.DateUtil;
@@ -19,16 +17,14 @@ import my.project.dailylexika.flashcard.model.entities.WordPack;
 import my.project.library.dailylexika.dtos.flashcards.ReviewDto;
 import my.project.library.dailylexika.dtos.flashcards.ReviewStatisticsDto;
 import my.project.library.dailylexika.enumerations.Platform;
-import my.project.dailylexika.user.model.entities.User;
 import my.project.dailylexika.flashcard.model.mappers.ReviewMapper;
 import my.project.dailylexika.flashcard.persistence.ReviewRepository;
 import my.project.library.util.exception.BadRequestException;
 import my.project.library.util.exception.InternalServerErrorException;
 import my.project.library.util.exception.ResourceAlreadyExistsException;
 import my.project.library.util.exception.ResourceNotFoundException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 

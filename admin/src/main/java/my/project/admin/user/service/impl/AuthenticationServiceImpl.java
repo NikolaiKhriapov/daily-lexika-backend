@@ -1,6 +1,5 @@
 package my.project.admin.user.service.impl;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import my.project.admin.user.service.AuthenticationService;
 import my.project.admin.user.service.UserService;
@@ -11,6 +10,7 @@ import my.project.library.util.security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

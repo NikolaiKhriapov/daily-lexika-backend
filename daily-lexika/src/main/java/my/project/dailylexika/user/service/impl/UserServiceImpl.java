@@ -1,6 +1,5 @@
 package my.project.dailylexika.user.service.impl;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import my.project.dailylexika.config.I18nUtil;
 import my.project.dailylexika.user._public.PublicRoleService;
@@ -19,6 +18,7 @@ import my.project.dailylexika.user.persistence.UserRepository;
 import my.project.library.dailylexika.events.user.AccountDeletedEvent;
 import my.project.library.dailylexika.events.user.UserEmailUpdatedEvent;
 import my.project.library.util.datetime.DateUtil;
+import my.project.library.util.exception.BadRequestException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -27,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -43,21 +44,25 @@ public class UserServiceImpl implements PublicUserService, UserService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
+    @Transactional
     public void save(User user) {
         userRepository.save(user);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email.toLowerCase());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User getUserByEmail(String email) {
         return getUserEntityByEmail(email);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDto getUser() {
         User user = getAuthenticatedUser();
         return userMapper.toDto(user);
@@ -131,15 +136,15 @@ public class UserServiceImpl implements PublicUserService, UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<UserDto> getPageOfUsers(Pageable pageable) {
         Page<User> pageOfUsers = userRepository.findAll(pageable);
-
         List<UserDto> listOfUserDto = userMapper.toDtoList(pageOfUsers.getContent());
-
         return new PageImpl<>(listOfUserDto, pageable, pageOfUsers.getTotalElements());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User getUserEntityByEmail(String email) {
         return userRepository.findUserByEmail(email.toLowerCase())
                 .orElseThrow(() -> new UsernameNotFoundException(I18nUtil.getMessage("dailylexika-exceptions.authentication.usernameNotFound")));
@@ -152,7 +157,7 @@ public class UserServiceImpl implements PublicUserService, UserService {
     private void throwIfPasswordIncorrect(User user, String passwordFromRequest) {
         boolean passwordsMatch = passwordEncoder.matches(passwordFromRequest, user.getPassword());
         if (!passwordsMatch) {
-            throw new IllegalStateException("Incorrect password");
+            throw new BadRequestException(I18nUtil.getMessage("dailylexika-exceptions.authentication.incorrectPassword"));
         }
     }
 
@@ -173,6 +178,7 @@ public class UserServiceImpl implements PublicUserService, UserService {
                         .userId(user.getId())
                         .platform(platform)
                         .emailUpdated(emailUpdated)
+                        .build()
         );
     }
 }
