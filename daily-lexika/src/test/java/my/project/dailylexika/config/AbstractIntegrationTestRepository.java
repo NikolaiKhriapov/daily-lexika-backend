@@ -1,7 +1,7 @@
 package my.project.dailylexika.config;
 
-import my.project.dailylexika.config.datahandler.ExcelDataHandler;
-import my.project.dailylexika.config.datahandler.WordsLoader;
+import my.project.dailylexika.flashcard.service.datahandler.ExcelDataHandler;
+import my.project.dailylexika.flashcard.service.datahandler.WordsLoader;
 import my.project.dailylexika.util.DatabaseContainer;
 import org.junit.ClassRule;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;

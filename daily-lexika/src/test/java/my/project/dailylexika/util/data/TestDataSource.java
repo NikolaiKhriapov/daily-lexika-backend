@@ -105,7 +105,7 @@ public class TestDataSource {
      * argument(1): 'user.setOfRoleStatisticsDto' (platforms on which the user is already registered)
      * argument(2): expected ('setOfRoleStatisticsDto.roleName')
      */
-    public static Stream<Arguments> getRoleStatistics() {
+    public static Stream<Arguments> getRoleStatisticsEntity() {
         return Stream.of(
                 arguments(USER_CHINESE, Set.of(USER_CHINESE), USER_CHINESE),
                 arguments(USER_ENGLISH, Set.of(USER_ENGLISH), USER_ENGLISH),

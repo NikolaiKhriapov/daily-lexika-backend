@@ -1,5 +1,6 @@
 package my.project.dailylexika.util.data;
 
+import my.project.library.dailylexika.dtos.user.RoleStatisticsDto;
 import my.project.library.util.datetime.DateUtil;
 import my.project.library.dailylexika.dtos.flashcards.ReviewDto;
 import my.project.library.dailylexika.dtos.flashcards.ReviewStatisticsDto;
@@ -7,12 +8,12 @@ import my.project.library.dailylexika.dtos.user.AuthenticationRequest;
 import my.project.library.dailylexika.dtos.user.RegistrationRequest;
 import my.project.library.dailylexika.enumerations.Platform;
 import my.project.library.dailylexika.enumerations.Status;
-import my.project.dailylexika.entities.flashcards.Word;
-import my.project.dailylexika.entities.flashcards.WordData;
-import my.project.dailylexika.entities.flashcards.WordPack;
+import my.project.dailylexika.flashcard.model.entities.Word;
+import my.project.dailylexika.flashcard.model.entities.WordData;
+import my.project.dailylexika.flashcard.model.entities.WordPack;
 import my.project.library.dailylexika.enumerations.RoleName;
-import my.project.dailylexika.entities.user.RoleStatistics;
-import my.project.dailylexika.entities.user.User;
+import my.project.dailylexika.user.model.entities.RoleStatistics;
+import my.project.dailylexika.user.model.entities.User;
 import org.mockito.Mockito;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -152,8 +153,8 @@ public class TestDataUtil {
 
     // Statistics
 
-    public static RoleStatistics generateRoleStatistics(RoleName roleName) {
-        return new RoleStatistics(
+    public static RoleStatisticsDto generateRoleStatistics(RoleName roleName) {
+        return new RoleStatisticsDto(
                 FakerUtil.generateLongId(),
                 roleName,
                 FakerUtil.generateRandomLong(100L),
