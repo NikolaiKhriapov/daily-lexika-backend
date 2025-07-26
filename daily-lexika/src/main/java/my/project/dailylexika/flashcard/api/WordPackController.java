@@ -27,7 +27,7 @@ public class WordPackController {
 
     @GetMapping
     public ResponseEntity<List<WordPackDto>> getAllWordPacks() {
-        return ResponseEntity.ok(wordPackService.getAllWordPacksForUser());
+        return ResponseEntity.ok(wordPackService.getAllForUser());
     }
 
     //TODO::: move to WordController and rename
@@ -35,7 +35,7 @@ public class WordPackController {
     public ResponseEntity<Page<WordDto>> getPageOfWordsByWordPackName(@PathVariable("wordPackName") String wordPackName,
                                                                       @RequestParam("page") int page,
                                                                       @RequestParam("size") int size) {
-        return ResponseEntity.ok(wordService.getPageOfWordsByWordPackName(wordPackName, PageRequest.of(page, size)));
+        return ResponseEntity.ok(wordService.getPageByWordPackName(wordPackName, PageRequest.of(page, size)));
     }
 
     @PostMapping

@@ -64,6 +64,15 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional
+    public ReviewDto createReview(ReviewDto reviewDto) {
+        throwIfReviewAlreadyExistsByWordPackName(reviewDto.wordPackDto().name());
+        Review newReview = reviewRepository.save(generateReview(reviewDto));
+        return reviewMapper.toDto(newReview);
+    }
+
+    @Override
+    @Transactional
     public ReviewDto updateReview(Long reviewId, ReviewDto reviewDto) {
         Review review = getReview(reviewId);
 
@@ -80,12 +89,57 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public ReviewDto createReview(ReviewDto reviewDto) {
-        throwIfReviewAlreadyExistsByWordPackName(reviewDto.wordPackDto().name());
+    @Transactional
+    public void deleteReview(Long reviewId) {
+        reviewRepository.delete(getReview(reviewId));
+    }
 
-        Review newReview = reviewRepository.save(generateReview(reviewDto));
+    @Override
+    @Transactional(readOnly = true)
+    public ReviewStatisticsDto getReviewStatistics(Long reviewId) {
+        UserDto user = userService.getUser();
+        Platform platform = roleService.getPlatformByRoleName(user.role());
 
-        return reviewMapper.toDto(newReview);
+        Review review = getReview(reviewId);
+        List<Integer> wordDataIds = wordDataService.getAllWordDataIdByWordPackNameAndPlatform(review.getWordPack().getName(), platform);
+
+        Integer newWords = wordService.countByUserIdAndWordData_IdInAndStatus(user.id(), wordDataIds, NEW);
+        Integer reviewWords = wordService.countByUserIdAndWordData_IdInAndStatus(user.id(), wordDataIds, IN_REVIEW);
+        Integer knownWords = wordService.countByUserIdAndWordData_IdInAndStatus(user.id(), wordDataIds, KNOWN);
+
+        return new ReviewStatisticsDto(
+                review.getId(),
+                review.getWordPack().getName(),
+                newWords,
+                reviewWords,
+                knownWords
+        );
+    }
+
+    /**
+     * Rules for answering in Daily Reviews:
+     * - When NEW –> YES –> KNOWN
+     * - When NEW -> NO  -> IN_REVIEW
+     * - When KNOWN –> YES -> KNOWN
+     * - When KNOWN -> NO  -> IN_REVIEW
+     * - When IN_REVIEW(0-3) -> YES -> IN_REVIEW(1-4)
+     * - When IN_REVIEW(4) -> YES -> KNOWN
+     * Rules for generating a Daily Review:
+     * - First, the NEW words are added in the amount of review.maxNewWordsPerDay
+     * - Then, the IN_REVIEW words are added in the amount of review.maxReviewWordsPerDay * 0.7
+     * - Then, the KNOWN words are added in the amount of review.maxReviewWordsPerDay * 0.3
+     * - When it is not enough of the IN_REVIEW words, it is compensated by the KNOWN words, and vice versa
+     * IN_REVIEW -> if dateOfLastOccurrence >= totalStreak x2
+     * KNOWN -> if dateOfLastOccurrence >= totalStreak
+     */
+    @Override
+    @Transactional
+    public List<Word> generateListOfWordsForReview(WordPack wordPack, ReviewDto reviewDto) {
+        UserDto user = userService.getUser();
+        Platform platform = roleService.getPlatformByRoleName(user.role());
+        List<Integer> wordDataIds = getWordDataIdsForWordPack(wordPack, platform);
+        wordService.updateWordsForUser(user.id(), wordDataIds);
+        return fetchWordsForReview(user.id(), wordDataIds, reviewDto);
     }
 
     @Override
@@ -104,104 +158,90 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void deleteReview(Long reviewId) {
-        reviewRepository.delete(getReview(reviewId));
-    }
-
-    @Override
     @Transactional
     public ReviewDto processReviewAction(Long reviewId, Boolean isCorrect) {
         Review review = getReview(reviewId);
-        if (isCorrect != null) {
-            List<Word> listOfWords = new ArrayList<>(review.getListOfWords());
 
-            Word thisWord = listOfWords.get(0);
-            thisWord.setOccurrence((short) (thisWord.getOccurrence() + 1));
-
-            if (isCorrect) {
-                updateWordForCorrectAnswer(thisWord, listOfWords);
-            }
-            if (!isCorrect) {
-                updateWordForIncorrectAnswer(thisWord, listOfWords);
-            }
-
-            review.setListOfWords(listOfWords);
-
-            if (review.getListOfWords().isEmpty()) {
-                review.setDateLastCompleted(DateUtil.nowInUtc());
-                updateUserStreak();
-            }
-
-            review = reviewRepository.save(review);
+        if (isCorrect == null) {
+            return reviewMapper.toDto(review);
         }
 
+        processAnswer(review, isCorrect);
+        checkAndUpdateReviewCompletion(review);
+
+        review = reviewRepository.save(review);
         return reviewMapper.toDto(review);
     }
 
     @Override
-    public ReviewStatisticsDto getReviewStatistics(Long reviewId) {
-        UserDto user = userService.getUser();
-        Platform platform = roleService.getPlatformByRoleName(user.role());
+    @Transactional
+    public void updateUserStreak() {
+        RoleStatisticsDto roleStatistics = roleService.getRoleStatistics();
 
-        Review review = getReview(reviewId);
-        List<Integer> wordDataIds = wordDataService.findAllWordDataIdByWordPackNameAndPlatform(review.getWordPack().getName(), platform);
+        Long daysFromLastStreak = DAYS.between(roleStatistics.dateOfLastStreak(), DateUtil.nowInUtc());
+        Long differenceBetweenRecordStreakAndCurrentStreak = roleStatistics.recordStreak() - roleStatistics.currentStreak();
 
-        Integer newWords = wordService.countByUserIdAndWordData_IdInAndStatus(user.id(), wordDataIds, NEW);
-        Integer reviewWords = wordService.countByUserIdAndWordData_IdInAndStatus(user.id(), wordDataIds, IN_REVIEW);
-        Integer knownWords = wordService.countByUserIdAndWordData_IdInAndStatus(user.id(), wordDataIds, KNOWN);
-
-        return new ReviewStatisticsDto(
-                review.getId(),
-                review.getWordPack().getName(),
-                newWords,
-                reviewWords,
-                knownWords
-        );
+        updateCurrentStreak(roleStatistics, daysFromLastStreak);
+        updateRecordStreak(roleStatistics, differenceBetweenRecordStreakAndCurrentStreak, daysFromLastStreak);
     }
 
-    /**
-     * // Answering in Daily Reviews
-     * When NEW –> YES –> KNOWN
-     * When NEW -> NO  -> IN_REVIEW
-     * When KNOWN –> YES -> KNOWN
-     * When KNOWN -> NO  -> IN_REVIEW
-     * When IN_REVIEW(0-3) -> YES -> IN_REVIEW(1-4)
-     * When IN_REVIEW(4) -> YES -> KNOWN
-     * <p>
-     * // Generating a Daily Review
-     * First, the NEW words are added in the amount of review.maxNewWordsPerDay
-     * Then, the IN_REVIEW words are added in the amount of review.maxReviewWordsPerDay * 0.7
-     * Then, the KNOWN words are added in the amount of review.maxReviewWordsPerDay * 0.3
-     * When it is not enough of the IN_REVIEW words, it is compensated by the KNOWN words, and vice versa
-     * <p>
-     * IN_REVIEW -> if dateOfLastOccurrence >= totalStreak x2
-     * KNOWN -> if dateOfLastOccurrence >= totalStreak
-     **/
     @Override
-    public List<Word> generateListOfWordsForReview(WordPack wordPack, ReviewDto reviewDto) {
-        UserDto user = userService.getUser();
-        Platform platform = roleService.getPlatformByRoleName(user.role());
+    public void deleteAllByUserIdAndPlatform(Integer userId, Platform platform) {
+        List<Review> allReviewsByUserId = reviewRepository.findByUserIdAndWordPack_Platform(userId, platform);
+        reviewRepository.deleteAll(allReviewsByUserId);
+    }
 
-        List<Integer> wordDataIds = wordDataService.findAllWordDataIdByWordPackNameAndPlatform(wordPack.getName(), platform);
+    @Override
+    public void throwIfReviewExistsForWordPack(String wordPackName) {
+        Integer userId = userService.getUser().id();
 
+        Optional<Review> review = reviewRepository.findByUserIdAndWordPack_Name(userId, wordPackName);
+        review.ifPresent(reviewRepository::delete);
+    }
+
+    private void processAnswer(Review review, boolean isCorrect) {
+        List<Word> listOfWords = new ArrayList<>(review.getListOfWords());
+
+        Word currentWord = listOfWords.get(0);
+        currentWord.setOccurrence((short) (currentWord.getOccurrence() + 1));
+
+        if (isCorrect) {
+            updateWordForCorrectAnswer(currentWord, listOfWords);
+        } else {
+            updateWordForIncorrectAnswer(currentWord, listOfWords);
+        }
+
+        review.setListOfWords(listOfWords);
+    }
+
+    private void checkAndUpdateReviewCompletion(Review review) {
+        if (review.getListOfWords().isEmpty()) {
+            review.setDateLastCompleted(DateUtil.nowInUtc());
+            updateUserStreak();
+        }
+    }
+
+    private List<Integer> getWordDataIdsForWordPack(WordPack wordPack, Platform platform) {
+        List<Integer> wordDataIds = wordDataService.getAllWordDataIdByWordPackNameAndPlatform(wordPack.getName(), platform);
         if (wordDataIds.isEmpty()) {
             throw new BadRequestException(I18nUtil.getMessage("dailylexika-exceptions.wordPack.noWordData"));
         }
+        return wordDataIds;
+    }
 
-        wordService.updateWordsForUser(user.id(), wordDataIds);
-
-        List<Word> newWords = wordService.findAllByUserIdAndWordDataIdInAndStatusNewRandomLimited(
-                user.id(),
+    private List<Word> fetchWordsForReview(Integer userId, List<Integer> wordDataIds, ReviewDto reviewDto) {
+        List<Word> newWords = wordService.getAllByUserIdAndWordDataIdInAndStatusNewRandomLimited(
+                userId,
                 wordDataIds,
                 reviewDto.maxNewWordsPerDay()
         );
-        List<Word> reviewWords = wordService.findAllByUserIdAndWordDataIdInAndStatusInReviewAndPeriodBetweenOrderedDescLimited(
-                user.id(),
+        List<Word> reviewWords = wordService.getAllByUserIdAndWordDataIdInAndStatusInReviewAndPeriodBetweenOrderedDescLimited(
+                userId,
                 wordDataIds,
                 reviewDto.maxReviewWordsPerDay()
         );
-        List<Word> knownWords = wordService.findAllByUserIdAndWordDataIdInAndStatusKnownAndPeriodBetweenOrderedAscLimited(
-                user.id(),
+        List<Word> knownWords = wordService.getAllByUserIdAndWordDataIdInAndStatusKnownAndPeriodBetweenOrderedAscLimited(
+                userId,
                 wordDataIds,
                 reviewDto.maxReviewWordsPerDay() - reviewWords.size()
         );
@@ -219,32 +259,6 @@ public class ReviewServiceImpl implements ReviewService {
         return listOfWords;
     }
 
-    @Override
-    public void deleteAllByUserIdAndPlatform(Integer userId, Platform platform) {
-        List<Review> allReviewsByUserId = reviewRepository.findByUserIdAndWordPack_Platform(userId, platform);
-        reviewRepository.deleteAll(allReviewsByUserId);
-    }
-
-    @Override
-    @Transactional
-    public void updateUserStreak() {
-        RoleStatisticsDto roleStatistics = roleService.getRoleStatistics();
-
-        Long daysFromLastStreak = DAYS.between(roleStatistics.dateOfLastStreak(), DateUtil.nowInUtc());
-        Long differenceBetweenRecordStreakAndCurrentStreak = roleStatistics.recordStreak() - roleStatistics.currentStreak();
-
-        updateCurrentStreak(roleStatistics, daysFromLastStreak);
-        updateRecordStreak(roleStatistics, differenceBetweenRecordStreakAndCurrentStreak, daysFromLastStreak);
-    }
-
-    @Override
-    public void throwIfReviewExistsForWordPack(String wordPackName) {
-        Integer userId = userService.getUser().id();
-
-        Optional<Review> review = reviewRepository.findByUserIdAndWordPack_Name(userId, wordPackName);
-        review.ifPresent(reviewRepository::delete);
-    }
-
     private Review getReview(Long reviewId) {
         return reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException(I18nUtil.getMessage("dailylexika-exceptions.review.notFound")));
@@ -252,7 +266,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     private Review generateReview(ReviewDto reviewDto) {
         Integer userId = userService.getUser().id();
-        WordPack wordPack = wordPackService.findByName(reviewDto.wordPackDto().name());
+        WordPack wordPack = wordPackService.getByName(reviewDto.wordPackDto().name());
 
         List<Word> listOfWords = generateListOfWordsForReview(wordPack, reviewDto);
 

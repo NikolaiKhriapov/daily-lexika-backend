@@ -7,12 +7,12 @@ import my.project.library.dailylexika.enumerations.Platform;
 import java.util.List;
 
 public interface WordPackService {
-    WordPack findByName(String wordPackName);
-    List<WordPack> findAll();
+    List<WordPack> getAll();
+    List<WordPackDto> getAllForUser();
+    WordPack getByName(String wordPackName);
     void saveAll(List<WordPack> wordPacks);
-    List<WordPackDto> getAllWordPacksForUser();
+    void deleteAllByUserIdAndPlatform(Integer userId, Platform platform);
     void createCustomWordPack(WordPackDto wordPackDto);
     void deleteCustomWordPack(String wordPackName);
-    void deleteAllByUserIdAndPlatform(Integer userId, Platform platform);
     void throwIfWordPackCategoryNotCustom(WordPack wordPack);
 }

@@ -44,28 +44,17 @@ public class UserServiceImpl implements PublicUserService, UserService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
+    @Transactional(readOnly = true)
+    public Page<UserDto> getPage(Pageable pageable) {
+        Page<User> pageOfUsers = userRepository.findAll(pageable);
+        List<UserDto> listOfUserDto = userMapper.toDtoList(pageOfUsers.getContent());
+        return new PageImpl<>(listOfUserDto, pageable, pageOfUsers.getTotalElements());
+    }
+
+    @Override
     @Transactional
     public void save(User user) {
         userRepository.save(user);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean existsByEmail(String email) {
-        return userRepository.existsByEmail(email.toLowerCase());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public User getUserByEmail(String email) {
-        return getUserEntityByEmail(email);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public UserDto getUser() {
-        User user = getAuthenticatedUser();
-        return userMapper.toDto(user);
     }
 
     @Override
@@ -117,6 +106,26 @@ public class UserServiceImpl implements PublicUserService, UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email.toLowerCase());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserDto getUser() {
+        User user = getAuthenticatedUser();
+        return userMapper.toDto(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User getUserEntityByEmail(String email) {
+        return userRepository.findUserByEmail(email.toLowerCase())
+                .orElseThrow(() -> new UsernameNotFoundException(I18nUtil.getMessage("dailylexika-exceptions.authentication.usernameNotFound")));
+    }
+
+    @Override
     @Transactional
     public void updateCurrentStreak(Long newCurrentStreak) {
         User user = getAuthenticatedUser();
@@ -133,21 +142,6 @@ public class UserServiceImpl implements PublicUserService, UserService {
         RoleStatistics roleStatistics = roleService.getRoleStatisticsEntity();
         roleStatistics.setRecordStreak(newRecordStreak);
         userRepository.save(user);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<UserDto> getPageOfUsers(Pageable pageable) {
-        Page<User> pageOfUsers = userRepository.findAll(pageable);
-        List<UserDto> listOfUserDto = userMapper.toDtoList(pageOfUsers.getContent());
-        return new PageImpl<>(listOfUserDto, pageable, pageOfUsers.getTotalElements());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public User getUserEntityByEmail(String email) {
-        return userRepository.findUserByEmail(email.toLowerCase())
-                .orElseThrow(() -> new UsernameNotFoundException(I18nUtil.getMessage("dailylexika-exceptions.authentication.usernameNotFound")));
     }
 
     private User getAuthenticatedUser() {

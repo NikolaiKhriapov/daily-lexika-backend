@@ -8,11 +8,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface UserService {
+    Page<UserDto> getPage(Pageable pageable);
     void save(User user);
-    boolean existsByEmail(String email);
-    User getUserByEmail(String email);
     UserDto updateUserInfo(UserDto userDto);
     void updatePassword(PasswordUpdateRequest request);
     void deleteAccount(AccountDeletionRequest request);
-    Page<UserDto> getPageOfUsers(Pageable pageable);
+    boolean existsByEmail(String email);
 }

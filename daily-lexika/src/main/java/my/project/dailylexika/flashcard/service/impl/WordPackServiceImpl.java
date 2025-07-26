@@ -6,12 +6,10 @@ import my.project.dailylexika.flashcard.model.entities.WordPack;
 import my.project.dailylexika.flashcard.service.WordPackService;
 import my.project.dailylexika.user._public.PublicRoleService;
 import my.project.dailylexika.user._public.PublicUserService;
-import my.project.dailylexika.user.service.RoleService;
 import my.project.library.dailylexika.dtos.flashcards.WordPackDto;
 import my.project.library.dailylexika.dtos.user.UserDto;
 import my.project.library.dailylexika.enumerations.Category;
 import my.project.library.dailylexika.enumerations.Platform;
-import my.project.dailylexika.user.model.entities.User;
 import my.project.dailylexika.flashcard.model.mappers.WordPackMapper;
 import my.project.dailylexika.flashcard.persistence.WordPackRepository;
 import my.project.library.dailylexika.events.flashcard.CustomWordPackToBeDeletedEvent;
@@ -19,7 +17,6 @@ import my.project.library.util.exception.BadRequestException;
 import my.project.library.util.exception.ResourceAlreadyExistsException;
 import my.project.library.util.exception.ResourceNotFoundException;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,23 +34,12 @@ public class WordPackServiceImpl implements WordPackService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
-    public WordPack findByName(String wordPackName) {
-        return wordPackRepository.findById(wordPackName)
-                .orElseThrow(() -> new ResourceNotFoundException(I18nUtil.getMessage("dailylexika-exceptions.wordPack.notFound", wordPackName)));
-    }
-
-    @Override
-    public List<WordPack> findAll() {
+    public List<WordPack> getAll() {
         return wordPackRepository.findAll();
     }
 
     @Override
-    public void saveAll(List<WordPack> wordPacks) {
-        wordPackRepository.saveAll(wordPacks);
-    }
-
-    @Override
-    public List<WordPackDto> getAllWordPacksForUser() {
+    public List<WordPackDto> getAllForUser() {
         UserDto user = userService.getUser();
         Platform platform = roleService.getPlatformByRoleName(user.role());
 
@@ -70,6 +56,26 @@ public class WordPackServiceImpl implements WordPackService {
         allWordPacks.addAll(allWordPacksCustomFiltered);
 
         return wordPackMapper.toDtoList(allWordPacks);
+    }
+
+    @Override
+    public WordPack getByName(String wordPackName) {
+        return wordPackRepository.findById(wordPackName)
+                .orElseThrow(() -> new ResourceNotFoundException(I18nUtil.getMessage("dailylexika-exceptions.wordPack.notFound", wordPackName)));
+    }
+
+    @Override
+    public void saveAll(List<WordPack> wordPacks) {
+        wordPackRepository.saveAll(wordPacks);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllByUserIdAndPlatform(Integer userId, Platform platform) {
+        wordPackRepository.findAllByUserIdAndPlatformAndCategoryCustom(userId, platform)
+                .stream()
+                .filter(wordPack -> wordPack.getName().endsWith("__" + userId))
+                .forEach(wordPack -> deleteCustomWordPack(wordPack.getName()));
     }
 
     @Override
@@ -99,22 +105,10 @@ public class WordPackServiceImpl implements WordPackService {
     @Override
     @Transactional
     public void deleteCustomWordPack(String wordPackName) {
-        WordPack wordPack = findByName(wordPackName);
-
+        WordPack wordPack = getByName(wordPackName);
         throwIfWordPackCategoryNotCustom(wordPack);
-
         publishCustomWordPackToBeDeletedEvent(wordPack);
-
         wordPackRepository.delete(wordPack);
-    }
-
-    @Override
-    @Transactional
-    public void deleteAllByUserIdAndPlatform(Integer userId, Platform platform) {
-        wordPackRepository.findAllByUserIdAndPlatformAndCategoryCustom(userId, platform)
-                .stream()
-                .filter(wordPack -> wordPack.getName().endsWith("__" + userId))
-                .forEach(wordPack -> deleteCustomWordPack(wordPack.getName()));
     }
 
     @Override

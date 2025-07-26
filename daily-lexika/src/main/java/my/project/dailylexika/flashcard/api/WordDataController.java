@@ -17,6 +17,6 @@ public class WordDataController {
 
     @GetMapping
     public ResponseEntity<List<WordDataDto>> getAllWordData() {
-        return ResponseEntity.ok(wordDataService.getAllWordData());
+        return ResponseEntity.ok(wordDataService.getAll());
     }
 }

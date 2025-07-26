@@ -11,6 +11,7 @@ import my.project.dailylexika.notification.model.entities.Notification;
 import my.project.library.util.exception.InternalServerErrorException;
 import my.project.library.util.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -24,18 +25,21 @@ public class NotificationServiceImpl implements NotificationService {
     private final PublicUserService userService;
 
     @Override
-    public List<NotificationDto> getAllNotifications() {
+    @Transactional(readOnly = true)
+    public List<NotificationDto> getAll() {
         Integer userId = userService.getUser().id();
         List<Notification> listOfNotifications = notificationRepository.findAllByToUserId(userId);
         return notificationMapper.toDtoList(listOfNotifications);
     }
 
     @Override
+    @Transactional
     public void sendNotification(Notification notification) {
         notificationRepository.save(notification);
     }
 
     @Override
+    @Transactional
     public void readNotification(Integer notificationId) {
         Integer userId = userService.getUser().id();
         Notification notificationToBeUpdated = getNotificationById(notificationId);
@@ -48,6 +52,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    @Transactional
     public void deleteAllByUserId(Integer userId) {
         notificationRepository.deleteAllByToUserId(userId);
     }

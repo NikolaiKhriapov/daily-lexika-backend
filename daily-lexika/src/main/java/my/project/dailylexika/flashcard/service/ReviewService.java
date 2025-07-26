@@ -10,14 +10,14 @@ import java.util.List;
 
 public interface ReviewService {
     List<ReviewDto> getAllReviews();
-    ReviewDto updateReview(Long reviewId, ReviewDto reviewDto);
     ReviewDto createReview(ReviewDto reviewDto);
-    ReviewDto refreshReview(Long reviewId);
+    ReviewDto updateReview(Long reviewId, ReviewDto reviewDto);
     void deleteReview(Long reviewId);
-    ReviewDto processReviewAction(Long reviewId, Boolean isCorrect);
     ReviewStatisticsDto getReviewStatistics(Long reviewId);
     List<Word> generateListOfWordsForReview(WordPack wordPack, ReviewDto reviewDto);
-    void deleteAllByUserIdAndPlatform(Integer userId, Platform platform);
+    ReviewDto refreshReview(Long reviewId);
+    ReviewDto processReviewAction(Long reviewId, Boolean isCorrect);
     void updateUserStreak();
+    void deleteAllByUserIdAndPlatform(Integer userId, Platform platform);
     void throwIfReviewExistsForWordPack(String wordPackName);
 }

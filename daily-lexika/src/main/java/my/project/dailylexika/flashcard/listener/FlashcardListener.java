@@ -42,11 +42,11 @@ public class FlashcardListener {
     @EventListener
     @Transactional
     public void on(CustomWordPackToBeDeletedEvent event) {
-        WordPack wordPack = wordPackService.findByName(event.wordPackName());
+        WordPack wordPack = wordPackService.getByName(event.wordPackName());
 
         reviewService.throwIfReviewExistsForWordPack(event.wordPackName());
 
-        List<WordData> listOfWordData = wordDataService.findAllByWordPackNameAndPlatform(wordPack.getName(), event.platform());
+        List<WordData> listOfWordData = wordDataService.getAllByWordPackNameAndPlatform(wordPack.getName(), event.platform());
         listOfWordData.forEach(wordData -> {
             List<WordPack> listOfWordPacks = wordData.getListOfWordPacks();
             listOfWordPacks.remove(wordPack);

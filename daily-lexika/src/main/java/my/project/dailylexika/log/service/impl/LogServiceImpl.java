@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,15 +24,15 @@ public class LogServiceImpl implements LogService {
     private final LogMapper logMapper;
 
     @Override
-    public Page<LogDto> getPageOfLogs(Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<LogDto> getPage(Pageable pageable) {
         Page<Log> pageOfLogs = logRepository.findAll(pageable);
-
         List<LogDto> listOfUserDto = logMapper.toDtoList(pageOfLogs.getContent());
-
         return new PageImpl<>(listOfUserDto, pageable, pageOfLogs.getTotalElements());
     }
 
     @Override
+    @Transactional
     public void logAccountRegistration(Integer userId, String userEmail, Platform platform) {
         logRepository.save(
                 new Log(
@@ -44,6 +45,7 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
+    @Transactional
     public void logAccountDeletion(Integer userId, String userEmail, Platform platform) {
         logRepository.save(
                 new Log(
@@ -56,6 +58,7 @@ public class LogServiceImpl implements LogService {
     }
 
     @Override
+    @Transactional
     public void logEmailUpdate(Integer userId, String userEmail, Platform platform, String emailUpdated) {
         logRepository.save(
                 new Log(

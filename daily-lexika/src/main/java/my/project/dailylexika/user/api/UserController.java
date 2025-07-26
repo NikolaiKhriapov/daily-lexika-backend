@@ -53,7 +53,6 @@ public class UserController {
         Sort sort = sortDirection.equalsIgnoreCase("desc")
                 ? Sort.by(Sort.Direction.DESC, "id")
                 : Sort.by(Sort.Direction.ASC, "id");
-
-        return ResponseEntity.ok(userService.getPageOfUsers(PageRequest.of(page, size, sort)));
+        return ResponseEntity.ok(userService.getPage(PageRequest.of(page, size, sort)));
     }
 }

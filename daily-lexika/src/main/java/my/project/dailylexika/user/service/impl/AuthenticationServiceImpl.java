@@ -1,6 +1,7 @@
 package my.project.dailylexika.user.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import my.project.dailylexika.user._public.PublicUserService;
 import my.project.dailylexika.user.service.AuthenticationService;
 import my.project.dailylexika.user.service.RoleService;
 import my.project.dailylexika.user.service.UserService;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserService userService;
+    private final PublicUserService publicUserService;
     private final RoleService roleService;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -34,25 +36,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     public AuthenticationResponse register(RegistrationRequest registrationRequest) {
         boolean isUserAlreadyExists = userService.existsByEmail(registrationRequest.email());
-
         RoleName roleName = roleService.getRoleNameByPlatform(registrationRequest.platform());
 
-        User user;
-        if (!isUserAlreadyExists) {
-            user = new User(
-                    registrationRequest.name(),
-                    registrationRequest.email().toLowerCase(),
-                    passwordEncoder.encode(registrationRequest.password())
-            );
-        } else {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            registrationRequest.email(),
-                            registrationRequest.password()
-                    )
-            );
-            user = userService.getUserByEmail(registrationRequest.email());
-        }
+        User user = getOrCreateUser(registrationRequest, isUserAlreadyExists);
 
         roleService.addRoleToUserRoles(user, roleName);
         user.setRole(roleName);
@@ -73,7 +59,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         authenticationRequest.password()
                 )
         );
-        User user = userService.getUserByEmail(authenticationRequest.email());
+        User user = publicUserService.getUserEntityByEmail(authenticationRequest.email());
         RoleName roleName = roleService.getRoleNameByPlatform(authenticationRequest.platform());
 
         roleService.throwIfUserNotRegisteredOnPlatform(user, roleName);
@@ -82,6 +68,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         String jwtToken = jwtService.generateToken(user.getUsername(), user.getRole().name());
         return new AuthenticationResponse(jwtToken);
+    }
+
+    private User getOrCreateUser(RegistrationRequest request, boolean isUserAlreadyExists) {
+        if (!isUserAlreadyExists) {
+            return new User(
+                    request.name(),
+                    request.email().toLowerCase(),
+                    passwordEncoder.encode(request.password())
+            );
+        } else {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.email(), request.password())
+            );
+            return publicUserService.getUserEntityByEmail(request.email());
+        }
     }
 
     private void publishAccountRegisteredEvent(User user, Platform platform, boolean isUserAlreadyExists) {

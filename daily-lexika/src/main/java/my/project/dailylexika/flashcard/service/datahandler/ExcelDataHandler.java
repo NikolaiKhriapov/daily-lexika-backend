@@ -166,7 +166,7 @@ public class ExcelDataHandler {
     }
 
     private void saveWordPacksToDatabase(List<WordPack> listOfWordPacks) {
-        List<WordPack> allWordPacks = wordPackService.findAll();
+        List<WordPack> allWordPacks = wordPackService.getAll();
         List<String> allWordPackNames = allWordPacks.stream()
                 .map(WordPack::getName)
                 .toList();
@@ -176,7 +176,7 @@ public class ExcelDataHandler {
             if (!allWordPackNames.contains(wordPack.getName())) {
                 wordsPacksToBeSavedOrUpdated.add(wordPack);
             } else {
-                WordPack wordPackToBeUpdated = wordPackService.findByName(wordPack.getName());
+                WordPack wordPackToBeUpdated = wordPackService.getByName(wordPack.getName());
                 wordPackToBeUpdated.setDescription(wordPack.getDescription());
                 wordPackToBeUpdated.setCategory(wordPack.getCategory());
                 wordPackToBeUpdated.setPlatform(wordPack.getPlatform());
@@ -187,7 +187,7 @@ public class ExcelDataHandler {
     }
 
     private void saveWordsToDatabase(List<WordData> listOfNewWordData, Platform platform) {
-        List<WordData> allExistingWordData = wordDataService.findAllByPlatform(platform);
+        List<WordData> allExistingWordData = wordDataService.getAllByPlatform(platform);
         List<Integer> allExistingWordDataIds = allExistingWordData.stream().map(WordData::getId).toList();
         List<Integer> allNewWordDataIds = listOfNewWordData.stream().map(WordData::getId).toList();
 
@@ -203,7 +203,7 @@ public class ExcelDataHandler {
             if (!allExistingWordDataIds.contains(wordData.getId())) {
                 wordsToBeSavedOrUpdated.add(wordData);
             } else {
-                WordData wordDataToBeUpdated = wordDataService.findEntityById(wordData.getId());
+                WordData wordDataToBeUpdated = wordDataService.getEntityById(wordData.getId());
                 wordDataToBeUpdated.setNameChinese(wordData.getNameChinese());
                 wordDataToBeUpdated.setTranscription(wordData.getTranscription());
                 wordDataToBeUpdated.setNameEnglish(wordData.getNameEnglish());
@@ -237,12 +237,12 @@ public class ExcelDataHandler {
                 .toList();
 
         wordPackNames.forEach(wordPackName -> {
-            WordPack wordPack = wordPackService.findByName(wordPackName);
+            WordPack wordPack = wordPackService.getByName(wordPackName);
             listOfWordPacks.add(wordPack);
         });
 
         try {
-            WordData wordDataExisting = wordDataService.findEntityById(wordData.getId());
+            WordData wordDataExisting = wordDataService.getEntityById(wordData.getId());
             for (WordPack wordPack : wordDataExisting.getListOfWordPacks()) {
                 if (wordPack.getCategory() == Category.CUSTOM) {
                     listOfWordPacks.add(wordPack);

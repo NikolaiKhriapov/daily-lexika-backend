@@ -20,7 +20,7 @@ public class WordController {
     public ResponseEntity<Page<WordDto>> getAllWordsByStatus(@PathVariable("status") Status status,
                                                              @RequestParam("page") int page,
                                                              @RequestParam("size") int size) {
-        return ResponseEntity.ok(wordService.getPageOfWordsByStatus(status, PageRequest.of(page, size)));
+        return ResponseEntity.ok(wordService.getPageByStatus(status, PageRequest.of(page, size)));
     }
 
     @GetMapping("/word-of-the-day")
@@ -30,6 +30,6 @@ public class WordController {
 
     @GetMapping("/by-word-data/{id}")
     public ResponseEntity<WordDto> getWordByWordDataId(@PathVariable("id") Integer wordDataId) {
-        return ResponseEntity.ok(wordService.findByWordDataId(wordDataId));
+        return ResponseEntity.ok(wordService.getByWordDataId(wordDataId));
     }
 }

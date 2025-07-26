@@ -1,5 +1,6 @@
 package my.project.dailylexika.user.service;
 
+import my.project.dailylexika.user._public.PublicUserService;
 import my.project.dailylexika.user.service.impl.AuthenticationServiceImpl;
 import my.project.library.util.security.JwtService;
 import my.project.library.dailylexika.dtos.user.AuthenticationRequest;
@@ -38,12 +39,15 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
     @Mock
     private UserService userService;
     @Mock
+    private PublicUserService publicUserService;
+    @Mock
     private ApplicationEventPublisher eventPublisher;
 
     @BeforeEach
     void setUp() {
         underTest = new AuthenticationServiceImpl(
                 userService,
+                publicUserService,
                 roleService,
                 jwtService,
                 authenticationManager,
@@ -92,7 +96,7 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
         User existingUser = generateUser(registrationRequest, existingRoleName);
 
         given(userService.existsByEmail(any())).willReturn(true);
-        given(userService.getUserByEmail(any())).willReturn(existingUser);
+        given(publicUserService.getUserEntityByEmail(any())).willReturn(existingUser);
         given(roleService.getRoleNameByPlatform(any())).willReturn(newRoleName);
         doAnswer(inv -> {
             User user      = inv.getArgument(0, User.class);
@@ -131,7 +135,7 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
         AuthenticationRequest authenticationRequest = generateAuthenticationRequest(platform);
         User existingUser = generateUser(authenticationRequest, roleName);
 
-        given(userService.getUserByEmail(any())).willReturn(existingUser);
+        given(publicUserService.getUserEntityByEmail(any())).willReturn(existingUser);
         given(roleService.getRoleNameByPlatform(any())).willReturn(roleName);
         willDoNothing().given(roleService).throwIfUserNotRegisteredOnPlatform(any(), any());
 

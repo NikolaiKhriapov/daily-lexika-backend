@@ -26,6 +26,6 @@ public class LogController {
                 ? Sort.by(Sort.Direction.DESC, "id")
                 : Sort.by(Sort.Direction.ASC, "id");
 
-        return ResponseEntity.ok(logService.getPageOfLogs(PageRequest.of(page, size, sort)));
+        return ResponseEntity.ok(logService.getPage(PageRequest.of(page, size, sort)));
     }
 }

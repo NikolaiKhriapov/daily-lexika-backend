@@ -6,8 +6,8 @@ import my.project.library.dailylexika.enumerations.Platform;
 import my.project.library.dailylexika.enumerations.RoleName;
 
 public interface RoleService {
-    void addRoleToUserRoles(User user, RoleName roleName);
     RoleName getRoleNameByPlatform(Platform platform);
+    void addRoleToUserRoles(User user, RoleName roleName);
     RoleStatistics getRoleStatisticsEntity();
     void throwIfUserNotRegisteredOnPlatform(User user, RoleName roleName);
 }

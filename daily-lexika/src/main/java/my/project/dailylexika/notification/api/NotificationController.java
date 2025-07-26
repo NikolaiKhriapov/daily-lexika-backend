@@ -18,7 +18,7 @@ public class NotificationController {
 
     @GetMapping
     public ResponseEntity<List<NotificationDto>> getAllNotifications() {
-        return ResponseEntity.ok(notificationService.getAllNotifications());
+        return ResponseEntity.ok(notificationService.getAll());
     }
 
     @PatchMapping("/read/{notificationId}")
