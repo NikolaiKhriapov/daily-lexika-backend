@@ -1,13 +1,15 @@
 package my.project.dailylexika.services.user;
 
 import my.project.dailylexika.config.AbstractUnitTest;
-import my.project.dailylexika.mappers.user.UserMapper;
-import my.project.dailylexika.repositories.user.UserRepository;
-import my.project.dailylexika.services.flashcards.ReviewService;
-import my.project.dailylexika.services.flashcards.WordPackService;
-import my.project.dailylexika.services.flashcards.WordService;
-import my.project.dailylexika.services.log.LogService;
-import my.project.dailylexika.services.notification.NotificationService;
+import my.project.dailylexika.user.model.mappers.UserMapper;
+import my.project.dailylexika.user.persistence.UserRepository;
+import my.project.dailylexika.flashcard.service.ReviewService;
+import my.project.dailylexika.flashcard.service.WordPackService;
+import my.project.dailylexika.flashcard.service.WordService;
+import my.project.dailylexika.log.service.LogService;
+import my.project.dailylexika.notification.service.NotificationService;
+import my.project.dailylexika.user.service.RoleService;
+import my.project.dailylexika.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -2,7 +2,7 @@ package my.project.dailylexika.controllers.flashcards;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import my.project.library.dailylexika.dtos.flashcards.ReviewDto;
-import my.project.dailylexika.repositories.flashcards.ReviewRepository;
+import my.project.dailylexika.flashcard.persistence.ReviewRepository;
 import my.project.dailylexika.config.AbstractIntegrationTest;
 import my.project.dailylexika.util.MockMvcService;
 import org.junit.jupiter.api.AfterEach;

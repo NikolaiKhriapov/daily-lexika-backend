@@ -1,9 +1,10 @@
 package my.project.dailylexika.services.user;
 
+import my.project.dailylexika.user.service.RoleService;
 import my.project.library.dailylexika.enumerations.Platform;
 import my.project.library.dailylexika.enumerations.RoleName;
-import my.project.dailylexika.entities.user.RoleStatistics;
-import my.project.dailylexika.entities.user.User;
+import my.project.dailylexika.user.model.entities.RoleStatistics;
+import my.project.dailylexika.user.model.entities.User;
 import my.project.dailylexika.config.AbstractUnitTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;

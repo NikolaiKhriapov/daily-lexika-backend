@@ -1,16 +1,19 @@
 package my.project.dailylexika.services.user;
 
+import my.project.dailylexika.user.service.AuthenticationService;
+import my.project.dailylexika.user.service.RoleService;
+import my.project.dailylexika.user.service.UserService;
 import my.project.library.util.security.JwtService;
 import my.project.library.dailylexika.dtos.user.AuthenticationRequest;
 import my.project.library.dailylexika.dtos.user.AuthenticationResponse;
 import my.project.library.dailylexika.dtos.user.RegistrationRequest;
 import my.project.library.dailylexika.enumerations.Platform;
 import my.project.library.dailylexika.enumerations.RoleName;
-import my.project.dailylexika.entities.user.RoleStatistics;
-import my.project.dailylexika.entities.user.User;
-import my.project.dailylexika.services.flashcards.WordService;
-import my.project.dailylexika.services.log.LogService;
-import my.project.dailylexika.services.notification.NotificationService;
+import my.project.dailylexika.user.model.entities.RoleStatistics;
+import my.project.dailylexika.user.model.entities.User;
+import my.project.dailylexika.flashcard.service.WordService;
+import my.project.dailylexika.log.service.LogService;
+import my.project.dailylexika.notification.service.NotificationService;
 import my.project.dailylexika.config.AbstractUnitTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;

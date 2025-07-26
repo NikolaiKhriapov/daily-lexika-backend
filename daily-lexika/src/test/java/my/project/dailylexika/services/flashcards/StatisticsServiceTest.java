@@ -1,14 +1,16 @@
 package my.project.dailylexika.services.flashcards;
 
 import my.project.dailylexika.config.AbstractUnitTest;
+import my.project.dailylexika.flashcard.service.ReviewService;
+import my.project.dailylexika.flashcard.service.StatisticsService;
 import my.project.library.dailylexika.dtos.flashcards.ReviewDto;
 import my.project.library.dailylexika.dtos.flashcards.ReviewStatisticsDto;
 import my.project.library.dailylexika.dtos.flashcards.StatisticsDto;
-import my.project.dailylexika.entities.flashcards.Word;
-import my.project.dailylexika.entities.user.RoleStatistics;
-import my.project.dailylexika.entities.user.User;
-import my.project.dailylexika.repositories.flashcards.WordRepository;
-import my.project.dailylexika.services.user.RoleService;
+import my.project.dailylexika.flashcard.model.entities.Word;
+import my.project.dailylexika.user.model.entities.RoleStatistics;
+import my.project.dailylexika.user.model.entities.User;
+import my.project.dailylexika.flashcard.persistence.WordRepository;
+import my.project.dailylexika.user.service.RoleService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;

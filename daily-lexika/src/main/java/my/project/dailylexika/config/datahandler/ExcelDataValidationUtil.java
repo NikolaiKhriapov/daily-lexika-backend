@@ -2,7 +2,7 @@ package my.project.dailylexika.config.datahandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import my.project.dailylexika.entities.flashcards.WordData;
+import my.project.dailylexika.flashcard.model.entities.WordData;
 
 import java.util.Collection;
 import java.util.List;

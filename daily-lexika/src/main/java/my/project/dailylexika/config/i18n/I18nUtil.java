@@ -1,7 +1,7 @@
 package my.project.dailylexika.config.i18n;
 
 import my.project.library.dailylexika.enumerations.Language;
-import my.project.dailylexika.entities.user.User;
+import my.project.dailylexika.user.model.entities.User;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Locale;
