@@ -16,53 +16,32 @@ services:
                "-c", "log_rotation_age=1d",
                "-c", "log_rotation_size=0" ]
     environment:
-#      POSTGRES_DB: daily_lexika # daily_budget, admin
+#      POSTGRES_DB: daily_lexika # admin
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - '5432:5432'
 
-  admin:
-    build:
-      context: admin
-    platform: linux/amd64
-    container_name: nikolai-backend-admin
-#    image: kolyakhryapov/nikolai-backend-admin:latest
-    restart: always
-    depends_on:
-      - db
-    ports:
-      - "8080:8080"
-    env_file:
-      - .env
-    environment:
-      DAILY_LEXIKA_BASE_URL: ${DAILY_LEXIKA_BASE_URL}
-      DAILY_BUDGET_BASE_URL: ${DAILY_BUDGET_BASE_URL}
-      ADMIN_BASE_URL: ${ADMIN_BASE_URL}
-      DB_HOST: ${DB_HOST}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-
-  daily-budget:
-    build:
-      context: daily-budget
-    platform: linux/amd64
-    container_name: nikolai-backend-daily-budget
-#    image: kolyakhryapov/nikolai-backend-daily-budget:latest
-    restart: always
-    depends_on:
-      - db
-    ports:
-      - "8001:8001"
-    env_file:
-      - .env
-    environment:
-      DAILY_LEXIKA_BASE_URL: ${DAILY_LEXIKA_BASE_URL}
-      DAILY_BUDGET_BASE_URL: ${DAILY_BUDGET_BASE_URL}
-      ADMIN_BASE_URL: ${ADMIN_BASE_URL}
-      DB_HOST: ${DB_HOST}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
+#  admin:
+#    build:
+#      context: admin
+#    platform: linux/amd64
+#    container_name: nikolai-backend-admin
+##    image: kolyakhryapov/nikolai-backend-admin:latest
+#    restart: always
+#    depends_on:
+#      - db
+#    ports:
+#      - "8080:8080"
+#    env_file:
+#      - .env
+#    environment:
+#      DAILY_LEXIKA_BASE_URL: ${DAILY_LEXIKA_BASE_URL}
+#      ADMIN_BASE_URL: ${ADMIN_BASE_URL}
+#      DB_HOST: ${DB_HOST}
+#      DB_USERNAME: ${DB_USERNAME}
+#      DB_PASSWORD: ${DB_PASSWORD}
+#
 
   daily-lexika:
     build:
@@ -79,7 +58,6 @@ services:
       - .env
     environment:
       DAILY_LEXIKA_BASE_URL: ${DAILY_LEXIKA_BASE_URL}
-      DAILY_BUDGET_BASE_URL: ${DAILY_BUDGET_BASE_URL}
       ADMIN_BASE_URL: ${ADMIN_BASE_URL}
       DB_HOST: ${DB_HOST}
       DB_USERNAME: ${DB_USERNAME}

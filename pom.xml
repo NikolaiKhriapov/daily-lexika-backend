@@ -15,7 +15,6 @@
 
     <modules>
         <module>library</module>
-        <module>daily-budget</module>
         <module>daily-lexika</module>
         <module>admin</module>
     </modules>
