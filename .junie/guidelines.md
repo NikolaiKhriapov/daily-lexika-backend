@@ -1,6 +1,6 @@
 # Developer Guidelines <!-- KEEP THIS FILE SHORT, ACTIONABLE & ALWAYS UP-TO-DATE -->
 
-This document provides essential project information. It covers the project structure, tech stack, and guidelines for development, testing, and deployment.
+This document provides essential project information. It covers the project structure, tech stack, and guidelines for development and testing.
 
 ## Project Overview
 
