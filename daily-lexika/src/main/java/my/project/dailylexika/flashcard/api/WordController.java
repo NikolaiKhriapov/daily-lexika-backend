@@ -23,6 +23,13 @@ public class WordController {
         return ResponseEntity.ok(wordService.getPageByStatus(status, PageRequest.of(page, size)));
     }
 
+    @GetMapping("/word-pack/{wordPackName}")
+    public ResponseEntity<Page<WordDto>> getPageOfWordsByWordPackName(@PathVariable("wordPackName") String wordPackName,
+                                                                      @RequestParam("page") int page,
+                                                                      @RequestParam("size") int size) {
+        return ResponseEntity.ok(wordService.getPageByWordPackName(wordPackName, PageRequest.of(page, size)));
+    }
+
     @GetMapping("/word-of-the-day")
     public ResponseEntity<WordDto> getWordOfTheDay() {
         return ResponseEntity.ok(wordService.getWordOfTheDay());
