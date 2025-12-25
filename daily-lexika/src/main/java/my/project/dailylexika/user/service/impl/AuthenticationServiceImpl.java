@@ -19,9 +19,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 @Service
 @RequiredArgsConstructor
+@Validated
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserService userService;
@@ -35,10 +37,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     @Transactional
     public AuthenticationResponse register(RegistrationRequest registrationRequest) {
-        boolean isUserAlreadyExists = userService.existsByEmail(registrationRequest.email());
+        String email = registrationRequest.email().toLowerCase();
+        boolean isUserAlreadyExists = userService.existsByEmail(email);
         RoleName roleName = roleService.getRoleNameByPlatform(registrationRequest.platform());
 
-        User user = getOrCreateUser(registrationRequest, isUserAlreadyExists);
+        User user = getOrCreateUser(registrationRequest, isUserAlreadyExists, email);
 
         roleService.addRoleToUserRoles(user, roleName);
         user.setRole(roleName);
@@ -53,13 +56,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     @Transactional
     public AuthenticationResponse login(AuthenticationRequest authenticationRequest) {
+        String email = authenticationRequest.email().toLowerCase();
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        authenticationRequest.email(),
+                        email,
                         authenticationRequest.password()
                 )
         );
-        User user = publicUserService.getUserEntityByEmail(authenticationRequest.email());
+        User user = publicUserService.getUserEntityByEmail(email);
         RoleName roleName = roleService.getRoleNameByPlatform(authenticationRequest.platform());
 
         roleService.throwIfUserNotRegisteredOnPlatform(user, roleName);
@@ -70,18 +74,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return new AuthenticationResponse(jwtToken);
     }
 
-    private User getOrCreateUser(RegistrationRequest request, boolean isUserAlreadyExists) {
+    private User getOrCreateUser(RegistrationRequest request, boolean isUserAlreadyExists, String email) {
         if (!isUserAlreadyExists) {
             return new User(
                     request.name(),
-                    request.email().toLowerCase(),
+                    email,
                     passwordEncoder.encode(request.password())
             );
         } else {
             authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.email(), request.password())
+                    new UsernamePasswordAuthenticationToken(email, request.password())
             );
-            return publicUserService.getUserEntityByEmail(request.email());
+            return publicUserService.getUserEntityByEmail(email);
         }
     }
 

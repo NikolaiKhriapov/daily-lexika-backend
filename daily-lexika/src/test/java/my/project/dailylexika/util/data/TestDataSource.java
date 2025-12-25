@@ -1,5 +1,7 @@
 package my.project.dailylexika.util.data;
 
+import my.project.library.dailylexika.dtos.user.AuthenticationRequest;
+import my.project.library.dailylexika.dtos.user.RegistrationRequest;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.Set;
@@ -15,10 +17,6 @@ public class TestDataSource {
 
     // AuthenticationServiceTest.java
 
-    /**
-     * argument(0): platform on which the user is being registered)
-     * argument(1): role that will be added to user
-     */
     public static Stream<Arguments> register_newUser() {
         return Stream.of(
                 arguments(CHINESE, USER_CHINESE),
@@ -26,11 +24,6 @@ public class TestDataSource {
         );
     }
 
-    /**
-     * argument(0): platform on which the user is being registered (second one)
-     * argument(1): user role (existing)
-     * argument(2): user role (to be added)
-     */
     public static Stream<Arguments> register_existingUserNewPlatform() {
         return Stream.of(
                 arguments(CHINESE, USER_ENGLISH, USER_CHINESE),
@@ -38,15 +31,74 @@ public class TestDataSource {
         );
     }
 
-    /**
-     * argument(0): platform on which the user is being logged in
-     * argument(1): user role (existing)
-     */
-    public static Stream<Arguments> login() {
+    public static Stream<Arguments> register_emailNormalization() {
         return Stream.of(
-                arguments(ENGLISH, USER_ENGLISH),
-                arguments(CHINESE, USER_CHINESE)
+                arguments(ENGLISH, USER_ENGLISH, "User@Test.com", "user@test.com"),
+                arguments(CHINESE, USER_CHINESE, "UPPER@TEST.COM", "upper@test.com")
         );
+    }
+
+    public static Stream<Arguments> register_throwIfInvalidInput() {
+        return Stream.of(
+                arguments(new RegistrationRequest(null, "user@test.com", "pass", ENGLISH)),
+                arguments(new RegistrationRequest(" ", "user@test.com", "pass", ENGLISH)),
+                arguments(new RegistrationRequest("", "user@test.com", "pass", ENGLISH)),
+                arguments(new RegistrationRequest("User", null, "pass", ENGLISH)),
+                arguments(new RegistrationRequest("User", " ", "pass", ENGLISH)),
+                arguments(new RegistrationRequest("User", "", "pass", ENGLISH)),
+                arguments(new RegistrationRequest("User", "user@test.com", null, ENGLISH)),
+                arguments(new RegistrationRequest("User", "user@test.com", " ", ENGLISH)),
+                arguments(new RegistrationRequest("User", "user@test.com", "", ENGLISH)),
+                arguments(new RegistrationRequest("User", "user@test.com", "pass", null))
+        );
+    }
+
+    public static Stream<Arguments> register_throwIfExistingUserInvalidPassword() {
+        return Stream.of(
+                arguments(CHINESE),
+                arguments(ENGLISH)
+        );
+    }
+
+    public static Stream<Arguments> register_throwIfExistingUserAlreadyHasRole() {
+        return register_newUser();
+    }
+
+    public static Stream<Arguments> login_success() {
+        return Stream.of(
+                arguments(CHINESE, USER_CHINESE),
+                arguments(ENGLISH, USER_ENGLISH)
+        );
+    }
+
+    public static Stream<Arguments> login_mixedCaseEmail() {
+        return Stream.of(
+                arguments(ENGLISH, USER_ENGLISH, "User@Test.com"),
+                arguments(CHINESE, USER_CHINESE, "MiXeD@Example.com")
+        );
+    }
+
+    public static Stream<Arguments> login_throwIfInvalidInput() {
+        return Stream.of(
+                arguments(new AuthenticationRequest(null, "pass", ENGLISH)),
+                arguments(new AuthenticationRequest(" ", "pass", ENGLISH)),
+                arguments(new AuthenticationRequest("", "pass", ENGLISH)),
+                arguments(new AuthenticationRequest("user@test.com", null, ENGLISH)),
+                arguments(new AuthenticationRequest("user@test.com", " ", ENGLISH)),
+                arguments(new AuthenticationRequest("user@test.com", "", ENGLISH)),
+                arguments(new AuthenticationRequest("user@test.com", "pass", null))
+        );
+    }
+
+    public static Stream<Arguments> login_throwIfBadCredentials() {
+        return Stream.of(
+                arguments(CHINESE),
+                arguments(ENGLISH)
+        );
+    }
+
+    public static Stream<Arguments> login_throwIfUserNotRegisteredOnPlatform() {
+        return login_success();
     }
 
     // RoleServiceTest.java
@@ -122,17 +174,6 @@ public class TestDataSource {
         return Stream.of(
                 arguments(USER_CHINESE, Set.of(USER_ENGLISH)),
                 arguments(USER_ENGLISH, Set.of(USER_CHINESE))
-        );
-    }
-
-    /**
-     * argument(0): 'user.role' (user current role; platform on which the user is already registered)
-     * argument(1): 'user.role' (platform on which the user is not registered)
-     */
-    public static Stream<Arguments> throwIfUserNotRegisteredOnPlatform() {
-        return Stream.of(
-                arguments(USER_CHINESE, USER_ENGLISH),
-                arguments(USER_ENGLISH, USER_CHINESE)
         );
     }
 
