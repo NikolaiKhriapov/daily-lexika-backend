@@ -1,6 +1,6 @@
 package my.project.library.dailylexika.dtos.user;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import my.project.library.dailylexika.enumerations.Language;
 import my.project.library.dailylexika.enumerations.RoleName;
 
@@ -12,10 +12,10 @@ public record UserDto(
 
         Integer id,
 
-        @NotEmpty
+        @NotBlank
         String name,
 
-        @NotEmpty
+        @NotBlank
         String email,
 
         RoleName role,

@@ -1,7 +1,10 @@
 package my.project.dailylexika.util.data;
 
+import my.project.library.dailylexika.dtos.user.AccountDeletionRequest;
 import my.project.library.dailylexika.dtos.user.AuthenticationRequest;
+import my.project.library.dailylexika.dtos.user.PasswordUpdateRequest;
 import my.project.library.dailylexika.dtos.user.RegistrationRequest;
+import my.project.library.dailylexika.dtos.user.UserDto;
 import org.junit.jupiter.params.provider.Arguments;
 
 import java.util.Set;
@@ -184,5 +187,111 @@ public class TestDataSource {
                 arguments(USER_CHINESE, Set.of(USER_CHINESE, USER_ENGLISH), USER_CHINESE),
                 arguments(USER_ENGLISH, Set.of(USER_CHINESE, USER_ENGLISH), USER_ENGLISH)
         );
+    }
+
+    // UserServiceTest.java
+
+    public static Stream<Arguments> updateUserInfo_publishUserEmailUpdatedEvent() {
+        return Stream.of(
+                arguments(USER_CHINESE, CHINESE, "Updated@Test.com", "updated@test.com"),
+                arguments(USER_ENGLISH, ENGLISH, "MIXED@Example.com", "mixed@example.com")
+        );
+    }
+
+    public static Stream<Arguments> updateUserInfo_throwIfInvalidInput() {
+        return Stream.of(
+                arguments(new UserDto(1, null, "user@test.com", USER_ENGLISH, Set.of(), null, null, null)),
+                arguments(new UserDto(1, "", "user@test.com", USER_ENGLISH, Set.of(), null, null, null)),
+                arguments(new UserDto(1, " ", "user@test.com", USER_ENGLISH, Set.of(), null, null, null)),
+                arguments(new UserDto(1, "User", null, USER_ENGLISH, Set.of(), null, null, null)),
+                arguments(new UserDto(1, "User", "", USER_ENGLISH, Set.of(), null, null, null)),
+                arguments(new UserDto(1, "User", " ", USER_ENGLISH, Set.of(), null, null, null))
+        );
+    }
+
+    public static Stream<Arguments> updatePassword_throwIfInvalidInput() {
+        return Stream.of(
+                arguments(new PasswordUpdateRequest(null, "newpass")),
+                arguments(new PasswordUpdateRequest("", "newpass")),
+                arguments(new PasswordUpdateRequest(" ", "newpass")),
+                arguments(new PasswordUpdateRequest("current", null)),
+                arguments(new PasswordUpdateRequest("current", "")),
+                arguments(new PasswordUpdateRequest("current", " "))
+        );
+    }
+
+    public static Stream<Arguments> deleteAccount() {
+        return Stream.of(
+                arguments(USER_CHINESE, CHINESE),
+                arguments(USER_ENGLISH, ENGLISH)
+        );
+    }
+
+    public static Stream<Arguments> deleteAccount_removeRoleOnly() {
+        return Stream.of(
+                arguments(USER_CHINESE, USER_ENGLISH, CHINESE),
+                arguments(USER_ENGLISH, USER_CHINESE, ENGLISH)
+        );
+    }
+
+    public static Stream<Arguments> deleteAccount_throwIfInvalidInput() {
+        return Stream.of(
+                arguments(new AccountDeletionRequest(null)),
+                arguments(new AccountDeletionRequest("")),
+                arguments(new AccountDeletionRequest(" "))
+        );
+    }
+
+    public static Stream<Arguments> existsByEmail() {
+        return Stream.of(
+                arguments("User@Test.com", "user@test.com", true),
+                arguments("lower@test.com", "lower@test.com", false)
+        );
+    }
+
+    public static Stream<Arguments> existsByEmail_throwIfInvalidInput() {
+        return Stream.of(
+                arguments((Object) null),
+                arguments(""),
+                arguments(" ")
+        );
+    }
+
+    public static Stream<Arguments> getUserEntityByEmail() {
+        return Stream.of(
+                arguments("User@Test.com", "user@test.com"),
+                arguments("MIXED@Example.com", "mixed@example.com")
+        );
+    }
+
+    public static Stream<Arguments> getUserEntityByEmail_throwIfInvalidInput() {
+        return Stream.of(
+                arguments((Object) null),
+                arguments(""),
+                arguments(" ")
+        );
+    }
+
+    public static Stream<Arguments> updateCurrentStreak() {
+        return Stream.of(
+                arguments(0L),
+                arguments(5L)
+        );
+    }
+
+    public static Stream<Arguments> updateCurrentStreak_throwIfInvalidInput() {
+        return Stream.of(
+                arguments((Object) null),
+                arguments(-1L),
+                arguments(-5L)
+        );
+    }
+
+    public static Stream<Arguments> updateRecordStreak() {
+        return updateCurrentStreak();
+    }
+
+    public static Stream<Arguments> updateRecordStreak_throwIfInvalidInput() {
+        return updateCurrentStreak_throwIfInvalidInput();
     }
 }

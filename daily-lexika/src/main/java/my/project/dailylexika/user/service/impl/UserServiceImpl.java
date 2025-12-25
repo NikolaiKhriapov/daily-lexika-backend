@@ -28,12 +28,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Validated
 public class UserServiceImpl implements PublicUserService, UserService {
 
     private final UserRepository userRepository;
@@ -62,13 +64,17 @@ public class UserServiceImpl implements PublicUserService, UserService {
     public UserDto updateUserInfo(UserDto userDto) {
         User user = getAuthenticatedUser();
 
-        if (!Objects.equals(user.getEmail(), userDto.email())) {
+        String normalizedEmail = userDto.email() == null ? null : userDto.email().toLowerCase();
+        if (normalizedEmail != null && !Objects.equals(user.getEmail(), normalizedEmail)) {
             RoleStatisticsDto currentRole = publicRoleService.getRoleStatistics();
             Platform platform = publicRoleService.getPlatformByRoleName(currentRole.roleName());
-            publishUserEmailUpdated(user, platform, userDto.email());
+            publishUserEmailUpdated(user, platform, normalizedEmail);
         }
 
         User updatedUser = userMapper.partialUpdate(userDto, user);
+        if (normalizedEmail != null) {
+            updatedUser.setEmail(normalizedEmail);
+        }
         return userMapper.toDto(userRepository.save(updatedUser));
     }
 
