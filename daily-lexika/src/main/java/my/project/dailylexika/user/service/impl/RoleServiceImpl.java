@@ -26,7 +26,6 @@ public class RoleServiceImpl implements RoleService, PublicRoleService {
     private final RoleStatisticsMapper roleStatisticsMapper;
 
     @Override
-    @Transactional(readOnly = true)
     public RoleName getRoleNameByPlatform(Platform platform) {
         return switch (platform) {
             case ENGLISH -> RoleName.USER_ENGLISH;
@@ -35,7 +34,6 @@ public class RoleServiceImpl implements RoleService, PublicRoleService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Platform getPlatformByRoleName(RoleName roleName) {
         return switch (roleName) {
             case USER_ENGLISH -> Platform.ENGLISH;
