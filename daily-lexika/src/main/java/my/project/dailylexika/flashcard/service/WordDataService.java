@@ -4,20 +4,22 @@ import my.project.dailylexika.flashcard.model.entities.WordData;
 import my.project.library.dailylexika.dtos.flashcards.WordDataDto;
 import my.project.library.dailylexika.enumerations.Platform;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public interface WordDataService {
     List<WordDataDto> getAll();
-    List<WordData> getAllByPlatform(Platform platform);
-    List<WordData> getAllByWordPackNameAndPlatform(String wordPackName, Platform platform);
-    WordDataDto addCustomWordPackToWordData(Integer wordDataId, String wordPackName);
-    WordDataDto removeCustomWordPackFromWordData(Integer wordDataId, String wordPackName);
-    void addCustomWordPackToWordDataByWordPackName(String wordPackNameToBeAdded, String wordPackNameOriginal);
-    void saveAll(List<WordData> listOfWordData);
-    void deleteAll(List<WordData> listOfWordData);
+    List<WordData> getAllByPlatform(@NotNull Platform platform);
+    List<WordData> getAllByWordPackNameAndPlatform(@NotBlank String wordPackName, @NotNull Platform platform);
+    WordDataDto addCustomWordPackToWordData(@NotNull Integer wordDataId, @NotBlank String wordPackName);
+    WordDataDto removeCustomWordPackFromWordData(@NotNull Integer wordDataId, @NotBlank String wordPackName);
+    void addCustomWordPackToWordDataByWordPackName(@NotBlank String wordPackNameToBeAdded, @NotBlank String wordPackNameOriginal);
+    void saveAll(@NotNull List<WordData> listOfWordData);
+    void deleteAll(@NotNull List<WordData> listOfWordData);
 
-    List<Integer> getAllWordDataIdByPlatform(Platform platform);
-    List<Integer> getAllWordDataIdByWordPackNameAndPlatform(String wordPackName, Platform platform);
-    Integer getIdByWordOfTheDayDateAndPlatform(Platform platform);
-    WordData getEntityById(Integer wordDataId);
+    List<Integer> getAllWordDataIdByPlatform(@NotNull Platform platform);
+    List<Integer> getAllWordDataIdByWordPackNameAndPlatform(@NotBlank String wordPackName, @NotNull Platform platform);
+    Integer getIdByWordOfTheDayDateAndPlatform(@NotNull Platform platform);
+    WordData getEntityById(@NotNull Integer wordDataId);
 }

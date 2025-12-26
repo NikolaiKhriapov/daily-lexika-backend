@@ -17,11 +17,17 @@ import my.project.dailylexika.flashcard.persistence.WordDataRepository;
 import my.project.library.util.exception.BadRequestException;
 import my.project.library.util.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
 
+import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
+
 @Service
 @RequiredArgsConstructor
+@Validated
 public class WordDataServiceImpl implements WordDataService {
 
     private final WordDataRepository wordDataRepository;
@@ -31,6 +37,7 @@ public class WordDataServiceImpl implements WordDataService {
     private final PublicRoleService roleService;
 
     @Override
+    @Transactional(readOnly = true)
     public List<WordDataDto> getAll() {
         UserDto user = userService.getUser();
         Platform platform = roleService.getPlatformByRoleName(user.role());
@@ -39,16 +46,19 @@ public class WordDataServiceImpl implements WordDataService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<WordData> getAllByPlatform(Platform platform) {
         return wordDataRepository.findAllByPlatform(platform);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<WordData> getAllByWordPackNameAndPlatform(String wordPackName, Platform platform) {
         return wordDataRepository.findAllByListOfWordPacks_NameAndPlatform(wordPackName, platform);
     }
 
     @Override
+    @Transactional
     public WordDataDto addCustomWordPackToWordData(Integer wordDataId, String wordPackName) {
         WordPack wordPack = wordPackService.getByName(wordPackName);
 
@@ -68,6 +78,7 @@ public class WordDataServiceImpl implements WordDataService {
     }
 
     @Override
+    @Transactional
     public WordDataDto removeCustomWordPackFromWordData(Integer wordDataId, String wordPackName) {
         WordPack wordPack = wordPackService.getByName(wordPackName);
 
@@ -87,6 +98,7 @@ public class WordDataServiceImpl implements WordDataService {
     }
 
     @Override
+    @Transactional
     public void addCustomWordPackToWordDataByWordPackName(String wordPackNameToBeAdded, String wordPackNameOriginal) {
         UserDto user = userService.getUser();
         Platform platform = roleService.getPlatformByRoleName(user.role());
@@ -109,32 +121,38 @@ public class WordDataServiceImpl implements WordDataService {
     }
 
     @Override
+    @Transactional
     public void saveAll(List<WordData> listOfWordData) {
         wordDataRepository.saveAll(listOfWordData);
     }
 
     @Override
+    @Transactional
     public void deleteAll(List<WordData> listOfWordData) {
         wordDataRepository.deleteAll(listOfWordData);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Integer> getAllWordDataIdByPlatform(Platform platform) {
         return wordDataRepository.findAllWordDataIdsByPlatform(platform);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Integer> getAllWordDataIdByWordPackNameAndPlatform(String wordPackName, Platform platform) {
         return wordDataRepository.findAllWordDataIdsByWordPackNameAndPlatform(wordPackName, platform);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Integer getIdByWordOfTheDayDateAndPlatform(Platform platform) {
         return wordDataRepository.findIdByWordOfTheDayDateAndPlatform(DateUtil.nowInUtc().toLocalDate(), platform)
                 .orElseThrow(() -> new ResourceNotFoundException(I18nUtil.getMessage("dailylexika-exceptions.wordData.wordOfTheDayDate.notFound")));
     }
 
     @Override
+    @Transactional(readOnly = true, propagation = REQUIRES_NEW)
     public WordData getEntityById(Integer wordDataId) {
         return wordDataRepository.findById(wordDataId)
                 .orElseThrow(() -> new ResourceNotFoundException(I18nUtil.getMessage("dailylexika-exceptions.wordData.notFound")));

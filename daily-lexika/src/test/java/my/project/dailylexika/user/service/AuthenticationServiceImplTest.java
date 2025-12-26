@@ -14,6 +14,7 @@ import my.project.library.util.exception.ResourceNotFoundException;
 import my.project.library.util.security.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -27,9 +28,16 @@ import org.springframework.validation.beanvalidation.MethodValidationPostProcess
 
 import jakarta.validation.ConstraintViolationException;
 
+import java.util.stream.Stream;
+
 import static my.project.dailylexika.util.CommonConstants.ENCODED_PASSWORD;
+import static my.project.library.dailylexika.enumerations.Platform.CHINESE;
+import static my.project.library.dailylexika.enumerations.Platform.ENGLISH;
+import static my.project.library.dailylexika.enumerations.RoleName.USER_CHINESE;
+import static my.project.library.dailylexika.enumerations.RoleName.USER_ENGLISH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.*;
@@ -71,7 +79,7 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#register_newUser")
+    @MethodSource("my.project.dailylexika.user.service.AuthenticationServiceImplTest$TestDataSource#register_newUser")
     void register_newUser(Platform platform, RoleName roleName) {
         // Given
         RegistrationRequest registrationRequest = new RegistrationRequest(NAME, EMAIL, PASSWORD, platform);
@@ -95,7 +103,7 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#register_existingUserNewPlatform")
+    @MethodSource("my.project.dailylexika.user.service.AuthenticationServiceImplTest$TestDataSource#register_existingUserNewPlatform")
     void register_existingUserNewPlatform(Platform platform, RoleName existingRoleName, RoleName newRoleName) {
         // Given
         RegistrationRequest registrationRequest = new RegistrationRequest(NAME, EMAIL, PASSWORD, platform);
@@ -125,7 +133,7 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#register_emailNormalization")
+    @MethodSource("my.project.dailylexika.user.service.AuthenticationServiceImplTest$TestDataSource#register_emailNormalization")
     void register_emailNormalization(Platform platform, RoleName roleName, String inputEmail, String expectedEmail) {
         // Given
         RegistrationRequest registrationRequest = new RegistrationRequest(NAME, inputEmail, PASSWORD, platform);
@@ -146,7 +154,7 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#register_throwIfInvalidInput")
+    @MethodSource("my.project.dailylexika.user.service.AuthenticationServiceImplTest$TestDataSource#register_throwIfInvalidInput")
     void register_throwIfInvalidInput(RegistrationRequest registrationRequest) {
         // Given
         AuthenticationService validatedService = createValidatedService();
@@ -157,7 +165,7 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#register_throwIfExistingUserInvalidPassword")
+    @MethodSource("my.project.dailylexika.user.service.AuthenticationServiceImplTest$TestDataSource#register_throwIfExistingUserInvalidPassword")
     void register_throwIfExistingUserInvalidPassword(Platform platform) {
         // Given
         RegistrationRequest registrationRequest = new RegistrationRequest(NAME, EMAIL, PASSWORD, platform);
@@ -175,7 +183,7 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#register_throwIfExistingUserAlreadyHasRole")
+    @MethodSource("my.project.dailylexika.user.service.AuthenticationServiceImplTest$TestDataSource#register_throwIfExistingUserAlreadyHasRole")
     void register_throwIfExistingUserAlreadyHasRole(Platform platform, RoleName existingRoleName) {
         // Given
         RegistrationRequest registrationRequest = new RegistrationRequest(NAME, EMAIL, PASSWORD, platform);
@@ -196,7 +204,7 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#login_success")
+    @MethodSource("my.project.dailylexika.user.service.AuthenticationServiceImplTest$TestDataSource#login_success")
     void login_success(Platform platform, RoleName roleName) {
         // Given
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(EMAIL, PASSWORD, platform);
@@ -216,7 +224,7 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#login_mixedCaseEmail")
+    @MethodSource("my.project.dailylexika.user.service.AuthenticationServiceImplTest$TestDataSource#login_mixedCaseEmail")
     void login_mixedCaseEmail(Platform platform, RoleName roleName, String inputEmail) {
         // Given
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(inputEmail, PASSWORD, platform);
@@ -242,7 +250,7 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#login_throwIfInvalidInput")
+    @MethodSource("my.project.dailylexika.user.service.AuthenticationServiceImplTest$TestDataSource#login_throwIfInvalidInput")
     void login_throwIfInvalidInput(AuthenticationRequest authenticationRequest) {
         // Given
         AuthenticationService validatedService = createValidatedService();
@@ -253,7 +261,7 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#login_throwIfBadCredentials")
+    @MethodSource("my.project.dailylexika.user.service.AuthenticationServiceImplTest$TestDataSource#login_throwIfBadCredentials")
     void login_throwIfBadCredentials(Platform platform) {
         // Given
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(EMAIL, PASSWORD, platform);
@@ -268,7 +276,7 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#login_throwIfUserNotRegisteredOnPlatform")
+    @MethodSource("my.project.dailylexika.user.service.AuthenticationServiceImplTest$TestDataSource#login_throwIfUserNotRegisteredOnPlatform")
     void login_throwIfUserNotRegisteredOnPlatform(Platform platform, RoleName roleName) {
         // Given
         AuthenticationRequest authenticationRequest = new AuthenticationRequest(EMAIL, PASSWORD, platform);
@@ -312,5 +320,92 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
                 .password(ENCODED_PASSWORD)
                 .role(roleName)
                 .build();
+    }
+
+    static class TestDataSource {
+
+        public static Stream<Arguments> register_newUser() {
+            return Stream.of(
+                    arguments(CHINESE, USER_CHINESE),
+                    arguments(ENGLISH, USER_ENGLISH)
+            );
+        }
+
+        public static Stream<Arguments> register_existingUserNewPlatform() {
+            return Stream.of(
+                    arguments(CHINESE, USER_ENGLISH, USER_CHINESE),
+                    arguments(ENGLISH, USER_CHINESE, USER_ENGLISH)
+            );
+        }
+
+        public static Stream<Arguments> register_emailNormalization() {
+            return Stream.of(
+                    arguments(ENGLISH, USER_ENGLISH, "User@Test.com", "user@test.com"),
+                    arguments(CHINESE, USER_CHINESE, "UPPER@TEST.COM", "upper@test.com")
+            );
+        }
+
+        public static Stream<Arguments> register_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments(new RegistrationRequest(null, "user@test.com", "pass", ENGLISH)),
+                    arguments(new RegistrationRequest(" ", "user@test.com", "pass", ENGLISH)),
+                    arguments(new RegistrationRequest("", "user@test.com", "pass", ENGLISH)),
+                    arguments(new RegistrationRequest("User", null, "pass", ENGLISH)),
+                    arguments(new RegistrationRequest("User", " ", "pass", ENGLISH)),
+                    arguments(new RegistrationRequest("User", "", "pass", ENGLISH)),
+                    arguments(new RegistrationRequest("User", "user@test.com", null, ENGLISH)),
+                    arguments(new RegistrationRequest("User", "user@test.com", " ", ENGLISH)),
+                    arguments(new RegistrationRequest("User", "user@test.com", "", ENGLISH)),
+                    arguments(new RegistrationRequest("User", "user@test.com", "pass", null))
+            );
+        }
+
+        public static Stream<Arguments> register_throwIfExistingUserInvalidPassword() {
+            return Stream.of(
+                    arguments(CHINESE),
+                    arguments(ENGLISH)
+            );
+        }
+
+        public static Stream<Arguments> register_throwIfExistingUserAlreadyHasRole() {
+            return register_newUser();
+        }
+
+        public static Stream<Arguments> login_success() {
+            return Stream.of(
+                    arguments(CHINESE, USER_CHINESE),
+                    arguments(ENGLISH, USER_ENGLISH)
+            );
+        }
+
+        public static Stream<Arguments> login_mixedCaseEmail() {
+            return Stream.of(
+                    arguments(ENGLISH, USER_ENGLISH, "User@Test.com"),
+                    arguments(CHINESE, USER_CHINESE, "MiXeD@Example.com")
+            );
+        }
+
+        public static Stream<Arguments> login_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments(new AuthenticationRequest(null, "pass", ENGLISH)),
+                    arguments(new AuthenticationRequest(" ", "pass", ENGLISH)),
+                    arguments(new AuthenticationRequest("", "pass", ENGLISH)),
+                    arguments(new AuthenticationRequest("user@test.com", null, ENGLISH)),
+                    arguments(new AuthenticationRequest("user@test.com", " ", ENGLISH)),
+                    arguments(new AuthenticationRequest("user@test.com", "", ENGLISH)),
+                    arguments(new AuthenticationRequest("user@test.com", "pass", null))
+            );
+        }
+
+        public static Stream<Arguments> login_throwIfBadCredentials() {
+            return Stream.of(
+                    arguments(CHINESE),
+                    arguments(ENGLISH)
+            );
+        }
+
+        public static Stream<Arguments> login_throwIfUserNotRegisteredOnPlatform() {
+            return login_success();
+        }
     }
 }

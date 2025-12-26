@@ -22,6 +22,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -42,10 +43,16 @@ import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static my.project.dailylexika.util.CommonConstants.ENCODED_PASSWORD;
+import static my.project.library.dailylexika.enumerations.Platform.CHINESE;
+import static my.project.library.dailylexika.enumerations.Platform.ENGLISH;
+import static my.project.library.dailylexika.enumerations.RoleName.USER_CHINESE;
+import static my.project.library.dailylexika.enumerations.RoleName.USER_ENGLISH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -205,7 +212,7 @@ class UserServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#updateUserInfo_publishUserEmailUpdatedEvent")
+    @MethodSource("my.project.dailylexika.user.service.UserServiceImplTest$TestDataSource#updateUserInfo_publishUserEmailUpdatedEvent")
     void updateUserInfo_publishUserEmailUpdatedEvent(RoleName roleName, Platform platform, String inputEmail, String expectedEmail) {
         // Given
         User user = buildUser(roleName);
@@ -258,7 +265,7 @@ class UserServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#updateUserInfo_throwIfInvalidInput")
+    @MethodSource("my.project.dailylexika.user.service.UserServiceImplTest$TestDataSource#updateUserInfo_throwIfInvalidInput")
     void updateUserInfo_throwIfInvalidInput(UserDto userDto) {
         // Given
         UserService validatedService = createValidatedService();
@@ -287,7 +294,7 @@ class UserServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#updatePassword_throwIfInvalidInput")
+    @MethodSource("my.project.dailylexika.user.service.UserServiceImplTest$TestDataSource#updatePassword_throwIfInvalidInput")
     void updatePassword_throwIfInvalidInput(PasswordUpdateRequest request) {
         // Given
         UserService validatedService = createValidatedService();
@@ -313,7 +320,7 @@ class UserServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#deleteAccount")
+    @MethodSource("my.project.dailylexika.user.service.UserServiceImplTest$TestDataSource#deleteAccount")
     void deleteAccount(RoleName roleName, Platform platform) {
         // Given
         RoleStatistics currentRoleStatistics = new RoleStatistics(roleName);
@@ -341,7 +348,7 @@ class UserServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#deleteAccount_throwIfInvalidInput")
+    @MethodSource("my.project.dailylexika.user.service.UserServiceImplTest$TestDataSource#deleteAccount_throwIfInvalidInput")
     void deleteAccount_throwIfInvalidInput(AccountDeletionRequest request) {
         // Given
         UserService validatedService = createValidatedService();
@@ -352,7 +359,7 @@ class UserServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#deleteAccount_removeRoleOnly")
+    @MethodSource("my.project.dailylexika.user.service.UserServiceImplTest$TestDataSource#deleteAccount_removeRoleOnly")
     void deleteAccount_removeRoleOnly(RoleName roleName, RoleName remainingRole, Platform platform) {
         // Given
         RoleStatistics currentRoleStatistics = new RoleStatistics(roleName);
@@ -398,7 +405,7 @@ class UserServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#existsByEmail")
+    @MethodSource("my.project.dailylexika.user.service.UserServiceImplTest$TestDataSource#existsByEmail")
     void existsByEmail(String inputEmail, String normalizedEmail, boolean expected) {
         // Given
         given(userRepository.existsByEmail(normalizedEmail)).willReturn(expected);
@@ -412,7 +419,7 @@ class UserServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#existsByEmail_throwIfInvalidInput")
+    @MethodSource("my.project.dailylexika.user.service.UserServiceImplTest$TestDataSource#existsByEmail_throwIfInvalidInput")
     void existsByEmail_throwIfInvalidInput(String inputEmail) {
         // Given
         UserService validatedService = createValidatedService();
@@ -438,7 +445,7 @@ class UserServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#getUserEntityByEmail")
+    @MethodSource("my.project.dailylexika.user.service.UserServiceImplTest$TestDataSource#getUserEntityByEmail")
     void getUserEntityByEmail(String inputEmail, String normalizedEmail) {
         // Given
         User user = buildUser(RoleName.USER_ENGLISH);
@@ -453,7 +460,7 @@ class UserServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#getUserEntityByEmail_throwIfInvalidInput")
+    @MethodSource("my.project.dailylexika.user.service.UserServiceImplTest$TestDataSource#getUserEntityByEmail_throwIfInvalidInput")
     void getUserEntityByEmail_throwIfInvalidInput(String inputEmail) {
         // Given
         PublicUserService validatedService = createValidatedPublicService();
@@ -475,7 +482,7 @@ class UserServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#updateCurrentStreak")
+    @MethodSource("my.project.dailylexika.user.service.UserServiceImplTest$TestDataSource#updateCurrentStreak")
     void updateCurrentStreak(Long newCurrentStreak) {
         // Given
         User user = buildUser(RoleName.USER_CHINESE);
@@ -497,7 +504,7 @@ class UserServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#updateCurrentStreak_throwIfInvalidInput")
+    @MethodSource("my.project.dailylexika.user.service.UserServiceImplTest$TestDataSource#updateCurrentStreak_throwIfInvalidInput")
     void updateCurrentStreak_throwIfInvalidInput(Long newCurrentStreak) {
         // Given
         PublicUserService validatedService = createValidatedPublicService();
@@ -508,7 +515,7 @@ class UserServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#updateRecordStreak")
+    @MethodSource("my.project.dailylexika.user.service.UserServiceImplTest$TestDataSource#updateRecordStreak")
     void updateRecordStreak(Long newRecordStreak) {
         // Given
         User user = buildUser(RoleName.USER_CHINESE);
@@ -528,7 +535,7 @@ class UserServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#updateRecordStreak_throwIfInvalidInput")
+    @MethodSource("my.project.dailylexika.user.service.UserServiceImplTest$TestDataSource#updateRecordStreak_throwIfInvalidInput")
     void updateRecordStreak_throwIfInvalidInput(Long newRecordStreak) {
         // Given
         PublicUserService validatedService = createValidatedPublicService();
@@ -608,5 +615,112 @@ class UserServiceImplTest extends AbstractUnitTest {
                 eventPublisher
         );
         return (PublicUserService) processor.postProcessAfterInitialization(service, "publicUserService");
+    }
+
+    private static class TestDataSource {
+
+        public static Stream<Arguments> updateUserInfo_publishUserEmailUpdatedEvent() {
+            return Stream.of(
+                    arguments(USER_CHINESE, CHINESE, "Updated@Test.com", "updated@test.com"),
+                    arguments(USER_ENGLISH, ENGLISH, "MIXED@Example.com", "mixed@example.com")
+            );
+        }
+
+        public static Stream<Arguments> updateUserInfo_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments(new UserDto(1, null, "user@test.com", USER_ENGLISH, Set.of(), null, null, null)),
+                    arguments(new UserDto(1, "", "user@test.com", USER_ENGLISH, Set.of(), null, null, null)),
+                    arguments(new UserDto(1, " ", "user@test.com", USER_ENGLISH, Set.of(), null, null, null)),
+                    arguments(new UserDto(1, "User", null, USER_ENGLISH, Set.of(), null, null, null)),
+                    arguments(new UserDto(1, "User", "", USER_ENGLISH, Set.of(), null, null, null)),
+                    arguments(new UserDto(1, "User", " ", USER_ENGLISH, Set.of(), null, null, null))
+            );
+        }
+
+        public static Stream<Arguments> updatePassword_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments(new PasswordUpdateRequest(null, "newpass")),
+                    arguments(new PasswordUpdateRequest("", "newpass")),
+                    arguments(new PasswordUpdateRequest(" ", "newpass")),
+                    arguments(new PasswordUpdateRequest("current", null)),
+                    arguments(new PasswordUpdateRequest("current", "")),
+                    arguments(new PasswordUpdateRequest("current", " "))
+            );
+        }
+
+        public static Stream<Arguments> deleteAccount() {
+            return Stream.of(
+                    arguments(USER_CHINESE, CHINESE),
+                    arguments(USER_ENGLISH, ENGLISH)
+            );
+        }
+
+        public static Stream<Arguments> deleteAccount_removeRoleOnly() {
+            return Stream.of(
+                    arguments(USER_CHINESE, USER_ENGLISH, CHINESE),
+                    arguments(USER_ENGLISH, USER_CHINESE, ENGLISH)
+            );
+        }
+
+        public static Stream<Arguments> deleteAccount_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments(new AccountDeletionRequest(null)),
+                    arguments(new AccountDeletionRequest("")),
+                    arguments(new AccountDeletionRequest(" "))
+            );
+        }
+
+        public static Stream<Arguments> existsByEmail() {
+            return Stream.of(
+                    arguments("User@Test.com", "user@test.com", true),
+                    arguments("lower@test.com", "lower@test.com", false)
+            );
+        }
+
+        public static Stream<Arguments> existsByEmail_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments((Object) null),
+                    arguments(""),
+                    arguments(" ")
+            );
+        }
+
+        public static Stream<Arguments> getUserEntityByEmail() {
+            return Stream.of(
+                    arguments("User@Test.com", "user@test.com"),
+                    arguments("MIXED@Example.com", "mixed@example.com")
+            );
+        }
+
+        public static Stream<Arguments> getUserEntityByEmail_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments((Object) null),
+                    arguments(""),
+                    arguments(" ")
+            );
+        }
+
+        public static Stream<Arguments> updateCurrentStreak() {
+            return Stream.of(
+                    arguments(0L),
+                    arguments(5L)
+            );
+        }
+
+        public static Stream<Arguments> updateCurrentStreak_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments((Object) null),
+                    arguments(-1L),
+                    arguments(-5L)
+            );
+        }
+
+        public static Stream<Arguments> updateRecordStreak() {
+            return updateCurrentStreak();
+        }
+
+        public static Stream<Arguments> updateRecordStreak_throwIfInvalidInput() {
+            return updateCurrentStreak_throwIfInvalidInput();
+        }
     }
 }

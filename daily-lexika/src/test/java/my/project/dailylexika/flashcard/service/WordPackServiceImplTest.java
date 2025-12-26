@@ -19,6 +19,7 @@ import my.project.library.util.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -31,9 +32,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import static my.project.library.dailylexika.enumerations.Platform.CHINESE;
+import static my.project.library.dailylexika.enumerations.Platform.ENGLISH;
+import static my.project.library.dailylexika.enumerations.RoleName.USER_CHINESE;
+import static my.project.library.dailylexika.enumerations.RoleName.USER_ENGLISH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
@@ -85,7 +92,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#getAllForUser_returnsNonCustomAndOwnedCustom")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#getAllForUser_returnsNonCustomAndOwnedCustom")
     void getAllForUser_returnsNonCustomAndOwnedCustom(Platform platform, RoleName roleName, String prefix) {
         // Given
         UserDto user = mockUser(USER_ID, roleName, platform);
@@ -108,7 +115,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#getAllForUser_filtersCustomByOwnerSuffix")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#getAllForUser_filtersCustomByOwnerSuffix")
     void getAllForUser_filtersCustomByOwnerSuffix(Platform platform, RoleName roleName, String prefix) {
         // Given
         UserDto user = mockUser(USER_ID, roleName, platform);
@@ -147,7 +154,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#getByName_throwIfInvalidInput")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#getByName_throwIfInvalidInput")
     void getByName_throwIfInvalidInput(String input) {
         // Given
         WordPackService validatedService = createValidatedService();
@@ -183,7 +190,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#saveAll_throwIfInvalidInput")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#saveAll_throwIfInvalidInput")
     void saveAll_throwIfInvalidInput(List<WordPack> input) {
         // Given
         WordPackService validatedService = createValidatedService();
@@ -194,7 +201,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#deleteAllByUserIdAndPlatform_deletesOwnedCustomOnly")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#deleteAllByUserIdAndPlatform_deletesOwnedCustomOnly")
     void deleteAllByUserIdAndPlatform_deletesOwnedCustomOnly(Platform platform, String prefix) {
         // Given
         WordPackServiceImpl spy = Mockito.spy(underTest);
@@ -216,7 +223,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#deleteAllByUserIdAndPlatform_throwIfInvalidInput")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#deleteAllByUserIdAndPlatform_throwIfInvalidInput")
     void deleteAllByUserIdAndPlatform_throwIfInvalidInput(Integer userId, Platform platform) {
         // Given
         WordPackService validatedService = createValidatedService();
@@ -227,7 +234,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#createCustomWordPack_createsWithDecoratedName")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#createCustomWordPack_createsWithDecoratedName")
     void createCustomWordPack_createsWithDecoratedName(Platform platform, RoleName roleName, String prefix) {
         // Given
         mockUser(USER_ID, roleName, platform);
@@ -248,7 +255,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#createCustomWordPack_trimsNameBeforeDecoration")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#createCustomWordPack_trimsNameBeforeDecoration")
     void createCustomWordPack_trimsNameBeforeDecoration(Platform platform, RoleName roleName, String prefix) {
         // Given
         mockUser(USER_ID, roleName, platform);
@@ -265,7 +272,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#createCustomWordPack_allowsCaseSensitiveDistinctNames")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#createCustomWordPack_allowsCaseSensitiveDistinctNames")
     void createCustomWordPack_allowsCaseSensitiveDistinctNames(Platform platform, RoleName roleName, String prefix) {
         // Given
         mockUser(USER_ID, roleName, platform);
@@ -287,7 +294,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#createCustomWordPack_preservesEmbeddedSuffix")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#createCustomWordPack_preservesEmbeddedSuffix")
     void createCustomWordPack_preservesEmbeddedSuffix(Platform platform, RoleName roleName, String prefix) {
         // Given
         mockUser(USER_ID, roleName, platform);
@@ -304,7 +311,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#createCustomWordPack_throwIfInvalidInput")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#createCustomWordPack_throwIfInvalidInput")
     void createCustomWordPack_throwIfInvalidInput(WordPackDto input) {
         // Given
         WordPackService validatedService = createValidatedService();
@@ -315,7 +322,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#createCustomWordPack_throwIfInvalidName")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#createCustomWordPack_throwIfInvalidName")
     void createCustomWordPack_throwIfInvalidName(String inputName) {
         // Given
         mockUser(USER_ID, RoleName.USER_ENGLISH, Platform.ENGLISH);
@@ -327,7 +334,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#createCustomWordPack_throwIfAlreadyExists")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#createCustomWordPack_throwIfAlreadyExists")
     void createCustomWordPack_throwIfAlreadyExists(Platform platform, RoleName roleName, String prefix) {
         // Given
         mockUser(USER_ID, roleName, platform);
@@ -340,7 +347,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#deleteCustomWordPack_deletesAndPublishesEvent")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#deleteCustomWordPack_deletesAndPublishesEvent")
     void deleteCustomWordPack_deletesAndPublishesEvent(Platform platform, RoleName roleName, String prefix) {
         // Given
         mockUser(USER_ID, roleName, platform);
@@ -360,7 +367,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#deleteCustomWordPack_throwIfInvalidInput")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#deleteCustomWordPack_throwIfInvalidInput")
     void deleteCustomWordPack_throwIfInvalidInput(String input) {
         // Given
         WordPackService validatedService = createValidatedService();
@@ -371,7 +378,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#deleteCustomWordPack_throwIfCategoryNotCustom")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#deleteCustomWordPack_throwIfCategoryNotCustom")
     void deleteCustomWordPack_throwIfCategoryNotCustom(Platform platform, RoleName roleName, String prefix) {
         // Given
         WordPack wordPack = new WordPack(prefix + "HSK_1", DESCRIPTION, Category.HSK, platform);
@@ -383,7 +390,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#throwIfWordPackCategoryNotCustom_throwIfNotCustom")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#throwIfWordPackCategoryNotCustom_throwIfNotCustom")
     void throwIfWordPackCategoryNotCustom_throwIfNotCustom(Platform platform, RoleName roleName, String prefix) {
         // Given
         WordPack wordPack = new WordPack(prefix + "HSK_1", DESCRIPTION, Category.HSK, platform);
@@ -394,7 +401,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.util.data.TestDataSource#throwIfWordPackCategoryNotCustom_throwIfInvalidInput")
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#throwIfWordPackCategoryNotCustom_throwIfInvalidInput")
     void throwIfWordPackCategoryNotCustom_throwIfInvalidInput(WordPack input) {
         // Given
         WordPackService validatedService = createValidatedService();
@@ -427,4 +434,115 @@ class WordPackServiceImplTest extends AbstractUnitTest {
         return (WordPackService) processor.postProcessAfterInitialization(service, "wordPackService");
     }
 
+    private static class TestDataSource {
+
+        public static Stream<Arguments> getAllForUser_returnsNonCustomAndOwnedCustom() {
+            return Stream.of(
+                    arguments(ENGLISH, USER_ENGLISH, "EN__"),
+                    arguments(CHINESE, USER_CHINESE, "CH__")
+            );
+        }
+
+        public static Stream<Arguments> getAllForUser_filtersCustomByOwnerSuffix() {
+            return getAllForUser_returnsNonCustomAndOwnedCustom();
+        }
+
+        public static Stream<Arguments> getByName_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments((Object) null),
+                    arguments(""),
+                    arguments(" ")
+            );
+        }
+
+        public static Stream<Arguments> saveAll_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments((Object) null)
+            );
+        }
+
+        public static Stream<Arguments> deleteAllByUserIdAndPlatform_deletesOwnedCustomOnly() {
+            return Stream.of(
+                    arguments(ENGLISH, "EN__"),
+                    arguments(CHINESE, "CH__")
+            );
+        }
+
+        public static Stream<Arguments> deleteAllByUserIdAndPlatform_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments(null, ENGLISH),
+                    arguments(1, null)
+            );
+        }
+
+        public static Stream<Arguments> createCustomWordPack_createsWithDecoratedName() {
+            return Stream.of(
+                    arguments(ENGLISH, USER_ENGLISH, "EN__"),
+                    arguments(CHINESE, USER_CHINESE, "CH__")
+            );
+        }
+
+        public static Stream<Arguments> createCustomWordPack_trimsNameBeforeDecoration() {
+            return createCustomWordPack_createsWithDecoratedName();
+        }
+
+        public static Stream<Arguments> createCustomWordPack_allowsCaseSensitiveDistinctNames() {
+            return createCustomWordPack_createsWithDecoratedName();
+        }
+
+        public static Stream<Arguments> createCustomWordPack_preservesEmbeddedSuffix() {
+            return createCustomWordPack_createsWithDecoratedName();
+        }
+
+        public static Stream<Arguments> createCustomWordPack_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments((Object) null),
+                    arguments(new WordPackDto(null, "desc", null, null, null, null, null)),
+                    arguments(new WordPackDto("", "desc", null, null, null, null, null)),
+                    arguments(new WordPackDto(" ", "desc", null, null, null, null, null)),
+                    arguments(new WordPackDto("name", null, null, null, null, null, null)),
+                    arguments(new WordPackDto("name", "", null, null, null, null, null)),
+                    arguments(new WordPackDto("name", " ", null, null, null, null, null))
+            );
+        }
+
+        public static Stream<Arguments> createCustomWordPack_throwIfInvalidName() {
+            return Stream.of(
+                    arguments("  ;  "),
+                    arguments("name;with;semicolon")
+            );
+        }
+
+        public static Stream<Arguments> createCustomWordPack_throwIfAlreadyExists() {
+            return createCustomWordPack_createsWithDecoratedName();
+        }
+
+        public static Stream<Arguments> deleteCustomWordPack_deletesAndPublishesEvent() {
+            return Stream.of(
+                    arguments(ENGLISH, USER_ENGLISH, "EN__"),
+                    arguments(CHINESE, USER_CHINESE, "CH__")
+            );
+        }
+
+        public static Stream<Arguments> deleteCustomWordPack_throwIfInvalidInput() {
+            return getByName_throwIfInvalidInput();
+        }
+
+        public static Stream<Arguments> deleteCustomWordPack_throwIfCategoryNotCustom() {
+            return deleteCustomWordPack_deletesAndPublishesEvent();
+        }
+
+        public static Stream<Arguments> throwIfWordPackCategoryNotCustom_throwIfNotCustom() {
+            return Stream.of(
+                    arguments(ENGLISH, USER_ENGLISH, "EN__"),
+                    arguments(CHINESE, USER_CHINESE, "CH__")
+            );
+        }
+
+        public static Stream<Arguments> throwIfWordPackCategoryNotCustom_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments((Object) null)
+            );
+        }
+    }
 }
