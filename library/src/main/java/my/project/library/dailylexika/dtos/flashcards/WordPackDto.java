@@ -10,11 +10,9 @@ import java.io.Serializable;
 
 public record WordPackDto(
 
-        @NotNull(message = "Field 'name' must not be null")
         @NotBlank(message = "Field 'name' must not be blank")
         String name,
 
-        @NotNull(message = "Field 'description' must not be null")
         @NotBlank(message = "Field 'description' must not be blank")
         String description,
 

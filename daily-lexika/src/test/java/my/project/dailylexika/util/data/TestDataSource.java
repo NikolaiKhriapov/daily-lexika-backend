@@ -1,5 +1,7 @@
 package my.project.dailylexika.util.data;
 
+import my.project.dailylexika.user.model.entities.User;
+import my.project.library.dailylexika.dtos.flashcards.WordPackDto;
 import my.project.library.dailylexika.dtos.user.AccountDeletionRequest;
 import my.project.library.dailylexika.dtos.user.AuthenticationRequest;
 import my.project.library.dailylexika.dtos.user.PasswordUpdateRequest;
@@ -113,10 +115,22 @@ public class TestDataSource {
         );
     }
 
+    public static Stream<Arguments> getRoleNameByPlatform_throwIfInvalidInput() {
+        return Stream.of(
+                arguments((Object) null)
+        );
+    }
+
     public static Stream<Arguments> getPlatformByRoleName() {
         return Stream.of(
                 arguments(USER_CHINESE, CHINESE),
                 arguments(USER_ENGLISH, ENGLISH)
+        );
+    }
+
+    public static Stream<Arguments> getPlatformByRoleName_throwIfInvalidInput() {
+        return Stream.of(
+                arguments((Object) null)
         );
     }
 
@@ -133,6 +147,20 @@ public class TestDataSource {
         return Stream.of(
                 arguments(USER_CHINESE, Set.of(USER_CHINESE)),
                 arguments(USER_ENGLISH, Set.of(USER_ENGLISH))
+        );
+    }
+
+    public static Stream<Arguments> addRoleToUserRoles_throwIfInvalidInput() {
+        User user = User.builder()
+                .id(1)
+                .name("User")
+                .email("user@test.com")
+                .password("pass")
+                .role(USER_ENGLISH)
+                .build();
+        return Stream.of(
+                arguments(null, USER_ENGLISH),
+                arguments(user, null)
         );
     }
 
@@ -177,6 +205,20 @@ public class TestDataSource {
                 arguments(USER_ENGLISH, Set.of(USER_ENGLISH), USER_CHINESE),
                 arguments(USER_CHINESE, Set.of(), USER_CHINESE),
                 arguments(USER_ENGLISH, Set.of(), USER_ENGLISH)
+        );
+    }
+
+    public static Stream<Arguments> throwIfUserNotRegisteredOnPlatform_throwIfInvalidInput() {
+        User user = User.builder()
+                .id(1)
+                .name("User")
+                .email("user@test.com")
+                .password("pass")
+                .role(USER_ENGLISH)
+                .build();
+        return Stream.of(
+                arguments(null, USER_ENGLISH),
+                arguments(user, null)
         );
     }
 
@@ -293,5 +335,116 @@ public class TestDataSource {
 
     public static Stream<Arguments> updateRecordStreak_throwIfInvalidInput() {
         return updateCurrentStreak_throwIfInvalidInput();
+    }
+
+    // WordPackServiceImplTest.java
+
+    public static Stream<Arguments> getAllForUser_returnsNonCustomAndOwnedCustom() {
+        return Stream.of(
+                arguments(ENGLISH, USER_ENGLISH, "EN__"),
+                arguments(CHINESE, USER_CHINESE, "CH__")
+        );
+    }
+
+    public static Stream<Arguments> getAllForUser_filtersCustomByOwnerSuffix() {
+        return getAllForUser_returnsNonCustomAndOwnedCustom();
+    }
+
+    public static Stream<Arguments> getByName_throwIfInvalidInput() {
+        return Stream.of(
+                arguments((Object) null),
+                arguments(""),
+                arguments(" ")
+        );
+    }
+
+    public static Stream<Arguments> saveAll_throwIfInvalidInput() {
+        return Stream.of(
+                arguments((Object) null)
+        );
+    }
+
+    public static Stream<Arguments> deleteAllByUserIdAndPlatform_deletesOwnedCustomOnly() {
+        return Stream.of(
+                arguments(ENGLISH, "EN__"),
+                arguments(CHINESE, "CH__")
+        );
+    }
+
+    public static Stream<Arguments> deleteAllByUserIdAndPlatform_throwIfInvalidInput() {
+        return Stream.of(
+                arguments(null, ENGLISH),
+                arguments(1, null)
+        );
+    }
+
+    public static Stream<Arguments> createCustomWordPack_createsWithDecoratedName() {
+        return Stream.of(
+                arguments(ENGLISH, USER_ENGLISH, "EN__"),
+                arguments(CHINESE, USER_CHINESE, "CH__")
+        );
+    }
+
+    public static Stream<Arguments> createCustomWordPack_trimsNameBeforeDecoration() {
+        return createCustomWordPack_createsWithDecoratedName();
+    }
+
+    public static Stream<Arguments> createCustomWordPack_allowsCaseSensitiveDistinctNames() {
+        return createCustomWordPack_createsWithDecoratedName();
+    }
+
+    public static Stream<Arguments> createCustomWordPack_preservesEmbeddedSuffix() {
+        return createCustomWordPack_createsWithDecoratedName();
+    }
+
+    public static Stream<Arguments> createCustomWordPack_throwIfInvalidInput() {
+        return Stream.of(
+                arguments((Object) null),
+                arguments(new WordPackDto(null, "desc", null, null, null, null, null)),
+                arguments(new WordPackDto("", "desc", null, null, null, null, null)),
+                arguments(new WordPackDto(" ", "desc", null, null, null, null, null)),
+                arguments(new WordPackDto("name", null, null, null, null, null, null)),
+                arguments(new WordPackDto("name", "", null, null, null, null, null)),
+                arguments(new WordPackDto("name", " ", null, null, null, null, null))
+        );
+    }
+
+    public static Stream<Arguments> createCustomWordPack_throwIfInvalidName() {
+        return Stream.of(
+                arguments("  ;  "),
+                arguments("name;with;semicolon")
+        );
+    }
+
+    public static Stream<Arguments> createCustomWordPack_throwIfAlreadyExists() {
+        return createCustomWordPack_createsWithDecoratedName();
+    }
+
+    public static Stream<Arguments> deleteCustomWordPack_deletesAndPublishesEvent() {
+        return Stream.of(
+                arguments(ENGLISH, USER_ENGLISH, "EN__"),
+                arguments(CHINESE, USER_CHINESE, "CH__")
+        );
+    }
+
+    public static Stream<Arguments> deleteCustomWordPack_throwIfInvalidInput() {
+        return getByName_throwIfInvalidInput();
+    }
+
+    public static Stream<Arguments> deleteCustomWordPack_throwIfCategoryNotCustom() {
+        return deleteCustomWordPack_deletesAndPublishesEvent();
+    }
+
+    public static Stream<Arguments> throwIfWordPackCategoryNotCustom_throwIfNotCustom() {
+        return Stream.of(
+                arguments(ENGLISH, USER_ENGLISH, "EN__"),
+                arguments(CHINESE, USER_CHINESE, "CH__")
+        );
+    }
+
+    public static Stream<Arguments> throwIfWordPackCategoryNotCustom_throwIfInvalidInput() {
+        return Stream.of(
+                arguments((Object) null)
+        );
     }
 }

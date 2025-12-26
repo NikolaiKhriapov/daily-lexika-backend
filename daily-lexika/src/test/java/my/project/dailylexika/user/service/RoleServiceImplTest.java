@@ -1,5 +1,6 @@
 package my.project.dailylexika.user.service;
 
+import my.project.dailylexika.user._public.PublicRoleService;
 import my.project.dailylexika.user.model.mappers.RoleStatisticsMapper;
 import my.project.dailylexika.user.service.impl.RoleServiceImpl;
 import my.project.library.dailylexika.dtos.user.RoleStatisticsDto;
@@ -18,6 +19,8 @@ import org.mockito.Mockito;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -50,6 +53,17 @@ class RoleServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
+    @MethodSource("my.project.dailylexika.util.data.TestDataSource#getRoleNameByPlatform_throwIfInvalidInput")
+    void getRoleNameByPlatform_throwIfInvalidInput(Platform input) {
+        // Given
+        RoleService validatedService = createValidatedService();
+
+        // When / Then
+        assertThatThrownBy(() -> validatedService.getRoleNameByPlatform(input))
+                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+    }
+
+    @ParameterizedTest
     @MethodSource("my.project.dailylexika.util.data.TestDataSource#getPlatformByRoleName")
     void getPlatformByRoleName(RoleName input, Platform expected) {
         // Given
@@ -58,6 +72,17 @@ class RoleServiceImplTest extends AbstractUnitTest {
 
         // Then
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.util.data.TestDataSource#getPlatformByRoleName_throwIfInvalidInput")
+    void getPlatformByRoleName_throwIfInvalidInput(RoleName input) {
+        // Given
+        PublicRoleService validatedService = createValidatedPublicService();
+
+        // When / Then
+        assertThatThrownBy(() -> validatedService.getPlatformByRoleName(input))
+                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
     }
 
     @ParameterizedTest
@@ -87,6 +112,17 @@ class RoleServiceImplTest extends AbstractUnitTest {
         // Then
         Set<RoleName> actualRoleNames = user.getRoleStatistics().stream().map(RoleStatistics::getRoleName).collect(Collectors.toSet());
         assertThat(actualRoleNames).isEqualTo(expectedRoleNames);
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.util.data.TestDataSource#addRoleToUserRoles_throwIfInvalidInput")
+    void addRoleToUserRoles_throwIfInvalidInput(User user, RoleName roleName) {
+        // Given
+        RoleService validatedService = createValidatedService();
+
+        // When / Then
+        assertThatThrownBy(() -> validatedService.addRoleToUserRoles(user, roleName))
+                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
     }
 
     @ParameterizedTest
@@ -172,6 +208,17 @@ class RoleServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
+    @MethodSource("my.project.dailylexika.util.data.TestDataSource#throwIfUserNotRegisteredOnPlatform_throwIfInvalidInput")
+    void throwIfUserNotRegisteredOnPlatform_throwIfInvalidInput(User user, RoleName roleName) {
+        // Given
+        RoleService validatedService = createValidatedService();
+
+        // When / Then
+        assertThatThrownBy(() -> validatedService.throwIfUserNotRegisteredOnPlatform(user, roleName))
+                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+    }
+
+    @ParameterizedTest
     @MethodSource("my.project.dailylexika.util.data.TestDataSource#throwIfUserNotRegisteredOnPlatform_doNotThrowIfUserRegisteredOnPlatform")
     void throwIfUserNotRegisteredOnPlatform_doNotThrowIfUserRegisteredOnPlatform(RoleName initialRole, Set<RoleName> existingRoles, RoleName input) {
         // Given
@@ -204,5 +251,25 @@ class RoleServiceImplTest extends AbstractUnitTest {
         SecurityContextHolder.setContext(securityContext);
         given(securityContext.getAuthentication()).willReturn(authentication);
         given(authentication.getPrincipal()).willReturn(user);
+    }
+
+    private RoleService createValidatedService() {
+        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
+        validator.afterPropertiesSet();
+        MethodValidationPostProcessor processor = new MethodValidationPostProcessor();
+        processor.setValidator(validator);
+        processor.afterPropertiesSet();
+        RoleServiceImpl service = new RoleServiceImpl(roleStatisticsMapper);
+        return (RoleService) processor.postProcessAfterInitialization(service, "roleService");
+    }
+
+    private PublicRoleService createValidatedPublicService() {
+        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
+        validator.afterPropertiesSet();
+        MethodValidationPostProcessor processor = new MethodValidationPostProcessor();
+        processor.setValidator(validator);
+        processor.afterPropertiesSet();
+        RoleServiceImpl service = new RoleServiceImpl(roleStatisticsMapper);
+        return (PublicRoleService) processor.postProcessAfterInitialization(service, "publicRoleService");
     }
 }

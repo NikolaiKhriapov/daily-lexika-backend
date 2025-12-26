@@ -15,11 +15,13 @@ import my.project.library.util.exception.ResourceNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.HashSet;
 import java.util.List;
 
 @Service
+@Validated
 @RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService, PublicRoleService {
 

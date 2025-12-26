@@ -19,11 +19,13 @@ import my.project.library.util.exception.ResourceNotFoundException;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Validated
 @RequiredArgsConstructor
 public class WordPackServiceImpl implements WordPackService {
 
@@ -39,6 +41,7 @@ public class WordPackServiceImpl implements WordPackService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<WordPackDto> getAllForUser() {
         UserDto user = userService.getUser();
         Platform platform = roleService.getPlatformByRoleName(user.role());
@@ -65,6 +68,7 @@ public class WordPackServiceImpl implements WordPackService {
     }
 
     @Override
+    @Transactional
     public void saveAll(List<WordPack> wordPacks) {
         wordPackRepository.saveAll(wordPacks);
     }
@@ -79,6 +83,7 @@ public class WordPackServiceImpl implements WordPackService {
     }
 
     @Override
+    @Transactional
     public void createCustomWordPack(WordPackDto wordPackDto) {
         UserDto user = userService.getUser();
         Platform platform = roleService.getPlatformByRoleName(user.role());
