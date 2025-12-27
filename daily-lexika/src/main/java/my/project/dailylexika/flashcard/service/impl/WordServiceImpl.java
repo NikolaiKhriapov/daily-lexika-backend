@@ -21,12 +21,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Validated
 public class WordServiceImpl implements WordService {
 
     private final WordRepository wordRepository;
@@ -109,7 +111,7 @@ public class WordServiceImpl implements WordService {
     @Override
     @Transactional(readOnly = true)
     public List<WordDto> getAllByUserIdAndStatusAndWordData_Platform(Integer userId, Status status, Platform platform) {
-        List<Word> words = wordRepository.findByUserIdAndStatusAndWordData_Platform(userId, Status.KNOWN, platform);
+        List<Word> words = wordRepository.findByUserIdAndStatusAndWordData_Platform(userId, status, platform);
         return wordMapper.toDtoList(words);
     }
 
