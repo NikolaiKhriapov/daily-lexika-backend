@@ -25,6 +25,7 @@ import my.project.library.util.exception.ResourceAlreadyExistsException;
 import my.project.library.util.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.*;
 
@@ -33,6 +34,7 @@ import static my.project.library.dailylexika.enumerations.Status.*;
 
 @Service
 @RequiredArgsConstructor
+@Validated
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
@@ -116,22 +118,6 @@ public class ReviewServiceImpl implements ReviewService {
         );
     }
 
-    /**
-     * Rules for answering in Daily Reviews:
-     * - When NEW –> YES –> KNOWN
-     * - When NEW -> NO  -> IN_REVIEW
-     * - When KNOWN –> YES -> KNOWN
-     * - When KNOWN -> NO  -> IN_REVIEW
-     * - When IN_REVIEW(0-3) -> YES -> IN_REVIEW(1-4)
-     * - When IN_REVIEW(4) -> YES -> KNOWN
-     * Rules for generating a Daily Review:
-     * - First, the NEW words are added in the amount of review.maxNewWordsPerDay
-     * - Then, the IN_REVIEW words are added in the amount of review.maxReviewWordsPerDay * 0.7
-     * - Then, the KNOWN words are added in the amount of review.maxReviewWordsPerDay * 0.3
-     * - When it is not enough of the IN_REVIEW words, it is compensated by the KNOWN words, and vice versa
-     * IN_REVIEW -> if dateOfLastOccurrence >= totalStreak x2
-     * KNOWN -> if dateOfLastOccurrence >= totalStreak
-     */
     @Override
     @Transactional
     public List<Word> generateListOfWordsForReview(WordPack wordPack, ReviewDto reviewDto) {
@@ -192,13 +178,22 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void throwIfReviewExistsForWordPack(String wordPackName) {
+    public void deleteReviewIfExistsForWordPack(String wordPackName) {
         Integer userId = userService.getUser().id();
 
         Optional<Review> review = reviewRepository.findByUserIdAndWordPack_Name(userId, wordPackName);
         review.ifPresent(reviewRepository::delete);
     }
 
+    /**
+     * Rules for answering in Daily Reviews:
+     * - When NEW –> YES –> KNOWN
+     * - When NEW -> NO  -> IN_REVIEW
+     * - When KNOWN –> YES -> KNOWN
+     * - When KNOWN -> NO  -> IN_REVIEW
+     * - When IN_REVIEW(0-3) -> YES -> IN_REVIEW(1-4)
+     * - When IN_REVIEW(4) -> YES -> KNOWN
+     */
     private void processAnswer(Review review, boolean isCorrect) {
         List<Word> listOfWords = new ArrayList<>(review.getListOfWords());
 
@@ -229,6 +224,15 @@ public class ReviewServiceImpl implements ReviewService {
         return wordDataIds;
     }
 
+    /**
+     * Rules for generating a Daily Review:
+     * - First, the NEW words are added in the amount of review.maxNewWordsPerDay
+     * - Then, the IN_REVIEW words are added in the amount of review.maxReviewWordsPerDay * 0.7
+     * - Then, the KNOWN words are added in the amount of review.maxReviewWordsPerDay * 0.3
+     * - When it is not enough of the IN_REVIEW words, it is compensated by the KNOWN words, and vice versa
+     * IN_REVIEW -> if dateOfLastOccurrence >= totalStreak x2
+     * KNOWN -> if dateOfLastOccurrence >= totalStreak
+     */
     private List<Word> fetchWordsForReview(Integer userId, List<Integer> wordDataIds, ReviewDto reviewDto) {
         List<Word> newWords = wordService.getAllByUserIdAndWordDataIdInAndStatusNewRandomLimited(
                 userId,
