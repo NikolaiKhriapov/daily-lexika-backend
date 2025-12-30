@@ -23,7 +23,7 @@ public class ReviewController {
     }
 
     @PatchMapping("/{reviewId}")
-    public ResponseEntity<ReviewDto> updateReview(@PathVariable("reviewId") Long reviewId,
+    public ResponseEntity<ReviewDto> updateReview(@PathVariable Long reviewId,
                                                   @RequestBody @Valid ReviewDto reviewDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(reviewService.updateReview(reviewId, reviewDTO));
     }
@@ -34,19 +34,19 @@ public class ReviewController {
     }
 
     @PatchMapping("/refresh/{reviewId}")
-    public ResponseEntity<ReviewDto> refreshReview(@PathVariable("reviewId") Long reviewId) {
+    public ResponseEntity<ReviewDto> refreshReview(@PathVariable Long reviewId) {
         return ResponseEntity.status(HttpStatus.OK).body(reviewService.refreshReview(reviewId));
     }
 
     @DeleteMapping("/{reviewId}")
-    public ResponseEntity<Void> deleteReview(@PathVariable("reviewId") Long reviewId) {
+    public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId) {
         reviewService.deleteReview(reviewId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/{reviewId}/action")
     public ResponseEntity<ReviewDto> processReviewAction(
-            @PathVariable("reviewId") Long reviewId,
+            @PathVariable Long reviewId,
             @RequestParam(value = "answer", required = false) Boolean isCorrect
     ) {
         return ResponseEntity.ok(reviewService.processReviewAction(reviewId, isCorrect));

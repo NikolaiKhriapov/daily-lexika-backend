@@ -1,6 +1,7 @@
 package my.project.admin.config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import my.project.library.util.exception.ApiErrorDTO;
 import my.project.library.util.exception.ResourceAlreadyExistsException;
 import my.project.library.util.exception.ResourceNotFoundException;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @ControllerAdvice
 public class DefaultExceptionHandler {
 
@@ -25,6 +27,7 @@ public class DefaultExceptionHandler {
         e.getBindingResult()
                 .getAllErrors()
                 .forEach((error) -> errors.add(error.getDefaultMessage()));
+        log.warn("Validation failed for {} {}: {}", request.getMethod(), request.getRequestURI(), errors, e);
 
         ApiErrorDTO apiErrorDTO = new ApiErrorDTO(
                 request.getRequestURI(),
@@ -40,6 +43,7 @@ public class DefaultExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiErrorDTO> handleException(ResourceNotFoundException e, HttpServletRequest request) {
+        log.warn("Resource not found for {} {}", request.getMethod(), request.getRequestURI(), e);
         ApiErrorDTO apiErrorDTO = new ApiErrorDTO(
                 request.getRequestURI(),
                 HttpStatus.NOT_FOUND.value(),
@@ -54,6 +58,7 @@ public class DefaultExceptionHandler {
 
     @ExceptionHandler(ResourceAlreadyExistsException.class)
     public ResponseEntity<ApiErrorDTO> handleException(ResourceAlreadyExistsException e, HttpServletRequest request) {
+        log.warn("Resource already exists for {} {}", request.getMethod(), request.getRequestURI(), e);
         ApiErrorDTO apiErrorDTO = new ApiErrorDTO(
                 request.getRequestURI(),
                 HttpStatus.CONFLICT.value(),
@@ -68,6 +73,7 @@ public class DefaultExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiErrorDTO> handleException(BadCredentialsException e, HttpServletRequest request) {
+        log.warn("Bad credentials for {} {}", request.getMethod(), request.getRequestURI(), e);
         ApiErrorDTO apiErrorDTO = new ApiErrorDTO(
                 request.getRequestURI(),
                 HttpStatus.BAD_REQUEST.value(),
@@ -82,6 +88,7 @@ public class DefaultExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorDTO> handleException(Exception e, HttpServletRequest request) {
+        log.error("Unhandled exception for {} {}", request.getMethod(), request.getRequestURI(), e);
         ApiErrorDTO apiErrorDTO = new ApiErrorDTO(
                 request.getRequestURI(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
