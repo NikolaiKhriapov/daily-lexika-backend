@@ -2,12 +2,15 @@ package my.project.dailylexika.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import my.project.library.util.exception.ApiErrorDTO;
+import my.project.library.util.exception.BadRequestException;
 import my.project.library.util.exception.ResourceAlreadyExistsException;
 import my.project.library.util.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -72,6 +75,48 @@ public class DefaultExceptionHandler {
                 HttpStatus.BAD_REQUEST,
                 LocalDateTime.now(),
                 "Invalid email or password.",
+                Arrays.toString(e.getStackTrace())
+        );
+
+        return new ResponseEntity<>(apiErrorDTO, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ApiErrorDTO> handleException(BadRequestException e, HttpServletRequest request) {
+        ApiErrorDTO apiErrorDTO = new ApiErrorDTO(
+                request.getRequestURI(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST,
+                LocalDateTime.now(),
+                e.getMessage(),
+                Arrays.toString(e.getStackTrace())
+        );
+
+        return new ResponseEntity<>(apiErrorDTO, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiErrorDTO> handleException(AccessDeniedException e, HttpServletRequest request) {
+        ApiErrorDTO apiErrorDTO = new ApiErrorDTO(
+                request.getRequestURI(),
+                HttpStatus.FORBIDDEN.value(),
+                HttpStatus.FORBIDDEN,
+                LocalDateTime.now(),
+                I18nUtil.getMessage("dailylexika-exceptions.security.forbidden"),
+                Arrays.toString(e.getStackTrace())
+        );
+
+        return new ResponseEntity<>(apiErrorDTO, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiErrorDTO> handleException(MissingServletRequestParameterException e, HttpServletRequest request) {
+        ApiErrorDTO apiErrorDTO = new ApiErrorDTO(
+                request.getRequestURI(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST,
+                LocalDateTime.now(),
+                e.getMessage(),
                 Arrays.toString(e.getStackTrace())
         );
 

@@ -99,7 +99,7 @@ public class UserServiceImpl implements PublicUserService, UserService {
         RoleStatistics currentRole = roleService.getRoleStatisticsEntity();
         Platform platform = publicRoleService.getPlatformByRoleName(currentRole.getRoleName());
 
-        user.getRoleStatistics().remove(currentRole);
+        user.getRoleStatistics().removeIf(role -> role.getRoleName().equals(currentRole.getRoleName()));
 
         boolean isDeleteUser = user.getRoleStatistics().isEmpty();
         if (isDeleteUser) {
@@ -176,6 +176,7 @@ public class UserServiceImpl implements PublicUserService, UserService {
         eventPublisher.publishEvent(
                 UserEmailUpdatedEvent.builder()
                         .userId(user.getId())
+                        .userEmail(user.getEmail())
                         .platform(platform)
                         .emailUpdated(emailUpdated)
                         .build()
