@@ -8,15 +8,12 @@ import java.io.Serializable;
 
 public record RegistrationRequest(
 
-        @NotNull(message = "Field 'name' must not be null")
         @NotBlank(message = "Field 'name' must not be blank")
         String name,
 
-        @NotNull(message = "Field 'email' must not be null")
         @NotBlank(message = "Field 'email' must not be blank")
         String email,
 
-        @NotNull(message = "Field 'password' must not be null")
         @NotBlank(message = "Field 'password' must not be blank")
         String password,
 
