@@ -35,7 +35,9 @@ public class ReviewController {
 
     @PatchMapping("/refresh/{reviewId}")
     public ResponseEntity<ReviewDto> refreshReview(@PathVariable Long reviewId) {
-        return ResponseEntity.status(HttpStatus.OK).body(reviewService.refreshReview(reviewId));
+        return reviewService.refreshReview(reviewId)
+                .map(reviewDto -> ResponseEntity.status(HttpStatus.OK).body(reviewDto))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NO_CONTENT).build());
     }
 
     @DeleteMapping("/{reviewId}")

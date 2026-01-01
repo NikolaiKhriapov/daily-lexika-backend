@@ -118,10 +118,11 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         Review review = buildReview(REVIEW_ID, platform, List.of(buildWord(NEW)));
         review.setDateGenerated(DateUtil.nowInUtc().minusDays(1));
         ReviewDto dto = buildReviewDto(REVIEW_ID, platform, 1, 2);
-        WordPack wordPack = buildWordPack(platform);
+        WordPack wordPack = new WordPack(WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform);
 
         given(reviewRepository.findByUserIdAndWordPack_Platform(USER_ID, platform)).willReturn(List.of(review));
         given(reviewMapper.toDto(review)).willReturn(dto);
+        given(wordDataService.existsByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(true);
         given(wordPackService.getByName(WORD_PACK_NAME)).willReturn(wordPack);
         given(wordDataService.getAllWordDataIdByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(List.of(1, 2));
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusNewRandomLimited(USER_ID, List.of(1, 2), 1)).willReturn(List.of(buildWord(NEW)));
@@ -139,13 +140,50 @@ class ReviewServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.ReviewServiceImplTest$TestDataSource#getAllReviews_outdatedReviewWithNoWordData")
+    void getAllReviews_outdatedReviewWithNoWordData_deletesReview(Platform platform, RoleName roleName) {
+        // Given
+        mockUser(USER_ID, roleName);
+        given(roleService.getPlatformByRoleName(roleName)).willReturn(platform);
+        Review reviewToDelete = buildReview(REVIEW_ID, platform, List.of(buildWord(NEW)));
+        reviewToDelete.setDateGenerated(DateUtil.nowInUtc().minusDays(1));
+        Review reviewToKeep = buildReview(REVIEW_ID + 1, platform, List.of(buildWord(NEW)));
+        String otherWordPackName = "HSK_2";
+        reviewToKeep.getWordPack().setName(otherWordPackName);
+        ReviewDto reviewToKeepDto = new ReviewDto(
+                reviewToKeep.getId(),
+                USER_ID.longValue(),
+                reviewToKeep.getMaxNewWordsPerDay(),
+                reviewToKeep.getMaxReviewWordsPerDay(),
+                new WordPackDto(otherWordPackName, DESCRIPTION, Category.HSK, platform, null, null, null),
+                List.of(),
+                reviewToKeep.getActualSize(),
+                reviewToKeep.getDateLastCompleted(),
+                reviewToKeep.getDateGenerated()
+        );
+
+        given(reviewRepository.findByUserIdAndWordPack_Platform(USER_ID, platform)).willReturn(List.of(reviewToDelete, reviewToKeep));
+        given(wordDataService.existsByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(false);
+        given(reviewMapper.toDto(reviewToKeep)).willReturn(reviewToKeepDto);
+
+        // When
+        List<ReviewDto> actual = underTest.getAllReviews();
+
+        // Then
+        assertThat(actual).containsExactly(reviewToKeepDto);
+        verify(reviewRepository).delete(reviewToDelete);
+        verify(reviewRepository, never()).save(any(Review.class));
+        verify(reviewMapper, never()).toDto(reviewToDelete);
+    }
+
+    @ParameterizedTest
     @MethodSource("my.project.dailylexika.flashcard.service.ReviewServiceImplTest$TestDataSource#createReview_createsNew")
     void createReview_createsNew(Platform platform, RoleName roleName) {
         // Given
         mockUser(USER_ID, roleName);
         given(roleService.getPlatformByRoleName(roleName)).willReturn(platform);
         ReviewDto reviewDto = buildReviewDto(REVIEW_ID, platform, 1, 2);
-        WordPack wordPack = buildWordPack(platform);
+        WordPack wordPack = new WordPack(WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform);
         Review review = buildReview(REVIEW_ID, platform, List.of(buildWord(NEW)));
 
         given(reviewRepository.existsByUserIdAndWordPack_PlatformAndWordPack_Name(USER_ID, platform, WORD_PACK_NAME)).willReturn(false);
@@ -331,7 +369,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         mockUser(USER_ID, roleName);
         given(roleService.getPlatformByRoleName(roleName)).willReturn(platform);
         ReviewDto reviewDto = buildReviewDto(REVIEW_ID, platform, 1, 2);
-        WordPack wordPack = buildWordPack(platform);
+        WordPack wordPack = new WordPack(WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform);
         Word newWord = buildWord(NEW);
         Word reviewWord = buildWord(IN_REVIEW);
         reviewWord.setOccurrence((short) 2);
@@ -372,7 +410,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         mockUser(USER_ID, roleName);
         given(roleService.getPlatformByRoleName(roleName)).willReturn(platform);
         ReviewDto reviewDto = buildReviewDto(REVIEW_ID, platform, 1, 2);
-        WordPack wordPack = buildWordPack(platform);
+        WordPack wordPack = new WordPack(WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform);
 
         given(wordDataService.getAllWordDataIdByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(List.of());
 
@@ -392,6 +430,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
 
         given(reviewRepository.findById(REVIEW_ID)).willReturn(Optional.of(review));
         given(reviewMapper.toDto(review)).willReturn(dto);
+        given(wordDataService.existsByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(true);
         given(wordDataService.getAllWordDataIdByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(List.of(1, 2));
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusNewRandomLimited(USER_ID, List.of(1, 2), 1)).willReturn(List.of(buildWord(NEW)));
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusInReviewAndPeriodBetweenOrderedDescLimited(USER_ID, List.of(1, 2), 2)).willReturn(List.of());
@@ -400,10 +439,29 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         given(reviewMapper.toDto(review)).willReturn(dto);
 
         // When
-        ReviewDto actual = underTest.refreshReview(REVIEW_ID);
+        Optional<ReviewDto> actual = underTest.refreshReview(REVIEW_ID);
 
         // Then
-        assertThat(actual).isEqualTo(dto);
+        assertThat(actual).contains(dto);
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.ReviewServiceImplTest$TestDataSource#refreshReview_deletesWhenNoWordData")
+    void refreshReview_deletesWhenNoWordData(Platform platform) {
+        // Given
+        Review review = buildReview(REVIEW_ID, platform, List.of(buildWord(NEW)));
+
+        given(reviewRepository.findById(REVIEW_ID)).willReturn(Optional.of(review));
+        given(wordDataService.existsByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(false);
+
+        // When
+        Optional<ReviewDto> actual = underTest.refreshReview(REVIEW_ID);
+
+        // Then
+        assertThat(actual).isEmpty();
+        verify(reviewRepository).delete(review);
+        verify(reviewRepository, never()).save(any(Review.class));
+        verify(reviewMapper, never()).toDto(review);
     }
 
     @ParameterizedTest
@@ -607,10 +665,6 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         given(userService.getUser()).willReturn(user);
     }
 
-    private WordPack buildWordPack(Platform platform) {
-        return new WordPack(WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform);
-    }
-
     private Word buildWord(my.project.library.dailylexika.enumerations.Status status) {
         Word word = new Word(USER_ID, null);
         word.setStatus(status);
@@ -622,7 +676,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
     }
 
     private Review buildReview(Long id, Platform platform, List<Word> listOfWords) {
-        Review review = new Review(USER_ID, 1, 2, buildWordPack(platform), listOfWords, listOfWords.size());
+        Review review = new Review(USER_ID, 1, 2, new WordPack(WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform), listOfWords, listOfWords.size());
         review.setId(id);
         review.setDateGenerated(DateUtil.nowInUtc());
         return review;
@@ -661,6 +715,13 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         }
 
         public static Stream<Arguments> getAllReviews_refreshesOutdatedReview() {
+            return Stream.of(
+                    arguments(ENGLISH, USER_ENGLISH),
+                    arguments(CHINESE, USER_CHINESE)
+            );
+        }
+
+        public static Stream<Arguments> getAllReviews_outdatedReviewWithNoWordData() {
             return Stream.of(
                     arguments(ENGLISH, USER_ENGLISH),
                     arguments(CHINESE, USER_CHINESE)
@@ -785,6 +846,13 @@ class ReviewServiceImplTest extends AbstractUnitTest {
             return Stream.of(
                     arguments(ENGLISH, USER_ENGLISH),
                     arguments(CHINESE, USER_CHINESE)
+            );
+        }
+
+        public static Stream<Arguments> refreshReview_deletesWhenNoWordData() {
+            return Stream.of(
+                    arguments(ENGLISH),
+                    arguments(CHINESE)
             );
         }
 

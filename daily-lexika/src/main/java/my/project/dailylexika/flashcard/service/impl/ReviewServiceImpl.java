@@ -56,6 +56,11 @@ public class ReviewServiceImpl implements ReviewService {
         List<ReviewDto> allReviewDtos = new ArrayList<>();
         for (Review oneReview : allReviews) {
             if (!Objects.equals(oneReview.getDateGenerated().toLocalDate(), DateUtil.nowInUtc().toLocalDate())) {
+                boolean hasWordData = wordDataService.existsByWordPackNameAndPlatform(oneReview.getWordPack().getName(), platform);
+                if (!hasWordData) {
+                    reviewRepository.delete(oneReview);
+                    continue;
+                }
                 reviewRepository.delete(oneReview);
                 reviewRepository.save(generateReview(reviewMapper.toDto(oneReview)));
             }
@@ -130,8 +135,14 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional
-    public ReviewDto refreshReview(Long reviewId) {
+    public Optional<ReviewDto> refreshReview(Long reviewId) {
         Review review = getReview(reviewId);
+        Platform platform = review.getWordPack().getPlatform();
+        boolean hasWordData = wordDataService.existsByWordPackNameAndPlatform(review.getWordPack().getName(), platform);
+        if (!hasWordData) {
+            reviewRepository.delete(review);
+            return Optional.empty();
+        }
 
         List<Word> updatedListOfWords = generateListOfWordsForReview(review.getWordPack(), reviewMapper.toDto(review));
 
@@ -140,7 +151,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         Review updatedReview = reviewRepository.save(review);
 
-        return reviewMapper.toDto(updatedReview);
+        return Optional.of(reviewMapper.toDto(updatedReview));
     }
 
     @Override

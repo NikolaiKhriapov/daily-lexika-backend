@@ -16,8 +16,8 @@ import my.project.dailylexika.flashcard.model.mappers.WordDataMapper;
 import my.project.dailylexika.flashcard.persistence.WordDataRepository;
 import my.project.library.util.exception.BadRequestException;
 import my.project.library.util.exception.ResourceNotFoundException;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
@@ -38,6 +38,7 @@ public class WordDataServiceImpl implements WordDataService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "wordDataCache", key = "#root.target.cacheKey()")
     public List<WordDataDto> getAll() {
         UserDto user = userService.getUser();
         Platform platform = roleService.getPlatformByRoleName(user.role());
@@ -55,6 +56,12 @@ public class WordDataServiceImpl implements WordDataService {
     @Transactional(readOnly = true)
     public List<WordData> getAllByWordPackNameAndPlatform(String wordPackName, Platform platform) {
         return wordDataRepository.findAllByListOfWordPacks_NameAndPlatform(wordPackName, platform);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsByWordPackNameAndPlatform(String wordPackName, Platform platform) {
+        return wordDataRepository.countByListOfWordPacks_NameAndPlatform(wordPackName, platform) > 0;
     }
 
     @Override
@@ -156,5 +163,11 @@ public class WordDataServiceImpl implements WordDataService {
     public WordData getEntityById(Integer wordDataId) {
         return wordDataRepository.findById(wordDataId)
                 .orElseThrow(() -> new ResourceNotFoundException(I18nUtil.getMessage("dailylexika-exceptions.wordData.notFound")));
+    }
+
+    public String cacheKey() {
+        UserDto user = userService.getUser();
+        Platform platform = roleService.getPlatformByRoleName(user.role());
+        return platform.name();
     }
 }

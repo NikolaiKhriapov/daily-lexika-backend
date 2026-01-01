@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Optional;
 
 public interface ReviewService {
     List<ReviewDto> getAllReviews();
@@ -18,7 +19,7 @@ public interface ReviewService {
     void deleteReview(@NotNull Long reviewId);
     ReviewStatisticsDto getReviewStatistics(@NotNull Long reviewId);
     List<Word> generateListOfWordsForReview(@NotNull WordPack wordPack, @NotNull @Valid ReviewDto reviewDto);
-    ReviewDto refreshReview(@NotNull Long reviewId);
+    Optional<ReviewDto> refreshReview(@NotNull Long reviewId);
     ReviewDto processReviewAction(@NotNull Long reviewId, Boolean isCorrect);
     void updateUserStreak();
     void deleteAllByUserIdAndPlatform(@NotNull Integer userId, @NotNull Platform platform);

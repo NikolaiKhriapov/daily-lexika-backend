@@ -12,6 +12,7 @@ public interface WordDataService {
     List<WordDataDto> getAll();
     List<WordData> getAllByPlatform(@NotNull Platform platform);
     List<WordData> getAllByWordPackNameAndPlatform(@NotBlank String wordPackName, @NotNull Platform platform);
+    boolean existsByWordPackNameAndPlatform(@NotBlank String wordPackName, @NotNull Platform platform);
     WordDataDto addCustomWordPackToWordData(@NotNull Integer wordDataId, @NotBlank String wordPackName);
     WordDataDto removeCustomWordPackFromWordData(@NotNull Integer wordDataId, @NotBlank String wordPackName);
     void addCustomWordPackToWordDataByWordPackName(@NotBlank String wordPackNameToBeAdded, @NotBlank String wordPackNameOriginal);
