@@ -77,24 +77,6 @@ class WordDataServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.flashcard.service.WordDataServiceImplTest$TestDataSource#getAll_returnsForUserPlatform")
-    void getAll_returnsForUserPlatform(Platform platform, RoleName roleName) {
-        // Given
-        mockUser(1, roleName, platform);
-        List<WordData> wordData = List.of(buildWordData(WORD_DATA_ID, new ArrayList<>(), platform));
-        List<WordDataDto> expected = List.of(new WordDataDto(WORD_DATA_ID.longValue(), null, null, null, null, null, null, null, null, platform));
-
-        given(wordDataRepository.findAllByPlatform(platform)).willReturn(wordData);
-        given(wordDataMapper.toDtoList(wordData)).willReturn(expected);
-
-        // When
-        List<WordDataDto> actual = underTest.getAll();
-
-        // Then
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @ParameterizedTest
     @MethodSource("my.project.dailylexika.flashcard.service.WordDataServiceImplTest$TestDataSource#getAllByPlatform_returnsAll")
     void getAllByPlatform_returnsAll(Platform platform) {
         // Given
@@ -527,13 +509,6 @@ class WordDataServiceImplTest extends AbstractUnitTest {
     }
 
     private static class TestDataSource {
-
-        public static Stream<Arguments> getAll_returnsForUserPlatform() {
-            return Stream.of(
-                    arguments(ENGLISH, USER_ENGLISH),
-                    arguments(CHINESE, USER_CHINESE)
-            );
-        }
 
         public static Stream<Arguments> getAllByPlatform_returnsAll() {
             return Stream.of(

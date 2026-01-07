@@ -16,12 +16,13 @@ import my.project.dailylexika.flashcard.model.mappers.WordDataMapper;
 import my.project.dailylexika.flashcard.persistence.WordDataRepository;
 import my.project.library.util.exception.BadRequestException;
 import my.project.library.util.exception.ResourceNotFoundException;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.text.Normalizer;
 import java.util.*;
+import java.util.Locale;
 
 import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
 
@@ -38,12 +39,13 @@ public class WordDataServiceImpl implements WordDataService {
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "wordDataCache", key = "#root.target.cacheKey()")
-    public List<WordDataDto> getAll() {
+    public List<WordDataDto> search(String query, Integer limit) {
         UserDto user = userService.getUser();
         Platform platform = roleService.getPlatformByRoleName(user.role());
-        List<WordData> allWordData = wordDataRepository.findAllByPlatform(platform);
-        return wordDataMapper.toDtoList(allWordData);
+        String normalizedQuery = query.trim();
+        String transcriptionQuery = normalizeTranscriptionQuery(query);
+        List<WordData> matches = wordDataRepository.searchByPlatformAndQuery(platform, user.translationLanguage(), normalizedQuery, transcriptionQuery, limit);
+        return wordDataMapper.toDtoList(matches);
     }
 
     @Override
@@ -165,9 +167,17 @@ public class WordDataServiceImpl implements WordDataService {
                 .orElseThrow(() -> new ResourceNotFoundException(I18nUtil.getMessage("dailylexika-exceptions.wordData.notFound")));
     }
 
-    public String cacheKey() {
-        UserDto user = userService.getUser();
-        Platform platform = roleService.getPlatformByRoleName(user.role());
-        return platform.name();
+    private static String normalizeTranscriptionQuery(String query) {
+        String trimmed = query == null ? "" : query.trim().toLowerCase(Locale.ROOT);
+        String normalized = Normalizer.normalize(trimmed, Normalizer.Form.NFD);
+        normalized = normalized.replaceAll("\\p{M}+", "");
+        normalized = normalized
+                .replace("u:", "u")
+                .replace("v", "u")
+                .replaceAll("\\d+", "");
+        if (normalized.isBlank()) {
+            normalized = normalized.toLowerCase(Locale.ROOT);
+        }
+        return normalized;
     }
 }

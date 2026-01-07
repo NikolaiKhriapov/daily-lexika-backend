@@ -6,10 +6,11 @@ import my.project.library.dailylexika.enumerations.Platform;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.util.List;
 
 public interface WordDataService {
-    List<WordDataDto> getAll();
+    List<WordDataDto> search(@NotBlank String query, @NotNull @Positive Integer limit);
     List<WordData> getAllByPlatform(@NotNull Platform platform);
     List<WordData> getAllByWordPackNameAndPlatform(@NotBlank String wordPackName, @NotNull Platform platform);
     boolean existsByWordPackNameAndPlatform(@NotBlank String wordPackName, @NotNull Platform platform);

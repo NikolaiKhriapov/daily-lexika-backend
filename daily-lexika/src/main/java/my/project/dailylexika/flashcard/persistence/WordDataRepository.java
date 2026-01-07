@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface WordDataRepository extends JpaRepository<WordData, Integer> {
+public interface WordDataRepository extends JpaRepository<WordData, Integer>, WordDataRepositoryCustom {
 
     @Override
     @CacheEvict(value = "wordDataCache", allEntries = true)
