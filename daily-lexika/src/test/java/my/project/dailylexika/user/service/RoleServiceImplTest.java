@@ -11,6 +11,7 @@ import my.project.dailylexika.user.model.entities.User;
 import my.project.dailylexika.config.AbstractUnitTest;
 import my.project.library.util.exception.ResourceAlreadyExistsException;
 import my.project.library.util.exception.ResourceNotFoundException;
+import my.project.dailylexika.util.ValidationTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -20,8 +21,6 @@ import org.mockito.Mockito;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -261,23 +260,13 @@ class RoleServiceImplTest extends AbstractUnitTest {
     }
 
     private RoleService createValidatedService() {
-        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
-        validator.afterPropertiesSet();
-        MethodValidationPostProcessor processor = new MethodValidationPostProcessor();
-        processor.setValidator(validator);
-        processor.afterPropertiesSet();
         RoleServiceImpl service = new RoleServiceImpl(roleStatisticsMapper);
-        return (RoleService) processor.postProcessAfterInitialization(service, "roleService");
+        return ValidationTestSupport.validatedProxy(service, "roleService", RoleService.class);
     }
 
     private PublicRoleService createValidatedPublicService() {
-        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
-        validator.afterPropertiesSet();
-        MethodValidationPostProcessor processor = new MethodValidationPostProcessor();
-        processor.setValidator(validator);
-        processor.afterPropertiesSet();
         RoleServiceImpl service = new RoleServiceImpl(roleStatisticsMapper);
-        return (PublicRoleService) processor.postProcessAfterInitialization(service, "publicRoleService");
+        return ValidationTestSupport.validatedProxy(service, "publicRoleService", PublicRoleService.class);
     }
 
     private static class TestDataSource {

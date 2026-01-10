@@ -1,5 +1,6 @@
 package my.project.dailylexika.flashcard.service;
 
+import jakarta.validation.ConstraintViolationException;
 import my.project.dailylexika.config.AbstractUnitTest;
 import my.project.dailylexika.flashcard.model.entities.WordPack;
 import my.project.dailylexika.flashcard.model.mappers.WordPackMapper;
@@ -7,15 +8,20 @@ import my.project.dailylexika.flashcard.persistence.WordPackRepository;
 import my.project.dailylexika.flashcard.service.impl.WordPackServiceImpl;
 import my.project.dailylexika.user._public.PublicRoleService;
 import my.project.dailylexika.user._public.PublicUserService;
-import my.project.library.dailylexika.dtos.flashcards.WordPackDto;
+import my.project.library.dailylexika.dtos.flashcards.WordPackCustomCreateDto;
+import my.project.library.dailylexika.dtos.flashcards.WordPackUserDto;
+import my.project.library.dailylexika.dtos.flashcards.admin.WordPackCreateDto;
+import my.project.library.dailylexika.dtos.flashcards.admin.WordPackDto;
+import my.project.library.dailylexika.dtos.flashcards.admin.WordPackUpdateDto;
 import my.project.library.dailylexika.dtos.user.UserDto;
 import my.project.library.dailylexika.enumerations.Category;
 import my.project.library.dailylexika.enumerations.Platform;
 import my.project.library.dailylexika.enumerations.RoleName;
-import my.project.library.dailylexika.events.flashcard.CustomWordPackToBeDeletedEvent;
+import my.project.library.dailylexika.events.flashcard.WordPackToBeDeletedEvent;
 import my.project.library.util.exception.BadRequestException;
 import my.project.library.util.exception.ResourceAlreadyExistsException;
 import my.project.library.util.exception.ResourceNotFoundException;
+import my.project.dailylexika.util.ValidationTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,10 +29,11 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,15 +49,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 class WordPackServiceImplTest extends AbstractUnitTest {
 
     private static final Integer USER_ID = 1;
     private static final String DESCRIPTION = "Description";
+    private static final Long WORD_PACK_ID_1 = 1L;
+    private static final Long WORD_PACK_ID_2 = 2L;
+    private static final Long WORD_PACK_ID_3 = 3L;
 
     private WordPackServiceImpl underTest;
     @Mock
@@ -75,40 +86,24 @@ class WordPackServiceImplTest extends AbstractUnitTest {
         );
     }
 
-    @Test
-    void getAll_returnsAll() {
-        // Given
-        List<WordPack> expected = List.of(
-                new WordPack("EN__Pack__1", DESCRIPTION, Category.CUSTOM, Platform.ENGLISH),
-                new WordPack("HSK_1", DESCRIPTION, Category.HSK, Platform.CHINESE)
-        );
-        given(wordPackRepository.findAll()).willReturn(expected);
-
-        // When
-        List<WordPack> actual = underTest.getAll();
-
-        // Then
-        assertThat(actual).isEqualTo(expected);
-    }
-
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#getAllForUser_returnsNonCustomAndOwnedCustom")
-    void getAllForUser_returnsNonCustomAndOwnedCustom(Platform platform, RoleName roleName, String prefix) {
+    void getAllForUser_returnsNonCustomAndOwnedCustom(Platform platform, RoleName roleName) {
         // Given
         UserDto user = mockUser(USER_ID, roleName, platform);
-        List<WordPack> nonCustom = List.of(new WordPack("HSK_1", DESCRIPTION, Category.HSK, platform));
-        List<WordPack> custom = List.of(new WordPack(prefix + "Pack__1", DESCRIPTION, Category.CUSTOM, platform));
+        List<WordPack> nonCustom = List.of(new WordPack(WORD_PACK_ID_1, "HSK_1", DESCRIPTION, Category.HSK, platform, null));
+        List<WordPack> custom = List.of(new WordPack(WORD_PACK_ID_2, "Pack", DESCRIPTION, Category.CUSTOM, platform, USER_ID));
         List<WordPack> expectedPacks = new ArrayList<>();
         expectedPacks.addAll(nonCustom);
         expectedPacks.addAll(custom);
-        List<WordPackDto> expectedDtos = List.of(new WordPackDto("dto", "dto", null, null, null, null, null));
+        List<WordPackUserDto> expectedDtos = List.of(new WordPackUserDto(WORD_PACK_ID_1, "dto", "dto", null, null, null, null, null, null));
 
         given(wordPackRepository.findAllByPlatformAndCategoryNot(platform, Category.CUSTOM)).willReturn(nonCustom);
         given(wordPackRepository.findAllByUserIdAndPlatformAndCategoryCustom(user.id(), platform)).willReturn(custom);
         given(wordPackMapper.toDtoList(expectedPacks)).willReturn(expectedDtos);
 
         // When
-        List<WordPackDto> actual = underTest.getAllForUser();
+        List<WordPackUserDto> actual = underTest.getAllForUser();
 
         // Then
         assertThat(actual).isEqualTo(expectedDtos);
@@ -116,110 +111,139 @@ class WordPackServiceImplTest extends AbstractUnitTest {
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#getAllForUser_filtersCustomByOwnerSuffix")
-    void getAllForUser_filtersCustomByOwnerSuffix(Platform platform, RoleName roleName, String prefix) {
+    void getAllForUser_filtersCustomByOwnerSuffix(Platform platform, RoleName roleName) {
         // Given
         UserDto user = mockUser(USER_ID, roleName, platform);
-        List<WordPack> nonCustom = List.of(new WordPack("HSK_1", DESCRIPTION, Category.HSK, platform));
+        List<WordPack> nonCustom = List.of(new WordPack(WORD_PACK_ID_1, "HSK_1", DESCRIPTION, Category.HSK, platform, null));
         List<WordPack> custom = List.of(
-                new WordPack(prefix + "Pack__1", DESCRIPTION, Category.CUSTOM, platform),
-                new WordPack(prefix + "Other__2", DESCRIPTION, Category.CUSTOM, platform)
+                new WordPack(WORD_PACK_ID_2, "Pack", DESCRIPTION, Category.CUSTOM, platform, USER_ID)
         );
         List<WordPack> expectedPacks = new ArrayList<>();
         expectedPacks.addAll(nonCustom);
-        expectedPacks.add(new WordPack(prefix + "Pack__1", DESCRIPTION, Category.CUSTOM, platform));
-        List<WordPackDto> expectedDtos = List.of(new WordPackDto("dto", "dto", null, null, null, null, null));
+        expectedPacks.add(new WordPack(WORD_PACK_ID_2, "Pack", DESCRIPTION, Category.CUSTOM, platform, USER_ID));
+        List<WordPackUserDto> expectedDtos = List.of(new WordPackUserDto(WORD_PACK_ID_1, "dto", "dto", null, null, null, null, null, null));
 
         given(wordPackRepository.findAllByPlatformAndCategoryNot(platform, Category.CUSTOM)).willReturn(nonCustom);
         given(wordPackRepository.findAllByUserIdAndPlatformAndCategoryCustom(user.id(), platform)).willReturn(custom);
         given(wordPackMapper.toDtoList(expectedPacks)).willReturn(expectedDtos);
 
         // When
-        List<WordPackDto> actual = underTest.getAllForUser();
+        List<WordPackUserDto> actual = underTest.getAllForUser();
 
         // Then
         assertThat(actual).isEqualTo(expectedDtos);
     }
 
-    @Test
-    void getByName_returnsWordPack() {
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#getPage_returnsSortedNonCustom")
+    void getPage_returnsSortedNonCustom(Platform platform) {
         // Given
-        WordPack expected = new WordPack("EN__Pack__1", DESCRIPTION, Category.CUSTOM, Platform.ENGLISH);
-        given(wordPackRepository.findById(expected.getName())).willReturn(Optional.of(expected));
+        WordPack wordPack = new WordPack(WORD_PACK_ID_1, "A1", DESCRIPTION, Category.HSK, platform, null);
+        given(wordPackRepository.findAllByPlatformAndCategoryNot(eq(platform), eq(Category.CUSTOM), any(Pageable.class)))
+                .willReturn(new PageImpl<>(List.of(wordPack)));
 
         // When
-        WordPack actual = underTest.getByName(expected.getName());
+        Page<WordPackDto> result = underTest.getPage(platform, PageRequest.of(0, 10));
+
+        // Then
+        ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
+        verify(wordPackRepository).findAllByPlatformAndCategoryNot(eq(platform), eq(Category.CUSTOM), captor.capture());
+        assertThat(captor.getValue().getSort().getOrderFor("name")).isNotNull();
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).name()).isEqualTo(wordPack.getName());
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#getById_returnsWordPack")
+    void getById_returnsWordPack(Platform platform) {
+        // Given
+        WordPack expected = new WordPack(WORD_PACK_ID_1, "Pack", DESCRIPTION, Category.CUSTOM, platform, USER_ID);
+        given(wordPackRepository.findById(expected.getId())).willReturn(Optional.of(expected));
+
+        // When
+        WordPack actual = underTest.getById(expected.getId());
 
         // Then
         assertThat(actual).isEqualTo(expected);
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#getByName_throwIfInvalidInput")
-    void getByName_throwIfInvalidInput(String input) {
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#getById_throwIfInvalidInput")
+    void getById_throwIfInvalidInput(Long input) {
         // Given
         WordPackService validatedService = createValidatedService();
 
         // When / Then
-        assertThatThrownBy(() -> validatedService.getByName(input))
-                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+        assertThatThrownBy(() -> validatedService.getById(input))
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     @Test
-    void getByName_throwIfNotFound() {
+    void getById_throwIfNotFound() {
         // Given
-        given(wordPackRepository.findById("missing")).willReturn(Optional.empty());
+        given(wordPackRepository.findById(WORD_PACK_ID_1)).willReturn(Optional.empty());
 
         // When / Then
-        assertThatThrownBy(() -> underTest.getByName("missing"))
+        assertThatThrownBy(() -> underTest.getById(WORD_PACK_ID_1))
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
-    @Test
-    void saveAll_persistsAll() {
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#getDtoById_returnsNonCustomDto")
+    void getDtoById_returnsNonCustomDto(Platform platform) {
         // Given
-        List<WordPack> input = List.of(
-                new WordPack("EN__Pack__1", DESCRIPTION, Category.CUSTOM, Platform.ENGLISH),
-                new WordPack("HSK_1", DESCRIPTION, Category.HSK, Platform.CHINESE)
-        );
+        WordPack wordPack = new WordPack(WORD_PACK_ID_1, "A1", DESCRIPTION, Category.HSK, platform, null);
+        given(wordPackRepository.findById(wordPack.getId())).willReturn(Optional.of(wordPack));
 
         // When
-        underTest.saveAll(input);
+        WordPackDto dto = underTest.getDtoById(wordPack.getId());
 
         // Then
-        verify(wordPackRepository).saveAll(input);
+        assertThat(dto.name()).isEqualTo(wordPack.getName());
+        assertThat(dto.description()).isEqualTo(wordPack.getDescription());
+        assertThat(dto.category()).isEqualTo(wordPack.getCategory());
+        assertThat(dto.platform()).isEqualTo(wordPack.getPlatform());
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#saveAll_throwIfInvalidInput")
-    void saveAll_throwIfInvalidInput(List<WordPack> input) {
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#getDtoById_throwIfCustom")
+    void getDtoById_throwIfCustom(Platform platform) {
+        // Given
+        WordPack wordPack = new WordPack(WORD_PACK_ID_1, "Custom", DESCRIPTION, Category.CUSTOM, platform, USER_ID);
+        given(wordPackRepository.findById(wordPack.getId())).willReturn(Optional.of(wordPack));
+
+        // When / Then
+        assertThatThrownBy(() -> underTest.getDtoById(wordPack.getId()))
+                .isInstanceOf(BadRequestException.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#getDtoById_throwIfInvalidInput")
+    void getDtoById_throwIfInvalidInput(Long input) {
         // Given
         WordPackService validatedService = createValidatedService();
 
         // When / Then
-        assertThatThrownBy(() -> validatedService.saveAll(input))
-                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+        assertThatThrownBy(() -> validatedService.getDtoById(input))
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#deleteAllByUserIdAndPlatform_deletesOwnedCustomOnly")
-    void deleteAllByUserIdAndPlatform_deletesOwnedCustomOnly(Platform platform, String prefix) {
+    void deleteAllByUserIdAndPlatform_deletesOwnedCustomOnly(Platform platform) {
         // Given
-        WordPackServiceImpl spy = Mockito.spy(underTest);
-        doNothing().when(spy).deleteCustomWordPack(any());
         List<WordPack> custom = List.of(
-                new WordPack(prefix + "Pack__1", DESCRIPTION, Category.CUSTOM, platform),
-                new WordPack(prefix + "Other__1", DESCRIPTION, Category.CUSTOM, platform),
-                new WordPack(prefix + "Foreign__2", DESCRIPTION, Category.CUSTOM, platform)
+                new WordPack(WORD_PACK_ID_1, "Pack", DESCRIPTION, Category.CUSTOM, platform, USER_ID),
+                new WordPack(WORD_PACK_ID_2, "Other", DESCRIPTION, Category.CUSTOM, platform, USER_ID)
         );
         given(wordPackRepository.findAllByUserIdAndPlatformAndCategoryCustom(USER_ID, platform)).willReturn(custom);
 
         // When
-        spy.deleteAllByUserIdAndPlatform(USER_ID, platform);
+        underTest.deleteAllByUserIdAndPlatform(USER_ID, platform);
 
         // Then
-        verify(spy).deleteCustomWordPack(prefix + "Pack__1");
-        verify(spy).deleteCustomWordPack(prefix + "Other__1");
-        verify(spy, never()).deleteCustomWordPack(prefix + "Foreign__2");
+        verify(wordPackRepository).delete(custom.get(0));
+        verify(wordPackRepository).delete(custom.get(1));
     }
 
     @ParameterizedTest
@@ -230,16 +254,177 @@ class WordPackServiceImplTest extends AbstractUnitTest {
 
         // When / Then
         assertThatThrownBy(() -> validatedService.deleteAllByUserIdAndPlatform(userId, platform))
-                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+                .isInstanceOf(ConstraintViolationException.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#create_prefixesNonCustomName")
+    void create_prefixesNonCustomName(Platform platform) {
+        // Given
+        WordPackCreateDto createDto = new WordPackCreateDto("Pack", DESCRIPTION, Category.HSK, platform);
+        given(wordPackRepository.existsByPlatformAndName(platform, "Pack")).willReturn(false);
+        given(wordPackRepository.save(any(WordPack.class))).willAnswer(invocation -> invocation.getArgument(0));
+
+        // When
+        WordPackDto result = underTest.create(createDto);
+
+        // Then
+        ArgumentCaptor<WordPack> captor = ArgumentCaptor.forClass(WordPack.class);
+        verify(wordPackRepository).save(captor.capture());
+        assertThat(captor.getValue().getName()).isEqualTo("Pack");
+        assertThat(result.name()).isEqualTo("Pack");
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#create_replacesWrongPrefix")
+    void create_replacesWrongPrefix(Platform platform, String wrongPrefix) {
+        // Given
+        WordPackCreateDto createDto = new WordPackCreateDto(wrongPrefix + "Pack", DESCRIPTION, Category.HSK, platform);
+        given(wordPackRepository.existsByPlatformAndName(platform, wrongPrefix + "Pack")).willReturn(false);
+        given(wordPackRepository.save(any(WordPack.class))).willAnswer(invocation -> invocation.getArgument(0));
+
+        // When
+        WordPackDto result = underTest.create(createDto);
+
+        // Then
+        ArgumentCaptor<WordPack> captor = ArgumentCaptor.forClass(WordPack.class);
+        verify(wordPackRepository).save(captor.capture());
+        assertThat(captor.getValue().getName()).isEqualTo(wrongPrefix + "Pack");
+        assertThat(result.name()).isEqualTo(wrongPrefix + "Pack");
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#create_throwIfInvalidInput")
+    void create_throwIfInvalidInput(WordPackCreateDto input) {
+        // Given
+        WordPackService validatedService = createValidatedService();
+
+        // When / Then
+        assertThatThrownBy(() -> validatedService.create(input))
+                .isInstanceOf(ConstraintViolationException.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#create_throwIfCategoryCustom")
+    void create_throwIfCategoryCustom(Platform platform) {
+        // Given
+        WordPackCreateDto createDto = new WordPackCreateDto("Pack", DESCRIPTION, Category.CUSTOM, platform);
+
+        // When / Then
+        assertThatThrownBy(() -> underTest.create(createDto))
+                .isInstanceOf(BadRequestException.class);
+        verify(wordPackRepository, never()).save(any());
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#create_throwIfAlreadyExists")
+    void create_throwIfAlreadyExists(Platform platform) {
+        // Given
+        WordPackCreateDto createDto = new WordPackCreateDto("Pack", DESCRIPTION, Category.HSK, platform);
+        given(wordPackRepository.existsByPlatformAndName(platform, "Pack")).willReturn(true);
+
+        // When / Then
+        assertThatThrownBy(() -> underTest.create(createDto))
+                .isInstanceOf(ResourceAlreadyExistsException.class);
+        verify(wordPackRepository, never()).save(any());
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#update_updatesDescriptionAndCategory")
+    void update_updatesDescriptionAndCategory(Platform platform) {
+        // Given
+        WordPack wordPack = new WordPack(WORD_PACK_ID_1, "A1", DESCRIPTION, Category.HSK, platform, null);
+        WordPackUpdateDto patchDto = new WordPackUpdateDto("New", Category.OTHER);
+        given(wordPackRepository.findById(wordPack.getId())).willReturn(Optional.of(wordPack));
+        given(wordPackRepository.save(any(WordPack.class))).willAnswer(invocation -> invocation.getArgument(0));
+
+        // When
+        WordPackDto result = underTest.update(wordPack.getId(), patchDto);
+
+        // Then
+        ArgumentCaptor<WordPack> captor = ArgumentCaptor.forClass(WordPack.class);
+        verify(wordPackRepository).save(captor.capture());
+        assertThat(captor.getValue().getDescription()).isEqualTo("New");
+        assertThat(captor.getValue().getCategory()).isEqualTo(Category.OTHER);
+        assertThat(result.category()).isEqualTo(Category.OTHER);
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#update_throwIfInvalidInput")
+    void update_throwIfInvalidInput(Long wordPackId, WordPackUpdateDto patchDto) {
+        // Given
+        WordPackService validatedService = createValidatedService();
+
+        // When / Then
+        assertThatThrownBy(() -> validatedService.update(wordPackId, patchDto))
+                .isInstanceOf(ConstraintViolationException.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#update_throwIfCategoryCustom")
+    void update_throwIfCategoryCustom(Platform platform) {
+        // Given
+        WordPack wordPack = new WordPack(WORD_PACK_ID_1, "A1", DESCRIPTION, Category.HSK, platform, null);
+        WordPackUpdateDto patchDto = new WordPackUpdateDto("New", Category.CUSTOM);
+        given(wordPackRepository.findById(wordPack.getId())).willReturn(Optional.of(wordPack));
+
+        // When / Then
+        assertThatThrownBy(() -> underTest.update(wordPack.getId(), patchDto))
+                .isInstanceOf(BadRequestException.class);
+        verify(wordPackRepository, never()).save(any());
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#delete_publishesEventAndDeletes")
+    void delete_publishesEventAndDeletes(Platform platform) {
+        // Given
+        WordPack wordPack = new WordPack(WORD_PACK_ID_1, "A1", DESCRIPTION, Category.HSK, platform, null);
+        given(wordPackRepository.findById(wordPack.getId())).willReturn(Optional.of(wordPack));
+
+        // When
+        underTest.delete(wordPack.getId());
+
+        // Then
+        ArgumentCaptor<WordPackToBeDeletedEvent> eventCaptor = ArgumentCaptor.forClass(WordPackToBeDeletedEvent.class);
+        verify(eventPublisher).publishEvent(eventCaptor.capture());
+        WordPackToBeDeletedEvent event = eventCaptor.getValue();
+        assertThat(event.wordPackId()).isEqualTo(wordPack.getId());
+        assertThat(event.platform()).isEqualTo(platform);
+        verify(wordPackRepository).delete(wordPack);
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#delete_throwIfInvalidInput")
+    void delete_throwIfInvalidInput(Long wordPackId) {
+        // Given
+        WordPackService validatedService = createValidatedService();
+
+        // When / Then
+        assertThatThrownBy(() -> validatedService.delete(wordPackId))
+                .isInstanceOf(ConstraintViolationException.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#delete_throwIfCustom")
+    void delete_throwIfCustom(Platform platform) {
+        // Given
+        WordPack wordPack = new WordPack(WORD_PACK_ID_1, "Custom", DESCRIPTION, Category.CUSTOM, platform, USER_ID);
+        given(wordPackRepository.findById(wordPack.getId())).willReturn(Optional.of(wordPack));
+
+        // When / Then
+        assertThatThrownBy(() -> underTest.delete(wordPack.getId()))
+                .isInstanceOf(BadRequestException.class);
+        verify(wordPackRepository, never()).delete(any(WordPack.class));
     }
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#createCustomWordPack_createsWithDecoratedName")
-    void createCustomWordPack_createsWithDecoratedName(Platform platform, RoleName roleName, String prefix) {
+    void createCustomWordPack_createsWithDecoratedName(Platform platform, RoleName roleName) {
         // Given
         mockUser(USER_ID, roleName, platform);
-        WordPackDto input = new WordPackDto("MyPack", DESCRIPTION, null, null, null, null, null);
-        given(wordPackRepository.existsById(prefix + "MyPack__1")).willReturn(false);
+        WordPackCustomCreateDto input = new WordPackCustomCreateDto("MyPack", DESCRIPTION);
+        given(wordPackRepository.existsByPlatformAndNameAndUserId(platform, "MyPack", USER_ID)).willReturn(false);
+        given(wordPackRepository.save(any(WordPack.class))).willAnswer(invocation -> invocation.getArgument(0));
 
         // When
         underTest.createCustomWordPack(input);
@@ -248,7 +433,7 @@ class WordPackServiceImplTest extends AbstractUnitTest {
         ArgumentCaptor<WordPack> captor = ArgumentCaptor.forClass(WordPack.class);
         verify(wordPackRepository).save(captor.capture());
         WordPack saved = captor.getValue();
-        assertThat(saved.getName()).isEqualTo(prefix + "MyPack__1");
+        assertThat(saved.getName()).isEqualTo("MyPack");
         assertThat(saved.getDescription()).isEqualTo(DESCRIPTION);
         assertThat(saved.getCategory()).isEqualTo(Category.CUSTOM);
         assertThat(saved.getPlatform()).isEqualTo(platform);
@@ -256,11 +441,12 @@ class WordPackServiceImplTest extends AbstractUnitTest {
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#createCustomWordPack_trimsNameBeforeDecoration")
-    void createCustomWordPack_trimsNameBeforeDecoration(Platform platform, RoleName roleName, String prefix) {
+    void createCustomWordPack_trimsNameBeforeDecoration(Platform platform, RoleName roleName) {
         // Given
         mockUser(USER_ID, roleName, platform);
-        WordPackDto input = new WordPackDto("  Trim  ", DESCRIPTION, null, null, null, null, null);
-        given(wordPackRepository.existsById(prefix + "Trim__1")).willReturn(false);
+        WordPackCustomCreateDto input = new WordPackCustomCreateDto("  Trim  ", DESCRIPTION);
+        given(wordPackRepository.existsByPlatformAndNameAndUserId(platform, "Trim", USER_ID)).willReturn(false);
+        given(wordPackRepository.save(any(WordPack.class))).willAnswer(invocation -> invocation.getArgument(0));
 
         // When
         underTest.createCustomWordPack(input);
@@ -268,18 +454,19 @@ class WordPackServiceImplTest extends AbstractUnitTest {
         // Then
         ArgumentCaptor<WordPack> captor = ArgumentCaptor.forClass(WordPack.class);
         verify(wordPackRepository).save(captor.capture());
-        assertThat(captor.getValue().getName()).isEqualTo(prefix + "Trim__1");
+        assertThat(captor.getValue().getName()).isEqualTo("Trim");
     }
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#createCustomWordPack_allowsCaseSensitiveDistinctNames")
-    void createCustomWordPack_allowsCaseSensitiveDistinctNames(Platform platform, RoleName roleName, String prefix) {
+    void createCustomWordPack_allowsCaseSensitiveDistinctNames(Platform platform, RoleName roleName) {
         // Given
         mockUser(USER_ID, roleName, platform);
-        WordPackDto first = new WordPackDto("MyPack", DESCRIPTION, null, null, null, null, null);
-        WordPackDto second = new WordPackDto("mypack", DESCRIPTION, null, null, null, null, null);
-        given(wordPackRepository.existsById(prefix + "MyPack__1")).willReturn(false);
-        given(wordPackRepository.existsById(prefix + "mypack__1")).willReturn(false);
+        WordPackCustomCreateDto first = new WordPackCustomCreateDto("MyPack", DESCRIPTION);
+        WordPackCustomCreateDto second = new WordPackCustomCreateDto("mypack", DESCRIPTION);
+        given(wordPackRepository.existsByPlatformAndNameAndUserId(platform, "MyPack", USER_ID)).willReturn(false);
+        given(wordPackRepository.existsByPlatformAndNameAndUserId(platform, "mypack", USER_ID)).willReturn(false);
+        given(wordPackRepository.save(any(WordPack.class))).willAnswer(invocation -> invocation.getArgument(0));
 
         // When
         underTest.createCustomWordPack(first);
@@ -287,19 +474,20 @@ class WordPackServiceImplTest extends AbstractUnitTest {
 
         // Then
         ArgumentCaptor<WordPack> captor = ArgumentCaptor.forClass(WordPack.class);
-        verify(wordPackRepository, Mockito.times(2)).save(captor.capture());
+        verify(wordPackRepository, times(2)).save(captor.capture());
         List<WordPack> saved = captor.getAllValues();
         assertThat(saved).extracting(WordPack::getName)
-                .containsExactlyInAnyOrder(prefix + "MyPack__1", prefix + "mypack__1");
+                .containsExactlyInAnyOrder("MyPack", "mypack");
     }
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#createCustomWordPack_preservesEmbeddedSuffix")
-    void createCustomWordPack_preservesEmbeddedSuffix(Platform platform, RoleName roleName, String prefix) {
+    void createCustomWordPack_preservesEmbeddedSuffix(Platform platform, RoleName roleName) {
         // Given
         mockUser(USER_ID, roleName, platform);
-        WordPackDto input = new WordPackDto("Foo__123", DESCRIPTION, null, null, null, null, null);
-        given(wordPackRepository.existsById(prefix + "Foo__123__1")).willReturn(false);
+        WordPackCustomCreateDto input = new WordPackCustomCreateDto("Foo123", DESCRIPTION);
+        given(wordPackRepository.existsByPlatformAndNameAndUserId(platform, "Foo123", USER_ID)).willReturn(false);
+        given(wordPackRepository.save(any(WordPack.class))).willAnswer(invocation -> invocation.getArgument(0));
 
         // When
         underTest.createCustomWordPack(input);
@@ -307,39 +495,44 @@ class WordPackServiceImplTest extends AbstractUnitTest {
         // Then
         ArgumentCaptor<WordPack> captor = ArgumentCaptor.forClass(WordPack.class);
         verify(wordPackRepository).save(captor.capture());
-        assertThat(captor.getValue().getName()).isEqualTo(prefix + "Foo__123__1");
+        assertThat(captor.getValue().getName()).isEqualTo("Foo123");
     }
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#createCustomWordPack_throwIfInvalidInput")
-    void createCustomWordPack_throwIfInvalidInput(WordPackDto input) {
+    void createCustomWordPack_throwIfInvalidInput(WordPackCustomCreateDto input) {
         // Given
         WordPackService validatedService = createValidatedService();
 
         // When / Then
         assertThatThrownBy(() -> validatedService.createCustomWordPack(input))
-                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#createCustomWordPack_throwIfInvalidName")
-    void createCustomWordPack_throwIfInvalidName(String inputName) {
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#createCustomWordPack_acceptsNamesWithSemicolons")
+    void createCustomWordPack_acceptsNamesWithSemicolons(Platform platform, RoleName roleName, String inputName) {
         // Given
-        mockUser(USER_ID, RoleName.USER_ENGLISH, Platform.ENGLISH);
-        WordPackDto input = new WordPackDto(inputName, DESCRIPTION, null, null, null, null, null);
+        mockUser(USER_ID, roleName, platform);
+        WordPackCustomCreateDto input = new WordPackCustomCreateDto(inputName, DESCRIPTION);
+        given(wordPackRepository.save(any(WordPack.class))).willAnswer(invocation -> invocation.getArgument(0));
 
-        // When / Then
-        assertThatThrownBy(() -> underTest.createCustomWordPack(input))
-                .isInstanceOf(BadRequestException.class);
+        // When
+        underTest.createCustomWordPack(input);
+
+        // Then
+        ArgumentCaptor<WordPack> captor = ArgumentCaptor.forClass(WordPack.class);
+        verify(wordPackRepository).save(captor.capture());
+        assertThat(captor.getValue().getName()).isEqualTo(inputName.trim());
     }
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#createCustomWordPack_throwIfAlreadyExists")
-    void createCustomWordPack_throwIfAlreadyExists(Platform platform, RoleName roleName, String prefix) {
+    void createCustomWordPack_throwIfAlreadyExists(Platform platform, RoleName roleName) {
         // Given
         mockUser(USER_ID, roleName, platform);
-        WordPackDto input = new WordPackDto("MyPack", DESCRIPTION, null, null, null, null, null);
-        given(wordPackRepository.existsById(prefix + "MyPack__1")).willReturn(true);
+        WordPackCustomCreateDto input = new WordPackCustomCreateDto("MyPack", DESCRIPTION);
+        given(wordPackRepository.existsByPlatformAndNameAndUserId(platform, "MyPack", USER_ID)).willReturn(true);
 
         // When / Then
         assertThatThrownBy(() -> underTest.createCustomWordPack(input))
@@ -348,55 +541,45 @@ class WordPackServiceImplTest extends AbstractUnitTest {
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#deleteCustomWordPack_deletesAndPublishesEvent")
-    void deleteCustomWordPack_deletesAndPublishesEvent(Platform platform, RoleName roleName, String prefix) {
+    void deleteCustomWordPack_deletesAndPublishesEvent(Platform platform, RoleName roleName) {
         // Given
-        mockUser(USER_ID, roleName, platform);
-        WordPack wordPack = new WordPack(prefix + "Pack__1", DESCRIPTION, Category.CUSTOM, platform);
-        given(wordPackRepository.findById(wordPack.getName())).willReturn(Optional.of(wordPack));
+        UserDto user = new UserDto(USER_ID, "User", "user@test.com", roleName, Set.of(), null, null, null);
+        given(userService.getUser()).willReturn(user);
+        WordPack wordPack = new WordPack(WORD_PACK_ID_1, "Pack", DESCRIPTION, Category.CUSTOM, platform, USER_ID);
+        given(wordPackRepository.findById(wordPack.getId())).willReturn(Optional.of(wordPack));
 
         // When
-        underTest.deleteCustomWordPack(wordPack.getName());
+        underTest.deleteCustomWordPack(wordPack.getId());
 
         // Then
-        ArgumentCaptor<CustomWordPackToBeDeletedEvent> eventCaptor = ArgumentCaptor.forClass(CustomWordPackToBeDeletedEvent.class);
+        ArgumentCaptor<WordPackToBeDeletedEvent> eventCaptor = ArgumentCaptor.forClass(WordPackToBeDeletedEvent.class);
         verify(eventPublisher).publishEvent(eventCaptor.capture());
-        CustomWordPackToBeDeletedEvent event = eventCaptor.getValue();
-        assertThat(event.wordPackName()).isEqualTo(wordPack.getName());
+        WordPackToBeDeletedEvent event = eventCaptor.getValue();
+        assertThat(event.wordPackId()).isEqualTo(wordPack.getId());
         assertThat(event.platform()).isEqualTo(platform);
         verify(wordPackRepository).delete(wordPack);
     }
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#deleteCustomWordPack_throwIfInvalidInput")
-    void deleteCustomWordPack_throwIfInvalidInput(String input) {
+    void deleteCustomWordPack_throwIfInvalidInput(Long input) {
         // Given
         WordPackService validatedService = createValidatedService();
 
         // When / Then
         assertThatThrownBy(() -> validatedService.deleteCustomWordPack(input))
-                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#deleteCustomWordPack_throwIfCategoryNotCustom")
-    void deleteCustomWordPack_throwIfCategoryNotCustom(Platform platform, RoleName roleName, String prefix) {
+    void deleteCustomWordPack_throwIfCategoryNotCustom(Platform platform) {
         // Given
-        WordPack wordPack = new WordPack(prefix + "HSK_1", DESCRIPTION, Category.HSK, platform);
-        given(wordPackRepository.findById(wordPack.getName())).willReturn(Optional.of(wordPack));
+        WordPack wordPack = new WordPack(WORD_PACK_ID_1, "HSK_1", DESCRIPTION, Category.HSK, platform, null);
+        given(wordPackRepository.findById(wordPack.getId())).willReturn(Optional.of(wordPack));
 
         // When / Then
-        assertThatThrownBy(() -> underTest.deleteCustomWordPack(wordPack.getName()))
-                .isInstanceOf(BadRequestException.class);
-    }
-
-    @ParameterizedTest
-    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#throwIfWordPackCategoryNotCustom_throwIfNotCustom")
-    void throwIfWordPackCategoryNotCustom_throwIfNotCustom(Platform platform, RoleName roleName, String prefix) {
-        // Given
-        WordPack wordPack = new WordPack(prefix + "HSK_1", DESCRIPTION, Category.HSK, platform);
-
-        // When / Then
-        assertThatThrownBy(() -> underTest.throwIfWordPackCategoryNotCustom(wordPack))
+        assertThatThrownBy(() -> underTest.deleteCustomWordPack(wordPack.getId()))
                 .isInstanceOf(BadRequestException.class);
     }
 
@@ -408,7 +591,18 @@ class WordPackServiceImplTest extends AbstractUnitTest {
 
         // When / Then
         assertThatThrownBy(() -> validatedService.throwIfWordPackCategoryNotCustom(input))
-                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+                .isInstanceOf(ConstraintViolationException.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.WordPackServiceImplTest$TestDataSource#throwIfWordPackCategoryNotCustom_throwIfNotCustom")
+    void throwIfWordPackCategoryNotCustom_throwIfNotCustom(Platform platform) {
+        // Given
+        WordPack wordPack = new WordPack(WORD_PACK_ID_1, "HSK_1", DESCRIPTION, Category.HSK, platform, null);
+
+        // When / Then
+        assertThatThrownBy(() -> underTest.throwIfWordPackCategoryNotCustom(wordPack))
+                .isInstanceOf(BadRequestException.class);
     }
 
     private UserDto mockUser(Integer id, RoleName roleName, Platform platform) {
@@ -419,11 +613,6 @@ class WordPackServiceImplTest extends AbstractUnitTest {
     }
 
     private WordPackService createValidatedService() {
-        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
-        validator.afterPropertiesSet();
-        MethodValidationPostProcessor processor = new MethodValidationPostProcessor();
-        processor.setValidator(validator);
-        processor.afterPropertiesSet();
         WordPackServiceImpl service = new WordPackServiceImpl(
                 wordPackRepository,
                 wordPackMapper,
@@ -431,40 +620,69 @@ class WordPackServiceImplTest extends AbstractUnitTest {
                 roleService,
                 eventPublisher
         );
-        return (WordPackService) processor.postProcessAfterInitialization(service, "wordPackService");
+        return ValidationTestSupport.validatedProxy(service, "wordPackService", WordPackService.class);
     }
 
     private static class TestDataSource {
 
         public static Stream<Arguments> getAllForUser_returnsNonCustomAndOwnedCustom() {
             return Stream.of(
-                    arguments(ENGLISH, USER_ENGLISH, "EN__"),
-                    arguments(CHINESE, USER_CHINESE, "CH__")
+                    arguments(ENGLISH, USER_ENGLISH),
+                    arguments(CHINESE, USER_CHINESE)
             );
         }
 
         public static Stream<Arguments> getAllForUser_filtersCustomByOwnerSuffix() {
-            return getAllForUser_returnsNonCustomAndOwnedCustom();
-        }
-
-        public static Stream<Arguments> getByName_throwIfInvalidInput() {
             return Stream.of(
-                    arguments((Object) null),
-                    arguments(""),
-                    arguments(" ")
+                    arguments(ENGLISH, USER_ENGLISH),
+                    arguments(CHINESE, USER_CHINESE)
             );
         }
 
-        public static Stream<Arguments> saveAll_throwIfInvalidInput() {
+        public static Stream<Arguments> getPage_returnsSortedNonCustom() {
+            return Stream.of(
+                    arguments(ENGLISH),
+                    arguments(CHINESE)
+            );
+        }
+
+        public static Stream<Arguments> getById_returnsWordPack() {
+            return Stream.of(
+                    arguments(ENGLISH),
+                    arguments(CHINESE)
+            );
+        }
+
+        public static Stream<Arguments> getById_throwIfInvalidInput() {
             return Stream.of(
                     arguments((Object) null)
             );
         }
 
+        public static Stream<Arguments> getDtoById_returnsNonCustomDto() {
+            return Stream.of(
+                    arguments(ENGLISH),
+                    arguments(CHINESE)
+            );
+        }
+
+        public static Stream<Arguments> getDtoById_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments((Object) null)
+            );
+        }
+
+        public static Stream<Arguments> getDtoById_throwIfCustom() {
+            return Stream.of(
+                    arguments(ENGLISH),
+                    arguments(CHINESE)
+            );
+        }
+
         public static Stream<Arguments> deleteAllByUserIdAndPlatform_deletesOwnedCustomOnly() {
             return Stream.of(
-                    arguments(ENGLISH, "EN__"),
-                    arguments(CHINESE, "CH__")
+                    arguments(ENGLISH),
+                    arguments(CHINESE)
             );
         }
 
@@ -475,73 +693,175 @@ class WordPackServiceImplTest extends AbstractUnitTest {
             );
         }
 
+        public static Stream<Arguments> create_prefixesNonCustomName() {
+            return Stream.of(
+                    arguments(ENGLISH),
+                    arguments(CHINESE)
+            );
+        }
+
+        public static Stream<Arguments> create_replacesWrongPrefix() {
+            return Stream.of(
+                    arguments(ENGLISH, "WRONG_"),
+                    arguments(CHINESE, "BAD_")
+            );
+        }
+
+        public static Stream<Arguments> create_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments((Object) null),
+                    arguments(new WordPackCreateDto(null, DESCRIPTION, Category.HSK, ENGLISH)),
+                    arguments(new WordPackCreateDto("", DESCRIPTION, Category.HSK, ENGLISH)),
+                    arguments(new WordPackCreateDto(" ", DESCRIPTION, Category.HSK, ENGLISH)),
+                    arguments(new WordPackCreateDto("name", null, Category.HSK, ENGLISH)),
+                    arguments(new WordPackCreateDto("name", "", Category.HSK, ENGLISH)),
+                    arguments(new WordPackCreateDto("name", " ", Category.HSK, ENGLISH)),
+                    arguments(new WordPackCreateDto("name", DESCRIPTION, null, ENGLISH)),
+                    arguments(new WordPackCreateDto("name", DESCRIPTION, Category.HSK, null))
+            );
+        }
+
+        public static Stream<Arguments> create_throwIfAlreadyExists() {
+            return Stream.of(
+                    arguments(ENGLISH),
+                    arguments(CHINESE)
+            );
+        }
+
+        public static Stream<Arguments> create_throwIfCategoryCustom() {
+            return Stream.of(
+                    arguments(ENGLISH),
+                    arguments(CHINESE)
+            );
+        }
+
+        public static Stream<Arguments> update_updatesDescriptionAndCategory() {
+            return Stream.of(
+                    arguments(ENGLISH),
+                    arguments(CHINESE)
+            );
+        }
+
+        public static Stream<Arguments> update_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments(null, new WordPackUpdateDto(DESCRIPTION, Category.HSK)),
+                    arguments(WORD_PACK_ID_1, null)
+            );
+        }
+
+        public static Stream<Arguments> update_throwIfCategoryCustom() {
+            return Stream.of(
+                    arguments(ENGLISH),
+                    arguments(CHINESE)
+            );
+        }
+
+        public static Stream<Arguments> delete_publishesEventAndDeletes() {
+            return Stream.of(
+                    arguments(ENGLISH),
+                    arguments(CHINESE)
+            );
+        }
+
+        public static Stream<Arguments> delete_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments((Object) null)
+            );
+        }
+
+        public static Stream<Arguments> delete_throwIfCustom() {
+            return Stream.of(
+                    arguments(ENGLISH),
+                    arguments(CHINESE)
+            );
+        }
+
         public static Stream<Arguments> createCustomWordPack_createsWithDecoratedName() {
             return Stream.of(
-                    arguments(ENGLISH, USER_ENGLISH, "EN__"),
-                    arguments(CHINESE, USER_CHINESE, "CH__")
+                    arguments(ENGLISH, USER_ENGLISH),
+                    arguments(CHINESE, USER_CHINESE)
             );
         }
 
         public static Stream<Arguments> createCustomWordPack_trimsNameBeforeDecoration() {
-            return createCustomWordPack_createsWithDecoratedName();
+            return Stream.of(
+                    arguments(ENGLISH, USER_ENGLISH),
+                    arguments(CHINESE, USER_CHINESE)
+            );
         }
 
         public static Stream<Arguments> createCustomWordPack_allowsCaseSensitiveDistinctNames() {
-            return createCustomWordPack_createsWithDecoratedName();
+            return Stream.of(
+                    arguments(ENGLISH, USER_ENGLISH),
+                    arguments(CHINESE, USER_CHINESE)
+            );
         }
 
         public static Stream<Arguments> createCustomWordPack_preservesEmbeddedSuffix() {
-            return createCustomWordPack_createsWithDecoratedName();
+            return Stream.of(
+                    arguments(ENGLISH, USER_ENGLISH),
+                    arguments(CHINESE, USER_CHINESE)
+            );
         }
 
         public static Stream<Arguments> createCustomWordPack_throwIfInvalidInput() {
             return Stream.of(
                     arguments((Object) null),
-                    arguments(new WordPackDto(null, "desc", null, null, null, null, null)),
-                    arguments(new WordPackDto("", "desc", null, null, null, null, null)),
-                    arguments(new WordPackDto(" ", "desc", null, null, null, null, null)),
-                    arguments(new WordPackDto("name", null, null, null, null, null, null)),
-                    arguments(new WordPackDto("name", "", null, null, null, null, null)),
-                    arguments(new WordPackDto("name", " ", null, null, null, null, null))
+                    arguments(new WordPackCustomCreateDto(null, "desc")),
+                    arguments(new WordPackCustomCreateDto("", "desc")),
+                    arguments(new WordPackCustomCreateDto(" ", "desc")),
+                    arguments(new WordPackCustomCreateDto("name", null)),
+                    arguments(new WordPackCustomCreateDto("name", "")),
+                    arguments(new WordPackCustomCreateDto("name", " "))
             );
         }
 
-        public static Stream<Arguments> createCustomWordPack_throwIfInvalidName() {
+        public static Stream<Arguments> createCustomWordPack_acceptsNamesWithSemicolons() {
             return Stream.of(
-                    arguments("  ;  "),
-                    arguments("name;with;semicolon")
+                    arguments(ENGLISH, USER_ENGLISH, "  ;  "),
+                    arguments(CHINESE, USER_CHINESE, "  ;  "),
+                    arguments(ENGLISH, USER_ENGLISH, "name;with;semicolon"),
+                    arguments(CHINESE, USER_CHINESE, "name;with;semicolon")
             );
         }
 
         public static Stream<Arguments> createCustomWordPack_throwIfAlreadyExists() {
-            return createCustomWordPack_createsWithDecoratedName();
+            return Stream.of(
+                    arguments(ENGLISH, USER_ENGLISH),
+                    arguments(CHINESE, USER_CHINESE)
+            );
         }
 
         public static Stream<Arguments> deleteCustomWordPack_deletesAndPublishesEvent() {
             return Stream.of(
-                    arguments(ENGLISH, USER_ENGLISH, "EN__"),
-                    arguments(CHINESE, USER_CHINESE, "CH__")
+                    arguments(ENGLISH, USER_ENGLISH),
+                    arguments(CHINESE, USER_CHINESE)
             );
         }
 
         public static Stream<Arguments> deleteCustomWordPack_throwIfInvalidInput() {
-            return getByName_throwIfInvalidInput();
+            return Stream.of(
+                    arguments((Object) null)
+            );
         }
 
         public static Stream<Arguments> deleteCustomWordPack_throwIfCategoryNotCustom() {
-            return deleteCustomWordPack_deletesAndPublishesEvent();
-        }
-
-        public static Stream<Arguments> throwIfWordPackCategoryNotCustom_throwIfNotCustom() {
             return Stream.of(
-                    arguments(ENGLISH, USER_ENGLISH, "EN__"),
-                    arguments(CHINESE, USER_CHINESE, "CH__")
+                    arguments(ENGLISH),
+                    arguments(CHINESE)
             );
         }
 
         public static Stream<Arguments> throwIfWordPackCategoryNotCustom_throwIfInvalidInput() {
             return Stream.of(
                     arguments((Object) null)
+            );
+        }
+
+        public static Stream<Arguments> throwIfWordPackCategoryNotCustom_throwIfNotCustom() {
+            return Stream.of(
+                    arguments(ENGLISH),
+                    arguments(CHINESE)
             );
         }
     }

@@ -12,6 +12,7 @@ import my.project.library.dailylexika.enumerations.RoleName;
 import my.project.library.util.exception.ResourceAlreadyExistsException;
 import my.project.library.util.exception.ResourceNotFoundException;
 import my.project.library.util.security.JwtService;
+import my.project.dailylexika.util.ValidationTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -23,14 +24,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import jakarta.validation.ConstraintViolationException;
 
 import java.util.stream.Stream;
 
-import static my.project.dailylexika.util.CommonConstants.ENCODED_PASSWORD;
 import static my.project.library.dailylexika.enumerations.Platform.CHINESE;
 import static my.project.library.dailylexika.enumerations.Platform.ENGLISH;
 import static my.project.library.dailylexika.enumerations.RoleName.USER_CHINESE;
@@ -48,6 +46,7 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
     private static final String NAME = "Test User";
     private static final String EMAIL = "User@Test.com";
     private static final String PASSWORD = "Pass123";
+    private static final String ENCODED_PASSWORD = "encodedPassword";
 
     private AuthenticationServiceImpl underTest;
     @Mock
@@ -295,11 +294,6 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
     }
 
     private AuthenticationService createValidatedService() {
-        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
-        validator.afterPropertiesSet();
-        MethodValidationPostProcessor processor = new MethodValidationPostProcessor();
-        processor.setValidator(validator);
-        processor.afterPropertiesSet();
         AuthenticationServiceImpl service = new AuthenticationServiceImpl(
                 userService,
                 publicUserService,
@@ -309,7 +303,7 @@ class AuthenticationServiceImplTest extends AbstractUnitTest {
                 passwordEncoder,
                 eventPublisher
         );
-        return (AuthenticationService) processor.postProcessAfterInitialization(service, "authenticationService");
+        return ValidationTestSupport.validatedProxy(service, "authenticationService", AuthenticationService.class);
     }
 
     private User buildUser(RoleName roleName) {

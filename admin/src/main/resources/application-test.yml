@@ -1,3 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:tc:postgresql:latest://${DB_HOST}:5433/test_database

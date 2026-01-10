@@ -16,16 +16,13 @@ spring:
     hibernate:
       ddl-auto: validate
   flyway:
-    locations: "classpath:db/migration"
+    locations: "classpath:db/migration/versioned,classpath:db/migration/seed"
 
 cors:
   allowed-origins: "*"
   allowed-methods: "*"
   allowed-headers: "*"
   exposed-headers: "*"
-
-file-location:
-  data-excel: "static/data/Data.xlsx"
 
 logging:
   level:

@@ -3,8 +3,6 @@ package my.project.library.admin.dtos.user;
 import jakarta.validation.constraints.NotEmpty;
 import my.project.library.admin.enumerations.RoleName;
 
-import java.io.Serializable;
-
 public record UserDto(
 
         Integer id,
@@ -17,5 +15,5 @@ public record UserDto(
 
         RoleName role
 
-) implements Serializable {
+) {
 }

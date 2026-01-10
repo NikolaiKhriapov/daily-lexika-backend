@@ -14,6 +14,9 @@ import my.project.library.dailylexika.enumerations.Platform;
 public class WordPack {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String name;
 
     private String description;
@@ -23,4 +26,6 @@ public class WordPack {
 
     @Enumerated(EnumType.STRING)
     private Platform platform;
+
+    private Integer userId;
 }

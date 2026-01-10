@@ -5,6 +5,9 @@ import jakarta.persistence.PersistenceContext;
 import my.project.dailylexika.flashcard.model.entities.WordData;
 import my.project.library.dailylexika.enumerations.Language;
 import my.project.library.dailylexika.enumerations.Platform;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +21,15 @@ public class WordDataRepositoryImpl implements WordDataRepositoryCustom {
     private EntityManager entityManager;
 
     @Override
-    public List<WordData> searchByPlatformAndQuery(Platform platform, Language translationLanguage, String query, String transcriptionQuery, int limit) {
-        List<FieldSpec> fields = resolveOrderedFields(platform, translationLanguage);
+    public Page<WordData> searchByPlatformAndQuery(Platform platform,
+                                                   Language translationLanguage,
+                                                   boolean adminSearch,
+                                                   String query,
+                                                   String transcriptionQuery,
+                                                   Pageable pageable) {
+        List<FieldSpec> fields = adminSearch
+                ? resolveAdminFields(platform)
+                : resolveOrderedFields(platform, translationLanguage);
         List<FieldSpec> searchFields = fields;
         List<FieldSpec> orderFields = fields;
         boolean usesTranscription = fields.stream().anyMatch(FieldSpec::usesTranscription);
@@ -56,7 +66,42 @@ public class WordDataRepositoryImpl implements WordDataRepositoryCustom {
             typedQuery.setParameter("pinyinTo", PINYIN_TONES_REPLACEMENT);
         }
 
-        return typedQuery.setMaxResults(limit).getResultList();
+        typedQuery.setFirstResult((int) pageable.getOffset());
+        typedQuery.setMaxResults(pageable.getPageSize());
+        List<WordData> content = typedQuery.getResultList();
+
+        if (!adminSearch) {
+            return new PageImpl<>(content, pageable, content.size());
+        }
+
+        StringBuilder countJpql = new StringBuilder("""
+                SELECT COUNT(wd) FROM word_data wd
+                WHERE wd.platform = :platform
+                AND (
+                """);
+        for (int i = 0; i < fields.size(); i++) {
+            if (i > 0) {
+                countJpql.append(" OR ");
+            }
+            FieldSpec field = fields.get(i);
+            countJpql.append(fieldExpression(field))
+                    .append(" LIKE CONCAT('%', ")
+                    .append(queryParameter(field))
+                    .append(", '%')");
+        }
+        countJpql.append(")");
+
+        var countQuery = entityManager.createQuery(countJpql.toString(), Long.class)
+                .setParameter("platform", platform)
+                .setParameter("query", query);
+        if (usesTranscription) {
+            countQuery.setParameter("transcriptionQuery", transcriptionQuery);
+            countQuery.setParameter("pinyinFrom", PINYIN_TONES);
+            countQuery.setParameter("pinyinTo", PINYIN_TONES_REPLACEMENT);
+        }
+        long total = countQuery.getSingleResult();
+
+        return new PageImpl<>(content, pageable, total);
     }
 
     private static List<FieldSpec> resolveOrderedFields(Platform platform, Language translationLanguage) {
@@ -76,6 +121,21 @@ public class WordDataRepositoryImpl implements WordDataRepositoryCustom {
             } else if (translationLanguage == Language.RUSSIAN) {
                 fields.add(new FieldSpec("nameRussian", false));
             }
+        }
+        return fields;
+    }
+
+    private static List<FieldSpec> resolveAdminFields(Platform platform) {
+        List<FieldSpec> fields = new ArrayList<>();
+        if (platform == Platform.CHINESE) {
+            fields.add(new FieldSpec("nameChinese", false));
+            fields.add(new FieldSpec("transcription", true));
+            fields.add(new FieldSpec("nameEnglish", false));
+            fields.add(new FieldSpec("nameRussian", false));
+        } else {
+            fields.add(new FieldSpec("nameEnglish", false));
+            fields.add(new FieldSpec("nameRussian", false));
+            fields.add(new FieldSpec("nameChinese", false));
         }
         return fields;
     }

@@ -10,7 +10,7 @@ import java.util.List;
 public interface WordDataMapper {
 
     @Mapping(target = "examples", source = "examples", qualifiedByName = "mapExamples")
-    @Mapping(target = "listOfWordPackNames", source = "listOfWordPacks", qualifiedByName = "mapListOfWordPackNames")
+    @Mapping(target = "listOfWordPackIds", source = "listOfWordPacks", qualifiedByName = "mapListOfWordPackIds")
     WordDataDto toDto(WordData entity);
 
     List<WordDataDto> toDtoList(List<WordData> entityList);

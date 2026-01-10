@@ -7,7 +7,6 @@ import my.project.library.dailylexika.dtos.flashcards.ReviewStatisticsDto;
 import my.project.library.dailylexika.enumerations.Platform;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
@@ -23,5 +22,7 @@ public interface ReviewService {
     ReviewDto processReviewAction(@NotNull Long reviewId, Boolean isCorrect);
     void updateUserStreak();
     void deleteAllByUserIdAndPlatform(@NotNull Integer userId, @NotNull Platform platform);
-    void deleteReviewIfExistsForWordPack(@NotBlank String wordPackName);
+    void deleteReviewIfExistsForWordPack(@NotNull Long wordPackId);
+    void deleteAllByWordPackId(@NotNull Long wordPackId);
+    void deleteReviewWordLinksByWordDataId(@NotNull Integer wordDataId);
 }

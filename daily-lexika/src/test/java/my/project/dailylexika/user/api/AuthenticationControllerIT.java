@@ -15,18 +15,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 import java.util.stream.Stream;
 
 import static my.project.library.dailylexika.enumerations.Platform.CHINESE;
 import static my.project.library.dailylexika.enumerations.Platform.ENGLISH;
+import static my.project.dailylexika.util.TestDataFactory.buildUniqueEmail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Transactional
 class AuthenticationControllerIT extends AbstractIntegrationTest {
 
     private static final String URI_REGISTER = "/api/v1/auth/register";
@@ -42,9 +41,10 @@ class AuthenticationControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.AuthenticationControllerIT$TestDataSource#register_createsUser_returnsCreatedToken")
     void register_createsUser_returnsCreatedToken(Platform platform) throws Exception {
-        RegistrationRequest registrationRequest = new RegistrationRequest(DEFAULT_NAME, uniqueEmail(), DEFAULT_PASSWORD, platform);
-
-        MvcResult result = mockMvc.perform(
+        // AuthenticationController.register
+        RegistrationRequest registrationRequest = new RegistrationRequest(DEFAULT_NAME, buildUniqueEmail(), DEFAULT_PASSWORD, platform);
+        MvcResult result = mockMvc
+                .perform(
                         post(URI_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(registrationRequest))
@@ -56,29 +56,31 @@ class AuthenticationControllerIT extends AbstractIntegrationTest {
                 AuthenticationResponse.class
         );
 
+        // Assertions
         assertThat(authenticationResponse.token()).isNotBlank();
     }
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.AuthenticationControllerIT$TestDataSource#register_existingUserNewPlatform_returnsCreatedToken")
     void register_existingUserNewPlatform_returnsCreatedToken(Platform registeredPlatform, Platform newPlatform) throws Exception {
-        String email = uniqueEmail();
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        RegistrationRequest registrationRequest1 = new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, registeredPlatform);
         mockMvc.perform(
                         post(URI_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, registeredPlatform)
-                                ))
+                                .content(objectMapper.writeValueAsString(registrationRequest1))
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        MvcResult result = mockMvc.perform(
+        // AuthenticationController.register
+        RegistrationRequest registrationRequest2 = new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, newPlatform);
+        MvcResult result = mockMvc
+                .perform(
                         post(URI_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, newPlatform)
-                                ))
+                                .content(objectMapper.writeValueAsString(registrationRequest2))
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
@@ -87,34 +89,37 @@ class AuthenticationControllerIT extends AbstractIntegrationTest {
                 AuthenticationResponse.class
         );
 
+        // Assertions
         assertThat(authenticationResponse.token()).isNotBlank();
     }
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.AuthenticationControllerIT$TestDataSource#register_existingUserSamePlatform_conflict")
     void register_existingUserSamePlatform_conflict(Platform platform) throws Exception {
-        String email = uniqueEmail();
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        RegistrationRequest registrationRequest1 = new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform);
         mockMvc.perform(
                         post(URI_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform)
-                                ))
+                                .content(objectMapper.writeValueAsString(registrationRequest1))
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        MvcResult result = mockMvc.perform(
+        // AuthenticationController.register
+        RegistrationRequest registrationRequest2 = new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform);
+        MvcResult result = mockMvc
+                .perform(
                         post(URI_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform)
-                                ))
+                                .content(objectMapper.writeValueAsString(registrationRequest2))
                 )
                 .andExpect(status().isConflict())
                 .andReturn();
         ApiErrorDTO error = objectMapper.readValue(result.getResponse().getContentAsString(), ApiErrorDTO.class);
 
+        // Assertions
         assertThat(error.statusCode()).isEqualTo(HttpStatus.CONFLICT.value());
         assertThat(error.path()).isEqualTo(URI_REGISTER);
     }
@@ -122,28 +127,30 @@ class AuthenticationControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.AuthenticationControllerIT$TestDataSource#register_existingUserWrongPassword_badRequest")
     void register_existingUserWrongPassword_badRequest(Platform platform) throws Exception {
-        String email = uniqueEmail();
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        RegistrationRequest registrationRequest1 = new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform);
         mockMvc.perform(
                         post(URI_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform)
-                                ))
+                                .content(objectMapper.writeValueAsString(registrationRequest1))
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        MvcResult result = mockMvc.perform(
+        // AuthenticationController.register
+        RegistrationRequest registrationRequest2 = new RegistrationRequest(DEFAULT_NAME, email, "wrongPass1", platform);
+        MvcResult result = mockMvc
+                .perform(
                         post(URI_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, "wrongPass1", platform)
-                                ))
+                                .content(objectMapper.writeValueAsString(registrationRequest2))
                 )
                 .andExpect(status().isBadRequest())
                 .andReturn();
         ApiErrorDTO error = objectMapper.readValue(result.getResponse().getContentAsString(), ApiErrorDTO.class);
 
+        // Assertions
         assertThat(error.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(error.path()).isEqualTo(URI_REGISTER);
     }
@@ -151,7 +158,9 @@ class AuthenticationControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.AuthenticationControllerIT$TestDataSource#register_validation_missingOrBlankFields_badRequest")
     void register_validation_missingOrBlankFields_badRequest(RegistrationRequest registrationRequest) throws Exception {
-        MvcResult result = mockMvc.perform(
+        // AuthenticationController.register
+        MvcResult result = mockMvc
+                .perform(
                         post(URI_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(registrationRequest))
@@ -160,6 +169,7 @@ class AuthenticationControllerIT extends AbstractIntegrationTest {
                 .andReturn();
         ApiErrorDTO error = objectMapper.readValue(result.getResponse().getContentAsString(), ApiErrorDTO.class);
 
+        // Assertions
         assertThat(error.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(error.path()).isEqualTo(URI_REGISTER);
     }
@@ -167,23 +177,24 @@ class AuthenticationControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.AuthenticationControllerIT$TestDataSource#register_emailCaseInsensitive_allowsLogin")
     void register_emailCaseInsensitive_allowsLogin(Platform platform) throws Exception {
+        // AuthenticationController.register
         String mixedCaseEmail = "UserCase" + UUID.randomUUID() + "@Test.com";
+        RegistrationRequest registrationRequest = new RegistrationRequest(DEFAULT_NAME, mixedCaseEmail, DEFAULT_PASSWORD, platform);
         mockMvc.perform(
                         post(URI_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, mixedCaseEmail, DEFAULT_PASSWORD, platform)
-                                ))
+                                .content(objectMapper.writeValueAsString(registrationRequest))
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        MvcResult result = mockMvc.perform(
+        // AuthenticationController.login
+        AuthenticationRequest authenticationRequest = new AuthenticationRequest(mixedCaseEmail.toLowerCase(), DEFAULT_PASSWORD, platform);
+        MvcResult result = mockMvc
+                .perform(
                         post(URI_LOGIN)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new AuthenticationRequest(mixedCaseEmail.toLowerCase(), DEFAULT_PASSWORD, platform)
-                                ))
+                                .content(objectMapper.writeValueAsString(authenticationRequest))
                 )
                 .andExpect(status().isOk())
                 .andReturn();
@@ -192,29 +203,31 @@ class AuthenticationControllerIT extends AbstractIntegrationTest {
                 AuthenticationResponse.class
         );
 
+        // Assertions
         assertThat(authenticationResponse.token()).isNotBlank();
     }
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.AuthenticationControllerIT$TestDataSource#login_success_returnsOkToken")
     void login_success_returnsOkToken(Platform platform) throws Exception {
-        String email = uniqueEmail();
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        RegistrationRequest registrationRequest = new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform);
         mockMvc.perform(
                         post(URI_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform)
-                                ))
+                                .content(objectMapper.writeValueAsString(registrationRequest))
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        MvcResult result = mockMvc.perform(
+        // AuthenticationController.login
+        AuthenticationRequest authenticationRequest = new AuthenticationRequest(email, DEFAULT_PASSWORD, platform);
+        MvcResult result = mockMvc
+                .perform(
                         post(URI_LOGIN)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new AuthenticationRequest(email, DEFAULT_PASSWORD, platform)
-                                ))
+                                .content(objectMapper.writeValueAsString(authenticationRequest))
                 )
                 .andExpect(status().isOk())
                 .andReturn();
@@ -223,34 +236,37 @@ class AuthenticationControllerIT extends AbstractIntegrationTest {
                 AuthenticationResponse.class
         );
 
+        // Assertions
         assertThat(authenticationResponse.token()).isNotBlank();
     }
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.AuthenticationControllerIT$TestDataSource#login_wrongPassword_badRequest")
     void login_wrongPassword_badRequest(Platform platform) throws Exception {
-        String email = uniqueEmail();
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        RegistrationRequest registrationRequest = new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform);
         mockMvc.perform(
                         post(URI_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform)
-                                ))
+                                .content(objectMapper.writeValueAsString(registrationRequest))
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        MvcResult result = mockMvc.perform(
+        // AuthenticationController.login
+        AuthenticationRequest authenticationRequest = new AuthenticationRequest(email, "wrongPass1", platform);
+        MvcResult result = mockMvc
+                .perform(
                         post(URI_LOGIN)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new AuthenticationRequest(email, "wrongPass1", platform)
-                                ))
+                                .content(objectMapper.writeValueAsString(authenticationRequest))
                 )
                 .andExpect(status().isBadRequest())
                 .andReturn();
         ApiErrorDTO error = objectMapper.readValue(result.getResponse().getContentAsString(), ApiErrorDTO.class);
 
+        // Assertions
         assertThat(error.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(error.path()).isEqualTo(URI_LOGIN);
     }
@@ -258,28 +274,30 @@ class AuthenticationControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.AuthenticationControllerIT$TestDataSource#login_userNotRegisteredOnPlatform_notFound")
     void login_userNotRegisteredOnPlatform_notFound(Platform registeredPlatform, Platform loginPlatform) throws Exception {
-        String email = uniqueEmail();
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        RegistrationRequest registrationRequest = new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, registeredPlatform);
         mockMvc.perform(
                         post(URI_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, registeredPlatform)
-                                ))
+                                .content(objectMapper.writeValueAsString(registrationRequest))
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        MvcResult result = mockMvc.perform(
+        // AuthenticationController.login
+        AuthenticationRequest authenticationRequest = new AuthenticationRequest(email, DEFAULT_PASSWORD, loginPlatform);
+        MvcResult result = mockMvc
+                .perform(
                         post(URI_LOGIN)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new AuthenticationRequest(email, DEFAULT_PASSWORD, loginPlatform)
-                                ))
+                                .content(objectMapper.writeValueAsString(authenticationRequest))
                 )
                 .andExpect(status().isNotFound())
                 .andReturn();
         ApiErrorDTO error = objectMapper.readValue(result.getResponse().getContentAsString(), ApiErrorDTO.class);
 
+        // Assertions
         assertThat(error.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(error.path()).isEqualTo(URI_LOGIN);
     }
@@ -287,6 +305,7 @@ class AuthenticationControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.AuthenticationControllerIT$TestDataSource#login_validation_missingOrBlankFields_badRequest")
     void login_validation_missingOrBlankFields_badRequest(AuthenticationRequest authenticationRequest) throws Exception {
+        // AuthenticationController.login
         MvcResult result = mockMvc.perform(
                         post(URI_LOGIN)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -296,6 +315,7 @@ class AuthenticationControllerIT extends AbstractIntegrationTest {
                 .andReturn();
         ApiErrorDTO error = objectMapper.readValue(result.getResponse().getContentAsString(), ApiErrorDTO.class);
 
+        // Assertions
         assertThat(error.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(error.path()).isEqualTo(URI_LOGIN);
     }
@@ -303,23 +323,24 @@ class AuthenticationControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.AuthenticationControllerIT$TestDataSource#login_emailCaseInsensitive_returnsOkToken")
     void login_emailCaseInsensitive_returnsOkToken(Platform platform) throws Exception {
-        String email = uniqueEmail();
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        RegistrationRequest registrationRequest = new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform);
         mockMvc.perform(
                         post(URI_REGISTER)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform)
-                                ))
+                                .content(objectMapper.writeValueAsString(registrationRequest))
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        MvcResult result = mockMvc.perform(
+        // AuthenticationController.login
+        AuthenticationRequest authenticationRequest = new AuthenticationRequest(email.toUpperCase(), DEFAULT_PASSWORD, platform);
+        MvcResult result = mockMvc
+                .perform(
                         post(URI_LOGIN)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new AuthenticationRequest(email.toUpperCase(), DEFAULT_PASSWORD, platform)
-                                ))
+                                .content(objectMapper.writeValueAsString(authenticationRequest))
                 )
                 .andExpect(status().isOk())
                 .andReturn();
@@ -328,11 +349,8 @@ class AuthenticationControllerIT extends AbstractIntegrationTest {
                 AuthenticationResponse.class
         );
 
+        // Assertions
         assertThat(authenticationResponse.token()).isNotBlank();
-    }
-
-    private static String uniqueEmail() {
-        return "user-" + UUID.randomUUID() + "@test.com";
     }
 
     static class TestDataSource {

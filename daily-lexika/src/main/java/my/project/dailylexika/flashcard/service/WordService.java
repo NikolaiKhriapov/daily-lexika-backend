@@ -7,14 +7,13 @@ import my.project.library.dailylexika.enumerations.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public interface WordService {
     WordDto getByWordDataId(@NotNull Integer wordDataId);
     Page<WordDto> getByUserIdAndWordDataIdIn(@NotNull Integer userId, @NotNull List<Integer> wordDataIds, @NotNull Pageable pageable);
-    Page<WordDto> getPageByWordPackName(@NotBlank String wordPackName, @NotNull Pageable pageable);
+    Page<WordDto> getPageByWordPackId(@NotNull Long wordPackId, @NotNull Pageable pageable);
     Page<WordDto> getPageByStatus(@NotNull Status status, @NotNull Pageable pageable);
     List<Word> getAllByUserIdAndWordDataIdInAndStatusNewRandomLimited(@NotNull Integer userId, @NotNull List<Integer> wordDataIds, @NotNull Integer limit);
     List<Word> getAllByUserIdAndWordDataIdInAndStatusInReviewAndPeriodBetweenOrderedDescLimited(@NotNull Integer userId, @NotNull List<Integer> wordDataIds, @NotNull Integer limit);
