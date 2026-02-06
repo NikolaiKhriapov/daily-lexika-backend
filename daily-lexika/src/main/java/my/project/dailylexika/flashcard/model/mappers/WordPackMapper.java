@@ -1,6 +1,6 @@
 package my.project.dailylexika.flashcard.model.mappers;
 
-import my.project.library.dailylexika.dtos.flashcards.WordPackDto;
+import my.project.library.dailylexika.dtos.flashcards.WordPackUserDto;
 import my.project.dailylexika.flashcard.model.entities.WordPack;
 import org.mapstruct.*;
 
@@ -12,7 +12,7 @@ public interface WordPackMapper {
     @Mapping(target = "wordsTotal", source = "entity", qualifiedByName = "mapWordsTotal")
     @Mapping(target = "wordsNew", source = "entity", qualifiedByName = "mapWordsNew")
     @Mapping(target = "reviewId", source = "entity", qualifiedByName = "mapReviewId")
-    WordPackDto toDto(WordPack entity);
+    WordPackUserDto toDto(WordPack entity);
 
-    List<WordPackDto> toDtoList(List<WordPack> entityList);
+    List<WordPackUserDto> toDtoList(List<WordPack> entityList);
 }

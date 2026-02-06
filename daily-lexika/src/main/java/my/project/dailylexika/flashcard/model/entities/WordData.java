@@ -31,7 +31,11 @@ public class WordData {
     private String examples;
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.LAZY)
-    @JoinTable
+    @JoinTable(
+            name = "word_data_word_packs",
+            joinColumns = @JoinColumn(name = "word_data_id"),
+            inverseJoinColumns = @JoinColumn(name = "word_pack_id")
+    )
     private List<WordPack> listOfWordPacks;
 
     private LocalDate wordOfTheDayDate;

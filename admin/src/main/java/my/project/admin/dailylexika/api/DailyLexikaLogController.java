@@ -1,6 +1,5 @@
 package my.project.admin.dailylexika.api;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import my.project.admin.dailylexika.service.DailyLexikaLogService;
 import my.project.library.dailylexika.dtos.log.LogDto;
@@ -19,10 +18,9 @@ public class DailyLexikaLogController {
     private final DailyLexikaLogService dailyLexikaLogService;
 
     @GetMapping
-    public ResponseEntity<Page<LogDto>> getAllLogs(HttpServletRequest request,
-                                                     @RequestParam("page") int page,
-                                                     @RequestParam("size") int size,
-                                                     @RequestParam(name = "sort", defaultValue = "asc") String sortDirection) {
-        return ResponseEntity.ok(dailyLexikaLogService.getAllLogs(request, page, size, sortDirection));
+    public ResponseEntity<Page<LogDto>> getAllLogs(@RequestParam("page") int page,
+                                                   @RequestParam("size") int size,
+                                                   @RequestParam(name = "sort", defaultValue = "asc") String sortDirection) {
+        return ResponseEntity.ok(dailyLexikaLogService.getAllLogs(page, size, sortDirection));
     }
 }

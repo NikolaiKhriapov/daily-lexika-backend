@@ -27,9 +27,15 @@ public class Review {
     private Integer maxReviewWordsPerDay;
 
     @OneToOne
+    @JoinColumn(name = "word_pack_id")
     private WordPack wordPack;
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "reviews_words",
+            joinColumns = @JoinColumn(name = "review_id"),
+            inverseJoinColumns = @JoinColumn(name = "word_id")
+    )
     @OrderColumn
     private List<Word> listOfWords;
 

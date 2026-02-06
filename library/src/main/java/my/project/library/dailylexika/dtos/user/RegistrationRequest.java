@@ -4,8 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import my.project.library.dailylexika.enumerations.Platform;
 
-import java.io.Serializable;
-
 public record RegistrationRequest(
 
         @NotBlank(message = "Field 'name' must not be blank")
@@ -20,5 +18,5 @@ public record RegistrationRequest(
         @NotNull(message = "Field 'platform' must not be null")
         Platform platform
 
-) implements Serializable {
+) {
 }

@@ -22,10 +22,6 @@
         <spring-security-core.version>6.0.4</spring-security-core.version>
         <spring-security-test.version>6.0.4</spring-security-test.version>
         <hibernate-validator.version>7.0.1.Final</hibernate-validator.version>
-        <poi.version>5.2.2</poi.version>
-        <poi-ooxml.version>5.2.2</poi-ooxml.version>
-        <junit-jupiter.version>1.21.4</junit-jupiter.version>
-        <postgresql.version>1.21.4</postgresql.version>
         <javafaker.version>1.0.2</javafaker.version>
         <spring-boot-maven-plugin.version>3.2.2</spring-boot-maven-plugin.version>
         <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
@@ -111,27 +107,19 @@
             <artifactId>lombok</artifactId>
         </dependency>
 
-        <dependency><!-- Working with Excel -->
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>${poi.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>${poi-ooxml.version}</version>
-        </dependency>
-
         <dependency><!-- Testing -->
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-testcontainers</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
-            <version>${postgresql.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

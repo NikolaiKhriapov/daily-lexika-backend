@@ -27,7 +27,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -37,6 +36,7 @@ import java.util.stream.Stream;
 import static my.project.library.admin.enumerations.RoleName.SUPER_ADMIN;
 import static my.project.library.dailylexika.enumerations.Platform.CHINESE;
 import static my.project.library.dailylexika.enumerations.Platform.ENGLISH;
+import static my.project.dailylexika.util.TestDataFactory.buildUniqueEmail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -44,14 +44,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Transactional
 class UserControllerIT extends AbstractIntegrationTest {
 
     private static final String URI_REGISTER = "/api/v1/auth/register";
     private static final String URI_LOGIN = "/api/v1/auth/login";
-    private static final String URI_USER_INFO = "/api/v1/users/info";
-    private static final String URI_USER_PASSWORD = "/api/v1/users/password";
-    private static final String URI_USERS = "/api/v1/users";
+
+    private static final String URI_GET_USER = "/api/v1/users/info";
+    private static final String URI_UPDATE_USER_INFO = "/api/v1/users/info";
+    private static final String URI_UPDATE_PASSWORD = "/api/v1/users/password";
+    private static final String URI_DELETE_ACCOUNT = "/api/v1/users";
+    private static final String URI_GET_PAGE_OF_USERS = "/api/v1/users";
+
     private static final String DEFAULT_NAME = "Test User";
     private static final String UPDATED_NAME = "Updated User";
     private static final String DEFAULT_PASSWORD = "Pass123!";
@@ -69,36 +72,29 @@ class UserControllerIT extends AbstractIntegrationTest {
 
     @Test
     void getUser_unauthenticated_unauthorized() throws Exception {
-        mockMvc.perform(get(URI_USER_INFO))
+        // UserController.getUser
+        mockMvc.perform(get(URI_GET_USER))
                 .andExpect(status().isUnauthorized());
     }
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.UserControllerIT$TestDataSource#getUser_authenticated_returnsUser")
     void getUser_authenticated_returnsUser(Platform platform) throws Exception {
-        String email = uniqueEmail();
-        MvcResult registerResult = mockMvc.perform(
-                        post(URI_REGISTER)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform)
-                                ))
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-        AuthenticationResponse registerResponse = objectMapper.readValue(
-                registerResult.getResponse().getContentAsString(),
-                AuthenticationResponse.class
-        );
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        AuthenticationResponse registerResponse = performAuthenticationControllerRegister(email, platform);
 
-        MvcResult result = mockMvc.perform(
-                        get(URI_USER_INFO)
+        // UserController.getUser
+        MvcResult result = mockMvc
+                .perform(
+                        get(URI_GET_USER)
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + registerResponse.token())
                 )
                 .andExpect(status().isOk())
                 .andReturn();
         UserDto userDto = objectMapper.readValue(result.getResponse().getContentAsString(), UserDto.class);
 
+        // Assertions
         assertThat(userDto.name()).isEqualTo(DEFAULT_NAME);
         assertThat(userDto.email()).isEqualTo(email.toLowerCase());
         assertThat(userDto.role()).isEqualTo(roleNameFor(platform));
@@ -107,10 +103,10 @@ class UserControllerIT extends AbstractIntegrationTest {
 
     @Test
     void updateUserInfo_unauthenticated_unauthorized() throws Exception {
+        // UserController.updateUserInfo
         UserDto request = new UserDto(null, UPDATED_NAME, "update@test.com", null, null, null, null, null);
-
         mockMvc.perform(
-                        patch(URI_USER_INFO)
+                        patch(URI_UPDATE_USER_INFO)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
                 )
@@ -120,35 +116,16 @@ class UserControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.UserControllerIT$TestDataSource#updateUserInfo_updatesEmailLowercase_returnsUser")
     void updateUserInfo_updatesEmailLowercase_returnsUser(Platform platform) throws Exception {
-        String email = uniqueEmail();
-        MvcResult registerResult = mockMvc.perform(
-                        post(URI_REGISTER)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform)
-                                ))
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-        AuthenticationResponse registerResponse = objectMapper.readValue(
-                registerResult.getResponse().getContentAsString(),
-                AuthenticationResponse.class
-        );
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        AuthenticationResponse registerResponse = performAuthenticationControllerRegister(email, platform);
 
+        // UserController.updateUserInfo
         String updatedEmail = "Updated" + UUID.randomUUID() + "@Test.com";
-        UserDto request = new UserDto(
-                null,
-                UPDATED_NAME,
-                updatedEmail,
-                null,
-                null,
-                Language.ENGLISH,
-                Language.RUSSIAN,
-                null
-        );
-
-        MvcResult result = mockMvc.perform(
-                        patch(URI_USER_INFO)
+        UserDto request = new UserDto(null, UPDATED_NAME, updatedEmail, null, null, Language.ENGLISH, Language.RUSSIAN, null);
+        MvcResult result = mockMvc
+                .perform(
+                        patch(URI_UPDATE_USER_INFO)
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + registerResponse.token())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
@@ -157,6 +134,7 @@ class UserControllerIT extends AbstractIntegrationTest {
                 .andReturn();
         UserDto userDto = objectMapper.readValue(result.getResponse().getContentAsString(), UserDto.class);
 
+        // Assertions
         assertThat(userDto.name()).isEqualTo(UPDATED_NAME);
         assertThat(userDto.email()).isEqualTo(updatedEmail.toLowerCase());
         assertThat(userRepository.existsByEmail(updatedEmail.toLowerCase())).isTrue();
@@ -165,23 +143,14 @@ class UserControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.UserControllerIT$TestDataSource#updateUserInfo_validation_missingOrBlankFields_badRequest")
     void updateUserInfo_validation_missingOrBlankFields_badRequest(Platform platform, UserDto request) throws Exception {
-        String email = uniqueEmail();
-        MvcResult registerResult = mockMvc.perform(
-                        post(URI_REGISTER)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform)
-                                ))
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-        AuthenticationResponse registerResponse = objectMapper.readValue(
-                registerResult.getResponse().getContentAsString(),
-                AuthenticationResponse.class
-        );
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        AuthenticationResponse registerResponse = performAuthenticationControllerRegister(email, platform);
 
-        MvcResult result = mockMvc.perform(
-                        patch(URI_USER_INFO)
+        // UserController.updateUserInfo
+        MvcResult result = mockMvc
+                .perform(
+                        patch(URI_UPDATE_USER_INFO)
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + registerResponse.token())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
@@ -190,16 +159,17 @@ class UserControllerIT extends AbstractIntegrationTest {
                 .andReturn();
         ApiErrorDTO error = objectMapper.readValue(result.getResponse().getContentAsString(), ApiErrorDTO.class);
 
+        // Assertions
         assertThat(error.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(error.path()).isEqualTo(URI_USER_INFO);
+        assertThat(error.path()).isEqualTo(URI_GET_USER);
     }
 
     @Test
     void updatePassword_unauthenticated_unauthorized() throws Exception {
+        // UserController.updateUserInfo
         PasswordUpdateRequest request = new PasswordUpdateRequest(DEFAULT_PASSWORD, NEW_PASSWORD);
-
         mockMvc.perform(
-                        patch(URI_USER_PASSWORD)
+                        patch(URI_UPDATE_PASSWORD)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
                 )
@@ -209,45 +179,35 @@ class UserControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.UserControllerIT$TestDataSource#updatePassword_success_changesPassword")
     void updatePassword_success_changesPassword(Platform platform) throws Exception {
-        String email = uniqueEmail();
-        MvcResult registerResult = mockMvc.perform(
-                        post(URI_REGISTER)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform)
-                                ))
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-        AuthenticationResponse registerResponse = objectMapper.readValue(
-                registerResult.getResponse().getContentAsString(),
-                AuthenticationResponse.class
-        );
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        AuthenticationResponse registerResponse = performAuthenticationControllerRegister(email, platform);
 
+        // UserController.updatePassword
         PasswordUpdateRequest request = new PasswordUpdateRequest(DEFAULT_PASSWORD, NEW_PASSWORD);
         mockMvc.perform(
-                        patch(URI_USER_PASSWORD)
+                        patch(URI_UPDATE_PASSWORD)
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + registerResponse.token())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
                 )
                 .andExpect(status().isOk());
 
+        // AuthenticationController.login
+        AuthenticationRequest authenticationRequest1 = new AuthenticationRequest(email, NEW_PASSWORD, platform);
         mockMvc.perform(
                         post(URI_LOGIN)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new AuthenticationRequest(email, NEW_PASSWORD, platform)
-                                ))
+                                .content(objectMapper.writeValueAsString(authenticationRequest1))
                 )
                 .andExpect(status().isOk());
 
+        // AuthenticationController.login
+        AuthenticationRequest authenticationRequest2 = new AuthenticationRequest(email, DEFAULT_PASSWORD, platform);
         mockMvc.perform(
                         post(URI_LOGIN)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new AuthenticationRequest(email, DEFAULT_PASSWORD, platform)
-                                ))
+                                .content(objectMapper.writeValueAsString(authenticationRequest2))
                 )
                 .andExpect(status().isBadRequest());
     }
@@ -255,24 +215,14 @@ class UserControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.UserControllerIT$TestDataSource#updatePassword_wrongPassword_badRequest")
     void updatePassword_wrongPassword_badRequest(Platform platform) throws Exception {
-        String email = uniqueEmail();
-        MvcResult registerResult = mockMvc.perform(
-                        post(URI_REGISTER)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform)
-                                ))
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-        AuthenticationResponse registerResponse = objectMapper.readValue(
-                registerResult.getResponse().getContentAsString(),
-                AuthenticationResponse.class
-        );
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        AuthenticationResponse registerResponse = performAuthenticationControllerRegister(email, platform);
 
+        // UserController.updatePassword
         PasswordUpdateRequest request = new PasswordUpdateRequest("wrong-pass", NEW_PASSWORD);
         mockMvc.perform(
-                        patch(URI_USER_PASSWORD)
+                        patch(URI_UPDATE_PASSWORD)
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + registerResponse.token())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
@@ -283,23 +233,14 @@ class UserControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.UserControllerIT$TestDataSource#updatePassword_validation_missingOrBlankFields_badRequest")
     void updatePassword_validation_missingOrBlankFields_badRequest(Platform platform, PasswordUpdateRequest request) throws Exception {
-        String email = uniqueEmail();
-        MvcResult registerResult = mockMvc.perform(
-                        post(URI_REGISTER)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform)
-                                ))
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-        AuthenticationResponse registerResponse = objectMapper.readValue(
-                registerResult.getResponse().getContentAsString(),
-                AuthenticationResponse.class
-        );
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        AuthenticationResponse registerResponse = performAuthenticationControllerRegister(email, platform);
 
-        MvcResult result = mockMvc.perform(
-                        patch(URI_USER_PASSWORD)
+        // UserController.updatePassword
+        MvcResult result = mockMvc
+                .perform(
+                        patch(URI_UPDATE_PASSWORD)
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + registerResponse.token())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
@@ -308,16 +249,17 @@ class UserControllerIT extends AbstractIntegrationTest {
                 .andReturn();
         ApiErrorDTO error = objectMapper.readValue(result.getResponse().getContentAsString(), ApiErrorDTO.class);
 
+        // Assertions
         assertThat(error.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(error.path()).isEqualTo(URI_USER_PASSWORD);
+        assertThat(error.path()).isEqualTo(URI_UPDATE_PASSWORD);
     }
 
     @Test
     void deleteAccount_unauthenticated_unauthorized() throws Exception {
+        // UserController.deleteAccount
         AccountDeletionRequest request = new AccountDeletionRequest(DEFAULT_PASSWORD);
-
         mockMvc.perform(
-                        delete(URI_USERS)
+                        delete(URI_DELETE_ACCOUNT)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
                 )
@@ -327,79 +269,46 @@ class UserControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.UserControllerIT$TestDataSource#deleteAccount_singleRole_deletesUser")
     void deleteAccount_singleRole_deletesUser(Platform platform) throws Exception {
-        String email = uniqueEmail();
-        MvcResult registerResult = mockMvc.perform(
-                        post(URI_REGISTER)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform)
-                                ))
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-        AuthenticationResponse registerResponse = objectMapper.readValue(
-                registerResult.getResponse().getContentAsString(),
-                AuthenticationResponse.class
-        );
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        AuthenticationResponse registerResponse = performAuthenticationControllerRegister(email, platform);
 
+        // UserController.deleteAccount
         AccountDeletionRequest request = new AccountDeletionRequest(DEFAULT_PASSWORD);
         mockMvc.perform(
-                        delete(URI_USERS)
+                        delete(URI_DELETE_ACCOUNT)
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + registerResponse.token())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
                 )
                 .andExpect(status().isNoContent());
 
+        // Assertions
         assertThat(userRepository.existsByEmail(email.toLowerCase())).isFalse();
     }
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.UserControllerIT$TestDataSource#deleteAccount_multiRole_removesOnlyCurrentRole")
     void deleteAccount_multiRole_removesOnlyCurrentRole(Platform platformToDelete) throws Exception {
-        String email = uniqueEmail();
-        mockMvc.perform(
-                        post(URI_REGISTER)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, ENGLISH)
-                                ))
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-        mockMvc.perform(
-                        post(URI_REGISTER)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, CHINESE)
-                                ))
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        performAuthenticationControllerRegister(email, ENGLISH);
+        performAuthenticationControllerRegister(email, CHINESE);
 
-        MvcResult loginResult = mockMvc.perform(
-                        post(URI_LOGIN)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new AuthenticationRequest(email, DEFAULT_PASSWORD, platformToDelete)
-                                ))
-                )
-                .andExpect(status().isOk())
-                .andReturn();
-        AuthenticationResponse loginResponse = objectMapper.readValue(
-                loginResult.getResponse().getContentAsString(),
-                AuthenticationResponse.class
-        );
+        // AuthenticationController.login
+        AuthenticationResponse loginResponse = performAuthenticationControllerLogin(email, platformToDelete);
 
+        // UserController.deleteAccount
         AccountDeletionRequest request = new AccountDeletionRequest(DEFAULT_PASSWORD);
         mockMvc.perform(
-                        delete(URI_USERS)
+                        delete(URI_DELETE_ACCOUNT)
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + loginResponse.token())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
                 )
                 .andExpect(status().isNoContent());
 
+        // Assertions
         List<RoleName> remainingRoles = userRepository.findUserByEmail(email.toLowerCase())
                 .orElseThrow()
                 .getRoleStatistics()
@@ -417,24 +326,14 @@ class UserControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.UserControllerIT$TestDataSource#deleteAccount_wrongPassword_badRequest")
     void deleteAccount_wrongPassword_badRequest(Platform platform) throws Exception {
-        String email = uniqueEmail();
-        MvcResult registerResult = mockMvc.perform(
-                        post(URI_REGISTER)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform)
-                                ))
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-        AuthenticationResponse registerResponse = objectMapper.readValue(
-                registerResult.getResponse().getContentAsString(),
-                AuthenticationResponse.class
-        );
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        AuthenticationResponse registerResponse = performAuthenticationControllerRegister(email, platform);
 
+        // UserController.deleteAccount
         AccountDeletionRequest request = new AccountDeletionRequest("wrong-pass");
         mockMvc.perform(
-                        delete(URI_USERS)
+                        delete(URI_DELETE_ACCOUNT)
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + registerResponse.token())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
@@ -445,23 +344,14 @@ class UserControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.UserControllerIT$TestDataSource#deleteAccount_validation_missingOrBlankFields_badRequest")
     void deleteAccount_validation_missingOrBlankFields_badRequest(Platform platform, AccountDeletionRequest request) throws Exception {
-        String email = uniqueEmail();
-        MvcResult registerResult = mockMvc.perform(
-                        post(URI_REGISTER)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform)
-                                ))
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-        AuthenticationResponse registerResponse = objectMapper.readValue(
-                registerResult.getResponse().getContentAsString(),
-                AuthenticationResponse.class
-        );
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        AuthenticationResponse registerResponse = performAuthenticationControllerRegister(email, platform);
 
-        MvcResult result = mockMvc.perform(
-                        delete(URI_USERS)
+        // UserController.deleteAccount
+        MvcResult result = mockMvc
+                .perform(
+                        delete(URI_DELETE_ACCOUNT)
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + registerResponse.token())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(request))
@@ -470,14 +360,16 @@ class UserControllerIT extends AbstractIntegrationTest {
                 .andReturn();
         ApiErrorDTO error = objectMapper.readValue(result.getResponse().getContentAsString(), ApiErrorDTO.class);
 
+        // Assertions
         assertThat(error.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
-        assertThat(error.path()).isEqualTo(URI_USERS);
+        assertThat(error.path()).isEqualTo(URI_DELETE_ACCOUNT);
     }
 
     @Test
     void getPageOfUsers_unauthenticated_unauthorized() throws Exception {
+        // UserController.getPageOfUsers
         mockMvc.perform(
-                        get(URI_USERS)
+                        get(URI_GET_PAGE_OF_USERS)
                                 .param("page", "0")
                                 .param("size", "2"))
                 .andExpect(status().isUnauthorized());
@@ -486,23 +378,13 @@ class UserControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.UserControllerIT$TestDataSource#getPageOfUsers_nonAdmin_forbidden")
     void getPageOfUsers_nonAdmin_forbidden(Platform platform) throws Exception {
-        String email = uniqueEmail();
-        MvcResult registerResult = mockMvc.perform(
-                        post(URI_REGISTER)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform)
-                                ))
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-        AuthenticationResponse registerResponse = objectMapper.readValue(
-                registerResult.getResponse().getContentAsString(),
-                AuthenticationResponse.class
-        );
+        // AuthenticationController.register
+        String email = buildUniqueEmail();
+        AuthenticationResponse registerResponse = performAuthenticationControllerRegister(email, platform);
 
+        // UserController.getPageOfUsers
         mockMvc.perform(
-                        get(URI_USERS)
+                        get(URI_GET_PAGE_OF_USERS)
                                 .param("page", "0")
                                 .param("size", "2")
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + registerResponse.token())
@@ -514,15 +396,17 @@ class UserControllerIT extends AbstractIntegrationTest {
     void getPageOfUsers_missingPageOrSize_badRequest() throws Exception {
         String adminToken = jwtService.generateToken(ADMIN_SUBJECT, SUPER_ADMIN.name());
 
+        // UserController.getPageOfUsers
         mockMvc.perform(
-                        get(URI_USERS)
+                        get(URI_GET_PAGE_OF_USERS)
                                 .param("size", "2")
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken)
                 )
                 .andExpect(status().isBadRequest());
 
+        // UserController.getPageOfUsers
         mockMvc.perform(
-                        get(URI_USERS)
+                        get(URI_GET_PAGE_OF_USERS)
                                 .param("page", "0")
                                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken)
                 )
@@ -532,30 +416,18 @@ class UserControllerIT extends AbstractIntegrationTest {
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.user.api.UserControllerIT$TestDataSource#getPageOfUsers_superAdmin_returnsPage")
     void getPageOfUsers_superAdmin_returnsPage(String sortDirection) throws Exception {
-        String emailOne = uniqueEmail();
-        String emailTwo = uniqueEmail();
-        mockMvc.perform(
-                        post(URI_REGISTER)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, emailOne, DEFAULT_PASSWORD, ENGLISH)
-                                ))
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-        mockMvc.perform(
-                        post(URI_REGISTER)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(
-                                        new RegistrationRequest(DEFAULT_NAME, emailTwo, DEFAULT_PASSWORD, CHINESE)
-                                ))
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
+        // AuthenticationController.register
+        String email1 = buildUniqueEmail();
+        performAuthenticationControllerRegister(email1, ENGLISH);
 
+        // AuthenticationController.register
+        String email2 = buildUniqueEmail();
+        performAuthenticationControllerRegister(email2, CHINESE);
+
+        // UserController.getPageOfUsers
         String adminToken = jwtService.generateToken(ADMIN_SUBJECT, SUPER_ADMIN.name());
         MvcResult result = mockMvc.perform(
-                        get(URI_USERS)
+                        get(URI_GET_PAGE_OF_USERS)
                                 .param("page", "0")
                                 .param("size", "2")
                                 .param("sort", sortDirection)
@@ -563,8 +435,9 @@ class UserControllerIT extends AbstractIntegrationTest {
                 )
                 .andExpect(status().isOk())
                 .andReturn();
-
         CustomPageImpl<UserDto> page = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+
+        // Assertions
         List<Integer> ids = page.getContent().stream()
                 .map(UserDto::id)
                 .toList();
@@ -577,12 +450,37 @@ class UserControllerIT extends AbstractIntegrationTest {
         }
     }
 
-    private static String uniqueEmail() {
-        return "user-" + UUID.randomUUID() + "@test.com";
+    private AuthenticationResponse performAuthenticationControllerRegister(String email, Platform platform) throws Exception {
+        RegistrationRequest registrationRequest = new RegistrationRequest(DEFAULT_NAME, email, DEFAULT_PASSWORD, platform);
+        MvcResult registerResult = mockMvc
+                .perform(
+                        post(URI_REGISTER)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(registrationRequest))
+                )
+                .andExpect(status().isCreated())
+                .andReturn();
+        return objectMapper.readValue(registerResult.getResponse().getContentAsString(), AuthenticationResponse.class);
+    }
+
+    private AuthenticationResponse performAuthenticationControllerLogin(String email, Platform platform) throws Exception {
+        AuthenticationRequest authenticationRequest = new AuthenticationRequest(email, DEFAULT_PASSWORD, platform);
+        MvcResult loginResult = mockMvc
+                .perform(
+                        post(URI_LOGIN)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(authenticationRequest))
+                )
+                .andExpect(status().isOk())
+                .andReturn();
+        return objectMapper.readValue(loginResult.getResponse().getContentAsString(), AuthenticationResponse.class);
     }
 
     private static RoleName roleNameFor(Platform platform) {
-        return platform == ENGLISH ? RoleName.USER_ENGLISH : RoleName.USER_CHINESE;
+        return switch (platform) {
+            case ENGLISH -> RoleName.USER_ENGLISH;
+            case CHINESE -> RoleName.USER_CHINESE;
+        };
     }
 
     static class TestDataSource {

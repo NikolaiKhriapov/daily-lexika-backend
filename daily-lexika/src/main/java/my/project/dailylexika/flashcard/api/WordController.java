@@ -23,11 +23,11 @@ public class WordController {
         return ResponseEntity.ok(wordService.getPageByStatus(status, PageRequest.of(page, size)));
     }
 
-    @GetMapping("/word-pack/{wordPackName}")
-    public ResponseEntity<Page<WordDto>> getPageOfWordsByWordPackName(@PathVariable("wordPackName") String wordPackName,
-                                                                      @RequestParam("page") int page,
-                                                                      @RequestParam("size") int size) {
-        return ResponseEntity.ok(wordService.getPageByWordPackName(wordPackName, PageRequest.of(page, size)));
+    @GetMapping("/word-pack/{wordPackId}")
+    public ResponseEntity<Page<WordDto>> getPageOfWordsByWordPackId(@PathVariable("wordPackId") Long wordPackId,
+                                                                    @RequestParam("page") int page,
+                                                                    @RequestParam("size") int size) {
+        return ResponseEntity.ok(wordService.getPageByWordPackId(wordPackId, PageRequest.of(page, size)));
     }
 
     @GetMapping("/word-of-the-day")

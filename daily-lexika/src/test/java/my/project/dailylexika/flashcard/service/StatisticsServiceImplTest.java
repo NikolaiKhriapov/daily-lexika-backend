@@ -64,8 +64,8 @@ class StatisticsServiceImplTest extends AbstractUnitTest {
         mockUser(USER_ID, roleName);
         RoleStatisticsDto roleStats = new RoleStatisticsDto(1L, roleName, 2L, null, 5L);
         List<WordDto> wordsKnown = List.of(
-                buildWordDto(1L, "你好", platform),
-                buildWordDto(2L, "学习", platform)
+                buildWordDto(1, "你好", platform),
+                buildWordDto(2, "学习", platform)
         );
 
         given(roleService.getRoleStatistics()).willReturn(roleStats);
@@ -91,8 +91,8 @@ class StatisticsServiceImplTest extends AbstractUnitTest {
         mockUser(USER_ID, roleName);
         RoleStatisticsDto roleStats = new RoleStatisticsDto(1L, roleName, 1L, null, 3L);
         List<WordDto> wordsKnown = List.of(
-                buildWordDto(1L, "你好", platform),
-                buildWordDto(2L, "好学", platform)
+                buildWordDto(1, "你好", platform),
+                buildWordDto(2, "好学", platform)
         );
 
         given(roleService.getRoleStatistics()).willReturn(roleStats);
@@ -136,10 +136,10 @@ class StatisticsServiceImplTest extends AbstractUnitTest {
         // Given
         mockUser(USER_ID, roleName);
         RoleStatisticsDto roleStats = new RoleStatisticsDto(1L, roleName, 0L, null, 0L);
-        ReviewDto review1 = new ReviewDto(11L, 1L, null, null, null, null, null, null, null);
-        ReviewDto review2 = new ReviewDto(22L, 1L, null, null, null, null, null, null, null);
-        ReviewStatisticsDto stats1 = new ReviewStatisticsDto(11L, "Pack1", 1, 2, 3);
-        ReviewStatisticsDto stats2 = new ReviewStatisticsDto(22L, "Pack2", 4, 5, 6);
+        ReviewDto review1 = new ReviewDto(11L, 1L, null, null, null, null, null, null, null, null);
+        ReviewDto review2 = new ReviewDto(22L, 1L, null, null, null, null, null, null, null, null);
+        ReviewStatisticsDto stats1 = new ReviewStatisticsDto(11L, 1L, 1, 2, 3);
+        ReviewStatisticsDto stats2 = new ReviewStatisticsDto(22L, 2L, 4, 5, 6);
 
         given(roleService.getRoleStatistics()).willReturn(roleStats);
         given(roleService.getPlatformByRoleName(roleName)).willReturn(platform);
@@ -160,9 +160,9 @@ class StatisticsServiceImplTest extends AbstractUnitTest {
         given(userService.getUser()).willReturn(user);
     }
 
-    private WordDto buildWordDto(Long id, String nameChinese, Platform platform) {
+    private WordDto buildWordDto(Integer id, String nameChinese, Platform platform) {
         WordDataDto wordDataDto = new WordDataDto(id, nameChinese, null, null, null, null, null, null, null, platform);
-        return new WordDto(id, USER_ID, wordDataDto, Status.KNOWN, (short) 0, (short) 0, (short) 0, null);
+        return new WordDto((long) id, USER_ID, wordDataDto, Status.KNOWN, (short) 0, (short) 0, (short) 0, null);
     }
 
     private static class TestDataSource {

@@ -56,7 +56,7 @@ public class ReviewServiceImpl implements ReviewService {
         List<ReviewDto> allReviewDtos = new ArrayList<>();
         for (Review oneReview : allReviews) {
             if (!Objects.equals(oneReview.getDateGenerated().toLocalDate(), DateUtil.nowInUtc().toLocalDate())) {
-                boolean hasWordData = wordDataService.existsByWordPackNameAndPlatform(oneReview.getWordPack().getName(), platform);
+                boolean hasWordData = wordDataService.existsByWordPackIdAndPlatform(oneReview.getWordPack().getId(), platform);
                 if (!hasWordData) {
                     reviewRepository.delete(oneReview);
                     continue;
@@ -73,7 +73,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional
     public ReviewDto createReview(ReviewDto reviewDto) {
-        throwIfReviewAlreadyExistsByWordPackName(reviewDto.wordPackDto().name());
+        throwIfReviewAlreadyExistsByWordPackId(reviewDto.wordPackId());
         Review newReview = reviewRepository.save(generateReview(reviewDto));
         return reviewMapper.toDto(newReview);
     }
@@ -108,7 +108,7 @@ public class ReviewServiceImpl implements ReviewService {
         Platform platform = roleService.getPlatformByRoleName(user.role());
 
         Review review = getReview(reviewId);
-        List<Integer> wordDataIds = wordDataService.getAllWordDataIdByWordPackNameAndPlatform(review.getWordPack().getName(), platform);
+        List<Integer> wordDataIds = wordDataService.getAllWordDataIdByWordPackIdAndPlatform(review.getWordPack().getId(), platform);
 
         Integer newWords = wordService.countByUserIdAndWordData_IdInAndStatus(user.id(), wordDataIds, NEW);
         Integer reviewWords = wordService.countByUserIdAndWordData_IdInAndStatus(user.id(), wordDataIds, IN_REVIEW);
@@ -116,7 +116,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         return new ReviewStatisticsDto(
                 review.getId(),
-                review.getWordPack().getName(),
+                review.getWordPack().getId(),
                 newWords,
                 reviewWords,
                 knownWords
@@ -138,7 +138,7 @@ public class ReviewServiceImpl implements ReviewService {
     public Optional<ReviewDto> refreshReview(Long reviewId) {
         Review review = getReview(reviewId);
         Platform platform = review.getWordPack().getPlatform();
-        boolean hasWordData = wordDataService.existsByWordPackNameAndPlatform(review.getWordPack().getName(), platform);
+        boolean hasWordData = wordDataService.existsByWordPackIdAndPlatform(review.getWordPack().getId(), platform);
         if (!hasWordData) {
             reviewRepository.delete(review);
             return Optional.empty();
@@ -189,11 +189,24 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void deleteReviewIfExistsForWordPack(String wordPackName) {
+    public void deleteReviewIfExistsForWordPack(Long wordPackId) {
         Integer userId = userService.getUser().id();
 
-        Optional<Review> review = reviewRepository.findByUserIdAndWordPack_Name(userId, wordPackName);
+        Optional<Review> review = reviewRepository.findByUserIdAndWordPack_Id(userId, wordPackId);
         review.ifPresent(reviewRepository::delete);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllByWordPackId(Long wordPackId) {
+        List<Review> reviews = reviewRepository.findByWordPack_Id(wordPackId);
+        reviewRepository.deleteAll(reviews);
+    }
+
+    @Override
+    @Transactional
+    public void deleteReviewWordLinksByWordDataId(Integer wordDataId) {
+        reviewRepository.deleteReviewWordLinksByWordDataId(wordDataId);
     }
 
     /**
@@ -228,7 +241,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     private List<Integer> getWordDataIdsForWordPack(WordPack wordPack, Platform platform) {
-        List<Integer> wordDataIds = wordDataService.getAllWordDataIdByWordPackNameAndPlatform(wordPack.getName(), platform);
+        List<Integer> wordDataIds = wordDataService.getAllWordDataIdByWordPackIdAndPlatform(wordPack.getId(), platform);
         if (wordDataIds.isEmpty()) {
             throw new BadRequestException(I18nUtil.getMessage("dailylexika-exceptions.wordPack.noWordData"));
         }
@@ -281,7 +294,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     private Review generateReview(ReviewDto reviewDto) {
         Integer userId = userService.getUser().id();
-        WordPack wordPack = wordPackService.getByName(reviewDto.wordPackDto().name());
+        WordPack wordPack = wordPackService.getById(reviewDto.wordPackId());
 
         List<Word> listOfWords = generateListOfWordsForReview(wordPack, reviewDto);
 
@@ -346,13 +359,13 @@ public class ReviewServiceImpl implements ReviewService {
         listOfWords.add(Math.min(listOfWords.size(), 3), thisWord);
     }
 
-    private void throwIfReviewAlreadyExistsByWordPackName(String wordPackName) {
+    private void throwIfReviewAlreadyExistsByWordPackId(Long wordPackId) {
         UserDto user = userService.getUser();
         Platform platform = roleService.getPlatformByRoleName(user.role());
 
-        boolean existsReviewByWordPackName = reviewRepository.existsByUserIdAndWordPack_PlatformAndWordPack_Name(user.id(), platform, wordPackName);
-        if (existsReviewByWordPackName) {
-            throw new ResourceAlreadyExistsException(I18nUtil.getMessage("dailylexika-exceptions.review.alreadyExists", wordPackName));
+        boolean existsReviewByWordPackId = reviewRepository.existsByUserIdAndWordPack_PlatformAndWordPack_Id(user.id(), platform, wordPackId);
+        if (existsReviewByWordPackId) {
+            throw new ResourceAlreadyExistsException(I18nUtil.getMessage("dailylexika-exceptions.review.alreadyExists", wordPackId));
         }
     }
 

@@ -1,6 +1,5 @@
 package my.project.library.dailylexika.dtos.notification;
 
-import java.io.Serializable;
 import java.time.OffsetDateTime;
 
 public record NotificationDto(
@@ -14,5 +13,5 @@ public record NotificationDto(
         OffsetDateTime sentAt,
         Boolean isRead
 
-) implements Serializable {
+) {
 }
