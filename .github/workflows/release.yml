@@ -127,12 +127,24 @@ jobs:
           script: |
             set -euo pipefail
 
-            DEPLOY_PATH="${DEPLOY_PATH}"
+            if [[ -z "${DEPLOY_PATH}" ]]; then
+              echo "DEPLOY_PATH is required"
+              exit 1
+            fi
+
+            if [[ -z "${DOCKERHUB_NAMESPACE}" ]]; then
+              echo "DOCKERHUB_NAMESPACE is required"
+              exit 1
+            fi
+
+            if [[ -z "${DOCKERHUB_USERNAME}" || -z "${DOCKERHUB_TOKEN}" ]]; then
+              echo "DOCKERHUB_USERNAME and DOCKERHUB_TOKEN are required"
+              exit 1
+            fi
+
             cd "${DEPLOY_PATH}"
 
-            if [[ -n "${DOCKERHUB_USERNAME:-}" && -n "${DOCKERHUB_TOKEN:-}" ]]; then
-              echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
-            fi
+            echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-stdin
 
             if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
               APP_TAG="${GITHUB_REF_NAME}"
@@ -140,15 +152,33 @@ jobs:
               APP_TAG="sha-${GITHUB_SHA::7}"
             fi
 
-            DEFAULT_SERVICE="${DEFAULT_SERVICE}"
-            SERVICE_INPUT="${SERVICE_INPUT:-$DEFAULT_SERVICE}"
-            if [[ "${SERVICE_INPUT}" == "both" ]]; then
+            if [[ -n "${SERVICE_INPUT}" ]]; then
+              SERVICE_TARGET="${SERVICE_INPUT}"
+            else
+              if [[ -z "${DEFAULT_SERVICE}" ]]; then
+                echo "DEFAULT_SERVICE is required when no service input is provided"
+                exit 1
+              fi
+              SERVICE_TARGET="${DEFAULT_SERVICE}"
+            fi
+
+            if [[ "${SERVICE_TARGET}" == "both" ]]; then
               COMPOSE_PROFILES="admin,daily-lexika"
             else
-              COMPOSE_PROFILES="${SERVICE_INPUT}"
+              COMPOSE_PROFILES="${SERVICE_TARGET}"
             fi
 
             export APP_TAG COMPOSE_PROFILES DOCKERHUB_NAMESPACE
-            docker compose pull
+            attempts=5
+            for i in $(seq 1 "${attempts}"); do
+              if docker compose pull; then
+                break
+              fi
+              if [[ "${i}" -eq "${attempts}" ]]; then
+                echo "docker compose pull failed after ${attempts} attempts"
+                exit 1
+              fi
+              sleep $((i * 5))
+            done
             docker compose up -d --remove-orphans
             docker image prune -f --filter "until=168h"

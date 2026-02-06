@@ -5,7 +5,7 @@ services:
     image: 'postgres:16.2-alpine'
     restart: always
     volumes:
-#      - ${DB_DATA}:/var/lib/postgresql/data
+      - ${DB_DATA}:/var/lib/postgresql/data
       - ../postgresql/logs:/var/log/postgresql/pg_log
       - ./scripts/init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql
     command: [ "postgres",
@@ -19,8 +19,6 @@ services:
 #      POSTGRES_DB: daily_lexika # admin
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - '5432:5432'
 
   admin:
     platform: linux/amd64
@@ -60,3 +58,6 @@ services:
       DB_HOST: ${DB_HOST}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
+
+volumes:
+  db_data:
