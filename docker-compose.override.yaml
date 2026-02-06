@@ -1,0 +1,10 @@
+services:
+  admin:
+    build:
+      context: .
+      dockerfile: admin/Dockerfile
+
+  daily-lexika:
+    build:
+      context: .
+      dockerfile: daily-lexika/Dockerfile

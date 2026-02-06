@@ -3,7 +3,6 @@ package my.project.library.dailylexika.dtos.flashcards;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 
-import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -22,7 +21,9 @@ public record ReviewDto(
         Integer maxReviewWordsPerDay,
 
         @NotNull
-        WordPackDto wordPackDto,
+        Long wordPackId,
+
+        WordPackUserDto wordPackDto,
 
         List<WordDto> listOfWordDto,
 
@@ -31,6 +32,5 @@ public record ReviewDto(
         OffsetDateTime dateLastCompleted,
 
         OffsetDateTime dateGenerated
-
-) implements Serializable {
+) {
 }

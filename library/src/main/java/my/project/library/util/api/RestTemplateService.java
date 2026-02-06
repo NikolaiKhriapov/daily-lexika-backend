@@ -69,6 +69,11 @@ public class RestTemplateService {
         return restTemplate.exchange(url, HttpMethod.GET, null,  responseType, new HashMap<String, String>());
     }
 
+    public <T> ResponseEntity<T> delete(String url, HttpHeaders headers, Class<T> tClass) {
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+        return restTemplate.exchange(url, HttpMethod.DELETE, request, tClass);
+    }
+
     public <T> ResponseEntity<T> exchange(String url, HttpHeaders headers, Object body, HttpMethod httpMethod, Class<T> tClass) {
         try{
             HttpEntity<Object> request = new HttpEntity<>(objectMapper.writeValueAsString(body), headers);
@@ -85,4 +90,3 @@ public class RestTemplateService {
         return headers;
     }
 }
-

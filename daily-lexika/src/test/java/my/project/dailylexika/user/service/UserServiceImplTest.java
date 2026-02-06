@@ -18,6 +18,7 @@ import my.project.library.dailylexika.events.user.AccountDeletedEvent;
 import my.project.library.dailylexika.events.user.UserEmailUpdatedEvent;
 import my.project.library.util.datetime.DateUtil;
 import my.project.library.util.exception.BadRequestException;
+import my.project.dailylexika.util.ValidationTestSupport;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,8 +37,6 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import java.time.OffsetDateTime;
 import java.util.HashSet;
@@ -45,7 +44,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static my.project.dailylexika.util.CommonConstants.ENCODED_PASSWORD;
 import static my.project.library.dailylexika.enumerations.Platform.CHINESE;
 import static my.project.library.dailylexika.enumerations.Platform.ENGLISH;
 import static my.project.library.dailylexika.enumerations.RoleName.USER_CHINESE;
@@ -64,6 +62,7 @@ class UserServiceImplTest extends AbstractUnitTest {
     private static final String EMAIL = "User@Test.com";
     private static final String PASSWORD = "Pass123";
     private static final String NEW_PASSWORD = "Pass456";
+    private static final String ENCODED_PASSWORD = "encodedPassword";
 
     private UserServiceImpl underTest;
     @Mock
@@ -584,11 +583,6 @@ class UserServiceImplTest extends AbstractUnitTest {
     }
 
     private UserService createValidatedService() {
-        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
-        validator.afterPropertiesSet();
-        MethodValidationPostProcessor processor = new MethodValidationPostProcessor();
-        processor.setValidator(validator);
-        processor.afterPropertiesSet();
         UserServiceImpl service = new UserServiceImpl(
                 userRepository,
                 userMapper,
@@ -597,15 +591,10 @@ class UserServiceImplTest extends AbstractUnitTest {
                 passwordEncoder,
                 eventPublisher
         );
-        return (UserService) processor.postProcessAfterInitialization(service, "userService");
+        return ValidationTestSupport.validatedProxy(service, "userService", UserService.class);
     }
 
     private PublicUserService createValidatedPublicService() {
-        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
-        validator.afterPropertiesSet();
-        MethodValidationPostProcessor processor = new MethodValidationPostProcessor();
-        processor.setValidator(validator);
-        processor.afterPropertiesSet();
         UserServiceImpl service = new UserServiceImpl(
                 userRepository,
                 userMapper,
@@ -614,7 +603,7 @@ class UserServiceImplTest extends AbstractUnitTest {
                 passwordEncoder,
                 eventPublisher
         );
-        return (PublicUserService) processor.postProcessAfterInitialization(service, "publicUserService");
+        return ValidationTestSupport.validatedProxy(service, "publicUserService", PublicUserService.class);
     }
 
     private static class TestDataSource {

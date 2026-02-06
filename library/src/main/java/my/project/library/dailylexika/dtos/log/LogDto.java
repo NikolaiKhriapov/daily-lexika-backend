@@ -3,7 +3,6 @@ package my.project.library.dailylexika.dtos.log;
 import my.project.library.dailylexika.enumerations.LogAction;
 import my.project.library.dailylexika.enumerations.Platform;
 
-import java.io.Serializable;
 import java.time.OffsetDateTime;
 
 public record LogDto(
@@ -16,5 +15,5 @@ public record LogDto(
     OffsetDateTime timestamp,
     String comment
 
-) implements Serializable {
+) {
 }

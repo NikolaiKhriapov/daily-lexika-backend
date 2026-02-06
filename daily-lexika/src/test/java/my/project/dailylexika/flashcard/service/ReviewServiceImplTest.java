@@ -1,5 +1,6 @@
 package my.project.dailylexika.flashcard.service;
 
+import jakarta.validation.ConstraintViolationException;
 import my.project.dailylexika.config.AbstractUnitTest;
 import my.project.dailylexika.flashcard.model.entities.Review;
 import my.project.dailylexika.flashcard.model.entities.Word;
@@ -11,7 +12,7 @@ import my.project.dailylexika.user._public.PublicRoleService;
 import my.project.dailylexika.user._public.PublicUserService;
 import my.project.library.dailylexika.dtos.flashcards.ReviewDto;
 import my.project.library.dailylexika.dtos.flashcards.ReviewStatisticsDto;
-import my.project.library.dailylexika.dtos.flashcards.WordPackDto;
+import my.project.library.dailylexika.dtos.flashcards.WordPackUserDto;
 import my.project.library.dailylexika.dtos.user.RoleStatisticsDto;
 import my.project.library.dailylexika.dtos.user.UserDto;
 import my.project.library.dailylexika.enumerations.Category;
@@ -22,6 +23,7 @@ import my.project.library.util.exception.BadRequestException;
 import my.project.library.util.exception.InternalServerErrorException;
 import my.project.library.util.exception.ResourceAlreadyExistsException;
 import my.project.library.util.exception.ResourceNotFoundException;
+import my.project.dailylexika.util.ValidationTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,8 +31,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +57,8 @@ import static org.mockito.Mockito.verify;
 class ReviewServiceImplTest extends AbstractUnitTest {
 
     private static final Integer USER_ID = 1;
+    private static final Integer WORD_DATA_ID = 100;
+    private static final Long WORD_PACK_ID = 1L;
     private static final String WORD_PACK_NAME = "HSK_1";
     private static final String DESCRIPTION = "Desc";
     private static final Long REVIEW_ID = 10L;
@@ -118,13 +120,13 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         Review review = buildReview(REVIEW_ID, platform, List.of(buildWord(NEW)));
         review.setDateGenerated(DateUtil.nowInUtc().minusDays(1));
         ReviewDto dto = buildReviewDto(REVIEW_ID, platform, 1, 2);
-        WordPack wordPack = new WordPack(WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform);
+        WordPack wordPack = new WordPack(WORD_PACK_ID, WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform, null);
 
         given(reviewRepository.findByUserIdAndWordPack_Platform(USER_ID, platform)).willReturn(List.of(review));
         given(reviewMapper.toDto(review)).willReturn(dto);
-        given(wordDataService.existsByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(true);
-        given(wordPackService.getByName(WORD_PACK_NAME)).willReturn(wordPack);
-        given(wordDataService.getAllWordDataIdByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(List.of(1, 2));
+        given(wordDataService.existsByWordPackIdAndPlatform(WORD_PACK_ID, platform)).willReturn(true);
+        given(wordPackService.getById(WORD_PACK_ID)).willReturn(wordPack);
+        given(wordDataService.getAllWordDataIdByWordPackIdAndPlatform(WORD_PACK_ID, platform)).willReturn(List.of(1, 2));
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusNewRandomLimited(USER_ID, List.of(1, 2), 1)).willReturn(List.of(buildWord(NEW)));
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusInReviewAndPeriodBetweenOrderedDescLimited(USER_ID, List.of(1, 2), 2)).willReturn(List.of());
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusKnownAndPeriodBetweenOrderedAscLimited(USER_ID, List.of(1, 2), 2)).willReturn(List.of());
@@ -155,7 +157,8 @@ class ReviewServiceImplTest extends AbstractUnitTest {
                 USER_ID.longValue(),
                 reviewToKeep.getMaxNewWordsPerDay(),
                 reviewToKeep.getMaxReviewWordsPerDay(),
-                new WordPackDto(otherWordPackName, DESCRIPTION, Category.HSK, platform, null, null, null),
+                reviewToKeep.getWordPack().getId(),
+                new WordPackUserDto(reviewToKeep.getWordPack().getId(), otherWordPackName, DESCRIPTION, Category.HSK, platform, null, null, null, null),
                 List.of(),
                 reviewToKeep.getActualSize(),
                 reviewToKeep.getDateLastCompleted(),
@@ -163,7 +166,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         );
 
         given(reviewRepository.findByUserIdAndWordPack_Platform(USER_ID, platform)).willReturn(List.of(reviewToDelete, reviewToKeep));
-        given(wordDataService.existsByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(false);
+        given(wordDataService.existsByWordPackIdAndPlatform(WORD_PACK_ID, platform)).willReturn(false);
         given(reviewMapper.toDto(reviewToKeep)).willReturn(reviewToKeepDto);
 
         // When
@@ -183,12 +186,12 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         mockUser(USER_ID, roleName);
         given(roleService.getPlatformByRoleName(roleName)).willReturn(platform);
         ReviewDto reviewDto = buildReviewDto(REVIEW_ID, platform, 1, 2);
-        WordPack wordPack = new WordPack(WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform);
+        WordPack wordPack = new WordPack(WORD_PACK_ID, WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform, null);
         Review review = buildReview(REVIEW_ID, platform, List.of(buildWord(NEW)));
 
-        given(reviewRepository.existsByUserIdAndWordPack_PlatformAndWordPack_Name(USER_ID, platform, WORD_PACK_NAME)).willReturn(false);
-        given(wordPackService.getByName(WORD_PACK_NAME)).willReturn(wordPack);
-        given(wordDataService.getAllWordDataIdByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(List.of(1, 2));
+        given(reviewRepository.existsByUserIdAndWordPack_PlatformAndWordPack_Id(USER_ID, platform, WORD_PACK_ID)).willReturn(false);
+        given(wordPackService.getById(WORD_PACK_ID)).willReturn(wordPack);
+        given(wordDataService.getAllWordDataIdByWordPackIdAndPlatform(WORD_PACK_ID, platform)).willReturn(List.of(1, 2));
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusNewRandomLimited(USER_ID, List.of(1, 2), 1)).willReturn(List.of(buildWord(NEW)));
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusInReviewAndPeriodBetweenOrderedDescLimited(USER_ID, List.of(1, 2), 2)).willReturn(List.of());
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusKnownAndPeriodBetweenOrderedAscLimited(USER_ID, List.of(1, 2), 2)).willReturn(List.of());
@@ -210,7 +213,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
 
         // When / Then
         assertThatThrownBy(() -> validatedService.createReview(reviewDto))
-                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     @ParameterizedTest
@@ -221,7 +224,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         given(roleService.getPlatformByRoleName(roleName)).willReturn(platform);
         ReviewDto reviewDto = buildReviewDto(REVIEW_ID, platform, 1, 2);
 
-        given(reviewRepository.existsByUserIdAndWordPack_PlatformAndWordPack_Name(USER_ID, platform, WORD_PACK_NAME)).willReturn(true);
+        given(reviewRepository.existsByUserIdAndWordPack_PlatformAndWordPack_Id(USER_ID, platform, WORD_PACK_ID)).willReturn(true);
 
         // When / Then
         assertThatThrownBy(() -> underTest.createReview(reviewDto))
@@ -238,7 +241,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         ReviewDto updateDto = buildReviewDto(REVIEW_ID, platform, 2, 3);
 
         given(reviewRepository.findById(REVIEW_ID)).willReturn(Optional.of(existing));
-        given(wordDataService.getAllWordDataIdByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(List.of(1, 2));
+        given(wordDataService.getAllWordDataIdByWordPackIdAndPlatform(WORD_PACK_ID, platform)).willReturn(List.of(1, 2));
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusNewRandomLimited(USER_ID, List.of(1, 2), 2)).willReturn(List.of(buildWord(NEW)));
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusInReviewAndPeriodBetweenOrderedDescLimited(USER_ID, List.of(1, 2), 3)).willReturn(List.of());
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusKnownAndPeriodBetweenOrderedAscLimited(USER_ID, List.of(1, 2), 3)).willReturn(List.of());
@@ -264,7 +267,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
 
         // When / Then
         assertThatThrownBy(() -> validatedService.updateReview(reviewId, reviewDto))
-                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     @ParameterizedTest
@@ -300,7 +303,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
 
         // When / Then
         assertThatThrownBy(() -> validatedService.deleteReview(reviewId))
-                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     @Test
@@ -322,7 +325,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         Review review = buildReview(REVIEW_ID, platform, List.of(buildWord(NEW)));
 
         given(reviewRepository.findById(REVIEW_ID)).willReturn(Optional.of(review));
-        given(wordDataService.getAllWordDataIdByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(List.of(1, 2, 3));
+        given(wordDataService.getAllWordDataIdByWordPackIdAndPlatform(WORD_PACK_ID, platform)).willReturn(List.of(1, 2, 3));
         given(wordService.countByUserIdAndWordData_IdInAndStatus(USER_ID, List.of(1, 2, 3), NEW)).willReturn(1);
         given(wordService.countByUserIdAndWordData_IdInAndStatus(USER_ID, List.of(1, 2, 3), IN_REVIEW)).willReturn(2);
         given(wordService.countByUserIdAndWordData_IdInAndStatus(USER_ID, List.of(1, 2, 3), KNOWN)).willReturn(3);
@@ -332,7 +335,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
 
         // Then
         assertThat(actual.reviewId()).isEqualTo(REVIEW_ID);
-        assertThat(actual.wordPackName()).isEqualTo(WORD_PACK_NAME);
+        assertThat(actual.wordPackId()).isEqualTo(WORD_PACK_ID);
         assertThat(actual.wordsNew()).isEqualTo(1);
         assertThat(actual.wordsInReview()).isEqualTo(2);
         assertThat(actual.wordsKnown()).isEqualTo(3);
@@ -346,7 +349,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
 
         // When / Then
         assertThatThrownBy(() -> validatedService.getReviewStatistics(reviewId))
-                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     @ParameterizedTest
@@ -369,7 +372,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         mockUser(USER_ID, roleName);
         given(roleService.getPlatformByRoleName(roleName)).willReturn(platform);
         ReviewDto reviewDto = buildReviewDto(REVIEW_ID, platform, 1, 2);
-        WordPack wordPack = new WordPack(WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform);
+        WordPack wordPack = new WordPack(WORD_PACK_ID, WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform, null);
         Word newWord = buildWord(NEW);
         Word reviewWord = buildWord(IN_REVIEW);
         reviewWord.setOccurrence((short) 2);
@@ -378,7 +381,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         knownWord.setOccurrence((short) 1);
         knownWord.setCurrentStreak((short) 1);
 
-        given(wordDataService.getAllWordDataIdByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(List.of(1, 2));
+        given(wordDataService.getAllWordDataIdByWordPackIdAndPlatform(WORD_PACK_ID, platform)).willReturn(List.of(1, 2));
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusNewRandomLimited(USER_ID, List.of(1, 2), 1)).willReturn(List.of(newWord));
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusInReviewAndPeriodBetweenOrderedDescLimited(USER_ID, List.of(1, 2), 2)).willReturn(List.of(reviewWord));
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusKnownAndPeriodBetweenOrderedAscLimited(USER_ID, List.of(1, 2), 1)).willReturn(List.of(knownWord));
@@ -400,7 +403,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
 
         // When / Then
         assertThatThrownBy(() -> validatedService.generateListOfWordsForReview(wordPack, reviewDto))
-                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     @ParameterizedTest
@@ -410,9 +413,9 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         mockUser(USER_ID, roleName);
         given(roleService.getPlatformByRoleName(roleName)).willReturn(platform);
         ReviewDto reviewDto = buildReviewDto(REVIEW_ID, platform, 1, 2);
-        WordPack wordPack = new WordPack(WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform);
+        WordPack wordPack = new WordPack(WORD_PACK_ID, WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform, null);
 
-        given(wordDataService.getAllWordDataIdByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(List.of());
+        given(wordDataService.getAllWordDataIdByWordPackIdAndPlatform(WORD_PACK_ID, platform)).willReturn(List.of());
 
         // When / Then
         assertThatThrownBy(() -> underTest.generateListOfWordsForReview(wordPack, reviewDto))
@@ -430,8 +433,8 @@ class ReviewServiceImplTest extends AbstractUnitTest {
 
         given(reviewRepository.findById(REVIEW_ID)).willReturn(Optional.of(review));
         given(reviewMapper.toDto(review)).willReturn(dto);
-        given(wordDataService.existsByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(true);
-        given(wordDataService.getAllWordDataIdByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(List.of(1, 2));
+        given(wordDataService.existsByWordPackIdAndPlatform(WORD_PACK_ID, platform)).willReturn(true);
+        given(wordDataService.getAllWordDataIdByWordPackIdAndPlatform(WORD_PACK_ID, platform)).willReturn(List.of(1, 2));
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusNewRandomLimited(USER_ID, List.of(1, 2), 1)).willReturn(List.of(buildWord(NEW)));
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusInReviewAndPeriodBetweenOrderedDescLimited(USER_ID, List.of(1, 2), 2)).willReturn(List.of());
         given(wordService.getAllByUserIdAndWordDataIdInAndStatusKnownAndPeriodBetweenOrderedAscLimited(USER_ID, List.of(1, 2), 2)).willReturn(List.of());
@@ -452,7 +455,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         Review review = buildReview(REVIEW_ID, platform, List.of(buildWord(NEW)));
 
         given(reviewRepository.findById(REVIEW_ID)).willReturn(Optional.of(review));
-        given(wordDataService.existsByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(false);
+        given(wordDataService.existsByWordPackIdAndPlatform(WORD_PACK_ID, platform)).willReturn(false);
 
         // When
         Optional<ReviewDto> actual = underTest.refreshReview(REVIEW_ID);
@@ -472,7 +475,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
 
         // When / Then
         assertThatThrownBy(() -> validatedService.refreshReview(reviewId))
-                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     @Test
@@ -554,7 +557,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
 
         // When / Then
         assertThatThrownBy(() -> validatedService.processReviewAction(reviewId, true))
-                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     @Test
@@ -631,7 +634,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
 
         // When / Then
         assertThatThrownBy(() -> validatedService.deleteAllByUserIdAndPlatform(userId, platform))
-                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     @ParameterizedTest
@@ -640,10 +643,10 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         // Given
         mockUser(USER_ID, roleName);
         Review review = buildReview(REVIEW_ID, platform, List.of(buildWord(NEW)));
-        given(reviewRepository.findByUserIdAndWordPack_Name(USER_ID, WORD_PACK_NAME)).willReturn(Optional.of(review));
+        given(reviewRepository.findByUserIdAndWordPack_Id(USER_ID, WORD_PACK_ID)).willReturn(Optional.of(review));
 
         // When
-        underTest.deleteReviewIfExistsForWordPack(WORD_PACK_NAME);
+        underTest.deleteReviewIfExistsForWordPack(WORD_PACK_ID);
 
         // Then
         verify(reviewRepository).delete(review);
@@ -651,13 +654,58 @@ class ReviewServiceImplTest extends AbstractUnitTest {
 
     @ParameterizedTest
     @MethodSource("my.project.dailylexika.flashcard.service.ReviewServiceImplTest$TestDataSource#deleteReviewIfExistsForWordPack_throwIfInvalidInput")
-    void deleteReviewIfExistsForWordPack_deleteInvalidInputIf(String wordPackName) {
+    void deleteReviewIfExistsForWordPack_deleteInvalidInputIf(Long wordPackId) {
         // Given
         ReviewService validatedService = createValidatedService();
 
         // When / Then
-        assertThatThrownBy(() -> validatedService.deleteReviewIfExistsForWordPack(wordPackName))
-                .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
+        assertThatThrownBy(() -> validatedService.deleteReviewIfExistsForWordPack(wordPackId))
+                .isInstanceOf(ConstraintViolationException.class);
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.ReviewServiceImplTest$TestDataSource#deleteAllByWordPackId_deletesAll")
+    void deleteAllByWordPackId_deletesAll(Platform platform) {
+        // Given
+        List<Review> reviews = List.of(buildReview(REVIEW_ID, platform, List.of(buildWord(NEW))));
+        given(reviewRepository.findByWordPack_Id(WORD_PACK_ID)).willReturn(reviews);
+
+        // When
+        underTest.deleteAllByWordPackId(WORD_PACK_ID);
+
+        // Then
+        verify(reviewRepository).deleteAll(reviews);
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.ReviewServiceImplTest$TestDataSource#deleteAllByWordPackId_throwIfInvalidInput")
+    void deleteAllByWordPackId_throwIfInvalidInput(Long wordPackId) {
+        // Given
+        ReviewService validatedService = createValidatedService();
+
+        // When / Then
+        assertThatThrownBy(() -> validatedService.deleteAllByWordPackId(wordPackId))
+                .isInstanceOf(ConstraintViolationException.class);
+    }
+
+    @Test
+    void deleteReviewWordLinksByWordDataId_deletesLinks() {
+        // When
+        underTest.deleteReviewWordLinksByWordDataId(WORD_DATA_ID);
+
+        // Then
+        verify(reviewRepository).deleteReviewWordLinksByWordDataId(WORD_DATA_ID);
+    }
+
+    @ParameterizedTest
+    @MethodSource("my.project.dailylexika.flashcard.service.ReviewServiceImplTest$TestDataSource#deleteReviewWordLinksByWordDataId_throwIfInvalidInput")
+    void deleteReviewWordLinksByWordDataId_throwIfInvalidInput(Integer wordDataId) {
+        // Given
+        ReviewService validatedService = createValidatedService();
+
+        // When / Then
+        assertThatThrownBy(() -> validatedService.deleteReviewWordLinksByWordDataId(wordDataId))
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     private void mockUser(Integer id, RoleName roleName) {
@@ -676,23 +724,18 @@ class ReviewServiceImplTest extends AbstractUnitTest {
     }
 
     private Review buildReview(Long id, Platform platform, List<Word> listOfWords) {
-        Review review = new Review(USER_ID, 1, 2, new WordPack(WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform), listOfWords, listOfWords.size());
+        Review review = new Review(USER_ID, 1, 2, new WordPack(WORD_PACK_ID, WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform, null), listOfWords, listOfWords.size());
         review.setId(id);
         review.setDateGenerated(DateUtil.nowInUtc());
         return review;
     }
 
     private ReviewDto buildReviewDto(Long reviewId, Platform platform, Integer maxNewWords, Integer maxReviewWords) {
-        WordPackDto wordPackDto = new WordPackDto(WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform, null, null, null);
-        return new ReviewDto(reviewId, USER_ID.longValue(), maxNewWords, maxReviewWords, wordPackDto, List.of(), 0, null, null);
+        WordPackUserDto wordPackDto = new WordPackUserDto(WORD_PACK_ID, WORD_PACK_NAME, DESCRIPTION, Category.HSK, platform, null, null, null, null);
+        return new ReviewDto(reviewId, USER_ID.longValue(), maxNewWords, maxReviewWords, WORD_PACK_ID, wordPackDto, List.of(), 0, null, null);
     }
 
     private ReviewService createValidatedService() {
-        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
-        validator.afterPropertiesSet();
-        MethodValidationPostProcessor processor = new MethodValidationPostProcessor();
-        processor.setValidator(validator);
-        processor.afterPropertiesSet();
         ReviewServiceImpl service = new ReviewServiceImpl(
                 reviewRepository,
                 reviewMapper,
@@ -702,7 +745,7 @@ class ReviewServiceImplTest extends AbstractUnitTest {
                 userService,
                 roleService
         );
-        return (ReviewService) processor.postProcessAfterInitialization(service, "reviewService");
+        return ValidationTestSupport.validatedProxy(service, "reviewService", ReviewService.class);
     }
 
     private static class TestDataSource {
@@ -736,14 +779,14 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         }
 
         public static Stream<Arguments> createReview_throwIfInvalidInput() {
-            WordPackDto wordPackDto = new WordPackDto(WORD_PACK_NAME, DESCRIPTION, Category.HSK, ENGLISH, null, null, null);
+            WordPackUserDto wordPackDto = new WordPackUserDto(WORD_PACK_ID, WORD_PACK_NAME, DESCRIPTION, Category.HSK, ENGLISH, null, null, null, null);
             return Stream.of(
                     arguments((Object) null),
-                    arguments(new ReviewDto(null, null, null, 1, wordPackDto, null, null, null, null)),
-                    arguments(new ReviewDto(null, null, -1, 1, wordPackDto, null, null, null, null)),
-                    arguments(new ReviewDto(null, null, 1, null, wordPackDto, null, null, null, null)),
-                    arguments(new ReviewDto(null, null, 1, -1, wordPackDto, null, null, null, null)),
-                    arguments(new ReviewDto(null, null, 1, 1, null, null, null, null, null))
+                    arguments(new ReviewDto(null, null, null, 1, WORD_PACK_ID, wordPackDto, null, null, null, null)),
+                    arguments(new ReviewDto(null, null, -1, 1, WORD_PACK_ID, wordPackDto, null, null, null, null)),
+                    arguments(new ReviewDto(null, null, 1, null, WORD_PACK_ID, wordPackDto, null, null, null, null)),
+                    arguments(new ReviewDto(null, null, 1, -1, WORD_PACK_ID, wordPackDto, null, null, null, null)),
+                    arguments(new ReviewDto(null, null, 1, 1, null, null, null, null, null, null))
             );
         }
 
@@ -762,16 +805,16 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         }
 
         public static Stream<Arguments> updateReview_throwIfInvalidInput() {
-            WordPackDto wordPackDto = new WordPackDto(WORD_PACK_NAME, DESCRIPTION, Category.HSK, ENGLISH, null, null, null);
+            WordPackUserDto wordPackDto = new WordPackUserDto(WORD_PACK_ID, WORD_PACK_NAME, DESCRIPTION, Category.HSK, ENGLISH, null, null, null, null);
             return Stream.of(
                     arguments(null, null),
                     arguments(REVIEW_ID, null),
-                    arguments(null, new ReviewDto(null, null, 1, 1, wordPackDto, null, null, null, null)),
-                    arguments(REVIEW_ID, new ReviewDto(null, null, null, 1, wordPackDto, null, null, null, null)),
-                    arguments(REVIEW_ID, new ReviewDto(null, null, -1, 1, wordPackDto, null, null, null, null)),
-                    arguments(REVIEW_ID, new ReviewDto(null, null, 1, null, wordPackDto, null, null, null, null)),
-                    arguments(REVIEW_ID, new ReviewDto(null, null, 1, -1, wordPackDto, null, null, null, null)),
-                    arguments(REVIEW_ID, new ReviewDto(null, null, 1, 1, null, null, null, null, null))
+                    arguments(null, new ReviewDto(null, null, 1, 1, WORD_PACK_ID, wordPackDto, null, null, null, null)),
+                    arguments(REVIEW_ID, new ReviewDto(null, null, null, 1, WORD_PACK_ID, wordPackDto, null, null, null, null)),
+                    arguments(REVIEW_ID, new ReviewDto(null, null, -1, 1, WORD_PACK_ID, wordPackDto, null, null, null, null)),
+                    arguments(REVIEW_ID, new ReviewDto(null, null, 1, null, WORD_PACK_ID, wordPackDto, null, null, null, null)),
+                    arguments(REVIEW_ID, new ReviewDto(null, null, 1, -1, WORD_PACK_ID, wordPackDto, null, null, null, null)),
+                    arguments(REVIEW_ID, new ReviewDto(null, null, 1, 1, null, null, null, null, null, null))
             );
         }
 
@@ -823,15 +866,15 @@ class ReviewServiceImplTest extends AbstractUnitTest {
         }
 
         public static Stream<Arguments> generateListOfWordsForReview_throwIfInvalidInput() {
-            WordPackDto wordPackDto = new WordPackDto(WORD_PACK_NAME, DESCRIPTION, Category.HSK, ENGLISH, null, null, null);
+            WordPackUserDto wordPackDto = new WordPackUserDto(WORD_PACK_ID, WORD_PACK_NAME, DESCRIPTION, Category.HSK, ENGLISH, null, null, null, null);
             return Stream.of(
-                    arguments(null, new ReviewDto(null, null, 1, 1, wordPackDto, null, null, null, null)),
+                    arguments(null, new ReviewDto(null, null, 1, 1, WORD_PACK_ID, wordPackDto, null, null, null, null)),
                     arguments(new WordPack(), null),
-                    arguments(new WordPack(), new ReviewDto(null, null, null, 1, wordPackDto, null, null, null, null)),
-                    arguments(new WordPack(), new ReviewDto(null, null, -1, 1, wordPackDto, null, null, null, null)),
-                    arguments(new WordPack(), new ReviewDto(null, null, 1, null, wordPackDto, null, null, null, null)),
-                    arguments(new WordPack(), new ReviewDto(null, null, 1, -1, wordPackDto, null, null, null, null)),
-                    arguments(new WordPack(), new ReviewDto(null, null, 1, 1, null, null, null, null, null))
+                    arguments(new WordPack(), new ReviewDto(null, null, null, 1, WORD_PACK_ID, wordPackDto, null, null, null, null)),
+                    arguments(new WordPack(), new ReviewDto(null, null, -1, 1, WORD_PACK_ID, wordPackDto, null, null, null, null)),
+                    arguments(new WordPack(), new ReviewDto(null, null, 1, null, WORD_PACK_ID, wordPackDto, null, null, null, null)),
+                    arguments(new WordPack(), new ReviewDto(null, null, 1, -1, WORD_PACK_ID, wordPackDto, null, null, null, null)),
+                    arguments(new WordPack(), new ReviewDto(null, null, 1, 1, null, null, null, null, null, null))
             );
         }
 
@@ -934,9 +977,26 @@ class ReviewServiceImplTest extends AbstractUnitTest {
 
         public static Stream<Arguments> deleteReviewIfExistsForWordPack_throwIfInvalidInput() {
             return Stream.of(
-                    arguments((Object) null),
-                    arguments(""),
-                    arguments(" ")
+                    arguments((Object) null)
+            );
+        }
+
+        public static Stream<Arguments> deleteAllByWordPackId_deletesAll() {
+            return Stream.of(
+                    arguments(ENGLISH),
+                    arguments(CHINESE)
+            );
+        }
+
+        public static Stream<Arguments> deleteAllByWordPackId_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments((Object) null)
+            );
+        }
+
+        public static Stream<Arguments> deleteReviewWordLinksByWordDataId_throwIfInvalidInput() {
+            return Stream.of(
+                    arguments((Object) null)
             );
         }
     }

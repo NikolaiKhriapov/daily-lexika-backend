@@ -55,11 +55,11 @@ public class WordServiceImpl implements WordService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<WordDto> getPageByWordPackName(String wordPackName, Pageable pageable) {
+    public Page<WordDto> getPageByWordPackId(Long wordPackId, Pageable pageable) {
         UserDto user = userService.getUser();
         Platform platform = roleService.getPlatformByRoleName(user.role());
 
-        List<Integer> wordDataIds = wordDataService.getAllWordDataIdByWordPackNameAndPlatform(wordPackName, platform);
+        List<Integer> wordDataIds = wordDataService.getAllWordDataIdByWordPackIdAndPlatform(wordPackId, platform);
         Page<WordDto> pageOfWords = getByUserIdAndWordDataIdIn(user.id(), wordDataIds, pageable);
 
         return new PageImpl<>(pageOfWords.getContent(), pageable, pageOfWords.getTotalElements());

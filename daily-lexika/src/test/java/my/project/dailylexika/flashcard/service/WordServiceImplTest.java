@@ -16,6 +16,7 @@ import my.project.library.dailylexika.enumerations.RoleName;
 import my.project.library.dailylexika.enumerations.Status;
 import my.project.library.util.datetime.DateUtil;
 import my.project.library.util.exception.ResourceNotFoundException;
+import my.project.dailylexika.util.ValidationTestSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,8 +28,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -53,7 +52,7 @@ class WordServiceImplTest extends AbstractUnitTest {
     private static final Integer WORD_DATA_ID = 10;
     private static final Integer WORD_DATA_ID_2 = 20;
     private static final Integer WORD_DATA_ID_3 = 30;
-    private static final String WORD_PACK_NAME = "HSK_1";
+    private static final Long WORD_PACK_ID = 1L;
 
     private WordServiceImpl underTest;
     @Mock
@@ -153,8 +152,8 @@ class WordServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.flashcard.service.WordServiceImplTest$TestDataSource#getPageByWordPackName_returnsPage")
-    void getPageByWordPackName_returnsPage(Platform platform, RoleName roleName) {
+    @MethodSource("my.project.dailylexika.flashcard.service.WordServiceImplTest$TestDataSource#getPageByWordPackId_returnsPage")
+    void getPageByWordPackId_returnsPage(Platform platform, RoleName roleName) {
         // Given
         UserDto user = mockUser(USER_ID, roleName);
         given(roleService.getPlatformByRoleName(roleName)).willReturn(platform);
@@ -165,13 +164,13 @@ class WordServiceImplTest extends AbstractUnitTest {
         WordDto dto1 = new WordDto(1L, user.id(), null, Status.NEW, (short) 0, (short) 0, (short) 0, word1.getDateOfLastOccurrence());
         WordDto dto2 = new WordDto(2L, user.id(), null, Status.NEW, (short) 0, (short) 1, (short) 0, word2.getDateOfLastOccurrence());
 
-        given(wordDataService.getAllWordDataIdByWordPackNameAndPlatform(WORD_PACK_NAME, platform)).willReturn(List.of(WORD_DATA_ID, WORD_DATA_ID_2));
+        given(wordDataService.getAllWordDataIdByWordPackIdAndPlatform(WORD_PACK_ID, platform)).willReturn(List.of(WORD_DATA_ID, WORD_DATA_ID_2));
         given(wordRepository.findByUserIdAndWordDataIdIn(user.id(), List.of(WORD_DATA_ID, WORD_DATA_ID_2), pageable)).willReturn(page);
         given(wordMapper.toDto(word1)).willReturn(dto1);
         given(wordMapper.toDto(word2)).willReturn(dto2);
 
         // When
-        Page<WordDto> actual = underTest.getPageByWordPackName(WORD_PACK_NAME, pageable);
+        Page<WordDto> actual = underTest.getPageByWordPackId(WORD_PACK_ID, pageable);
 
         // Then
         assertThat(actual.getContent()).containsExactly(dto1, dto2);
@@ -179,13 +178,13 @@ class WordServiceImplTest extends AbstractUnitTest {
     }
 
     @ParameterizedTest
-    @MethodSource("my.project.dailylexika.flashcard.service.WordServiceImplTest$TestDataSource#getPageByWordPackName_throwIfInvalidInput")
-    void getPageByWordPackName_throwIfInvalidInput(String wordPackName, Pageable pageable) {
+    @MethodSource("my.project.dailylexika.flashcard.service.WordServiceImplTest$TestDataSource#getPageByWordPackId_throwIfInvalidInput")
+    void getPageByWordPackId_throwIfInvalidInput(Long wordPackId, Pageable pageable) {
         // Given
         WordService validatedService = createValidatedService();
 
         // When / Then
-        assertThatThrownBy(() -> validatedService.getPageByWordPackName(wordPackName, pageable))
+        assertThatThrownBy(() -> validatedService.getPageByWordPackId(wordPackId, pageable))
                 .isInstanceOf(jakarta.validation.ConstraintViolationException.class);
     }
 
@@ -558,11 +557,6 @@ class WordServiceImplTest extends AbstractUnitTest {
     }
 
     private WordService createValidatedService() {
-        LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
-        validator.afterPropertiesSet();
-        MethodValidationPostProcessor processor = new MethodValidationPostProcessor();
-        processor.setValidator(validator);
-        processor.afterPropertiesSet();
         WordServiceImpl service = new WordServiceImpl(
                 wordRepository,
                 wordMapper,
@@ -570,7 +564,7 @@ class WordServiceImplTest extends AbstractUnitTest {
                 userService,
                 roleService
         );
-        return (WordService) processor.postProcessAfterInitialization(service, "wordService");
+        return ValidationTestSupport.validatedProxy(service, "wordService", WordService.class);
     }
 
     private static class TestDataSource {
@@ -606,23 +600,19 @@ class WordServiceImplTest extends AbstractUnitTest {
             );
         }
 
-        public static Stream<Arguments> getPageByWordPackName_returnsPage() {
+        public static Stream<Arguments> getPageByWordPackId_returnsPage() {
             return Stream.of(
                     arguments(ENGLISH, USER_ENGLISH),
                     arguments(CHINESE, USER_CHINESE)
             );
         }
 
-        public static Stream<Arguments> getPageByWordPackName_throwIfInvalidInput() {
+        public static Stream<Arguments> getPageByWordPackId_throwIfInvalidInput() {
             Pageable pageable = PageRequest.of(0, 1);
             return Stream.of(
                     arguments(null, null),
                     arguments(null, pageable),
-                    arguments("", pageable),
-                    arguments(" ", pageable),
-                    arguments("\t", pageable),
-                    arguments("\n", pageable),
-                    arguments(WORD_PACK_NAME, null)
+                    arguments(WORD_PACK_ID, null)
             );
         }
 

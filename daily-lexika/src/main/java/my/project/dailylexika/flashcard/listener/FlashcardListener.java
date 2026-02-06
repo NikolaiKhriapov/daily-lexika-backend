@@ -1,15 +1,15 @@
 package my.project.dailylexika.flashcard.listener;
 
 import lombok.AllArgsConstructor;
-import my.project.dailylexika.flashcard.model.entities.WordData;
-import my.project.dailylexika.flashcard.model.entities.WordPack;
 import my.project.dailylexika.flashcard.service.ReviewService;
 import my.project.dailylexika.flashcard.service.WordDataService;
 import my.project.dailylexika.flashcard.service.WordPackService;
 import my.project.dailylexika.flashcard.service.WordService;
-import my.project.library.dailylexika.events.flashcard.CustomWordPackToBeDeletedEvent;
+import my.project.library.dailylexika.events.flashcard.WordDataToBeDeletedEvent;
+import my.project.library.dailylexika.events.flashcard.WordPackToBeDeletedEvent;
 import my.project.library.dailylexika.events.user.AccountDeletedEvent;
 import my.project.library.dailylexika.events.user.AccountRegisteredEvent;
+import my.project.library.dailylexika.enumerations.Platform;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,16 +41,24 @@ public class FlashcardListener {
 
     @EventListener
     @Transactional
-    public void on(CustomWordPackToBeDeletedEvent event) {
-        WordPack wordPack = wordPackService.getByName(event.wordPackName());
+    public void on(WordDataToBeDeletedEvent event) {
+        reviewService.deleteReviewWordLinksByWordDataId(event.wordDataId());
+        wordService.deleteAllByWordDataId(List.of(event.wordDataId()));
+    }
 
-        reviewService.deleteReviewIfExistsForWordPack(event.wordPackName());
+    @EventListener
+    @Transactional
+    public void on(WordPackToBeDeletedEvent event) {
+        handleWordPackDeletion(event.wordPackId(), event.platform());
+    }
 
-        List<WordData> listOfWordData = wordDataService.getAllByWordPackNameAndPlatform(wordPack.getName(), event.platform());
-        listOfWordData.forEach(wordData -> {
-            List<WordPack> listOfWordPacks = wordData.getListOfWordPacks();
-            listOfWordPacks.remove(wordPack);
-            wordData.setListOfWordPacks(listOfWordPacks);
-        });
+    private void handleWordPackDeletion(Long wordPackId, Platform platform) {
+        boolean isWordPackCustom = wordPackService.getById(wordPackId).getUserId() != null;
+        if (isWordPackCustom) {
+            reviewService.deleteReviewIfExistsForWordPack(wordPackId);
+        } else {
+            reviewService.deleteAllByWordPackId(wordPackId);
+        }
+        wordDataService.removeWordPackReferences(wordPackId, platform);
     }
 }

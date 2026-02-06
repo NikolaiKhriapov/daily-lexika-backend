@@ -39,11 +39,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        SecurityContextHolder.clearContext();
+
         String jwt = authHeader.substring(7);
         String subject = jwtService.extractUsername(jwt);
         String roleName = jwtService.extractRoleName(jwt);
 
-        if (subject != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (subject != null) {
             if (roleName.startsWith("USER")) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(subject);
                 if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {

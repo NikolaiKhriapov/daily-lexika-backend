@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import my.project.library.dailylexika.enumerations.Language;
 import my.project.library.dailylexika.enumerations.RoleName;
 
-import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.Set;
 
@@ -28,5 +27,5 @@ public record UserDto(
 
         OffsetDateTime dateOfRegistration
 
-) implements Serializable {
+) {
 }
