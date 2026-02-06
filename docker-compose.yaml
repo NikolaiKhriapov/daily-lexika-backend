@@ -23,11 +23,10 @@ services:
       - '5432:5432'
 
   admin:
-    build:
-      context: admin
     platform: linux/amd64
     container_name: nikolai-backend-admin
-#    image: kolyakhryapov/nikolai-backend-admin:latest
+    image: docker.io/${DOCKERHUB_NAMESPACE}/nikolai-backend-admin:${APP_TAG}
+    profiles: ["admin"]
     restart: always
     depends_on:
       - db
@@ -44,11 +43,10 @@ services:
 
 
   daily-lexika:
-    build:
-      context: daily-lexika
     platform: linux/amd64
     container_name: nikolai-backend-daily-lexika
-#    image: kolyakhryapov/nikolai-backend-daily-lexika:latest
+    image: docker.io/${DOCKERHUB_NAMESPACE}/nikolai-backend-daily-lexika:${APP_TAG}
+    profiles: ["daily-lexika"]
     restart: always
     depends_on:
       - db
