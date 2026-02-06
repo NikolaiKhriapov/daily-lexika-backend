@@ -82,6 +82,8 @@ jobs:
     needs: build_push
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Prepare deploy directory
         uses: appleboy/ssh-action@v1.0.3
         env:
