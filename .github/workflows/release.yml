@@ -9,8 +9,8 @@ on:
       service:
         description: Service to deploy
         type: choice
-        options: [admin, daily-lexika]
-        default: admin
+        options: [admin, daily-lexika, both]
+        default: both
 
 permissions:
   contents: read
@@ -127,7 +127,7 @@ jobs:
           script: |
             set -euo pipefail
 
-            DEPLOY_PATH="${DEPLOY_PATH:-/opt/backend}"
+            DEPLOY_PATH="${DEPLOY_PATH}"
             cd "${DEPLOY_PATH}"
 
             if [[ -n "${DOCKERHUB_USERNAME:-}" && -n "${DOCKERHUB_TOKEN:-}" ]]; then
@@ -140,8 +140,13 @@ jobs:
               APP_TAG="sha-${GITHUB_SHA::7}"
             fi
 
-            DEFAULT_SERVICE="${DEFAULT_SERVICE:-admin}"
-            COMPOSE_PROFILES="${SERVICE_INPUT:-$DEFAULT_SERVICE}"
+            DEFAULT_SERVICE="${DEFAULT_SERVICE}"
+            SERVICE_INPUT="${SERVICE_INPUT:-$DEFAULT_SERVICE}"
+            if [[ "${SERVICE_INPUT}" == "both" ]]; then
+              COMPOSE_PROFILES="admin,daily-lexika"
+            else
+              COMPOSE_PROFILES="${SERVICE_INPUT}"
+            fi
 
             export APP_TAG COMPOSE_PROFILES DOCKERHUB_NAMESPACE
             docker compose pull
