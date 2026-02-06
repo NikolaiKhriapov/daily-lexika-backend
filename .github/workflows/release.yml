@@ -16,9 +16,9 @@ permissions:
   contents: read
 
 env:
-  DOCKERHUB_NAMESPACE: ${{ vars.DOCKERHUB_NAMESPACE || 'kolyakhryapov' }}
-  DEFAULT_SERVICE: ${{ vars.DEFAULT_SERVICE || 'admin' }}
-  DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/opt/nikolai-backend' }}
+  DOCKERHUB_NAMESPACE: ${{ vars.DOCKERHUB_NAMESPACE }}
+  DEFAULT_SERVICE: ${{ vars.DEFAULT_SERVICE }}
+  DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
 
 jobs:
   test:
@@ -125,7 +125,7 @@ jobs:
           script: |
             set -euo pipefail
 
-            DEPLOY_PATH="${DEPLOY_PATH:-/opt/nikolai-backend}"
+            DEPLOY_PATH="${DEPLOY_PATH:-/opt/backend}"
             cd "${DEPLOY_PATH}"
 
             if [[ -n "${DOCKERHUB_USERNAME:-}" && -n "${DOCKERHUB_TOKEN:-}" ]]; then
