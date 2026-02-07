@@ -1,14 +1,20 @@
 services:
-  db:
-    ports:
-      - "5432:5432"
-
   admin:
+    image: nikolai-backend-admin:local
+    platform: linux/amd64
+    pull_policy: never
     build:
       context: .
-      dockerfile: admin/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        APP_NAME: admin
 
   daily-lexika:
+    image: nikolai-backend-daily-lexika:local
+    platform: linux/amd64
+    pull_policy: never
     build:
       context: .
-      dockerfile: daily-lexika/Dockerfile
+      dockerfile: ./Dockerfile
+      args:
+        APP_NAME: daily-lexika
