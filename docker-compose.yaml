@@ -22,7 +22,6 @@ services:
       - "127.0.0.1:5432:5432"
 
   admin:
-    platform: linux/amd64
     container_name: nikolai-backend-admin
     image: docker.io/${DOCKERHUB_NAMESPACE}/nikolai-backend-admin:${APP_TAG}
     restart: always
@@ -41,7 +40,6 @@ services:
 
 
   daily-lexika:
-    platform: linux/amd64
     container_name: nikolai-backend-daily-lexika
     image: docker.io/${DOCKERHUB_NAMESPACE}/nikolai-backend-daily-lexika:${APP_TAG}
     restart: always
