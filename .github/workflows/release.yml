@@ -62,7 +62,9 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ${{ matrix.service }}/Dockerfile
+          file: Dockerfile
+          build-args: |
+            APP_NAME=${{ matrix.service }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -155,4 +157,4 @@ jobs:
               sleep $((i * 5))
             done
             docker compose up -d --remove-orphans
-            docker image prune -f --filter "until=168h"
+            docker image prune -af
